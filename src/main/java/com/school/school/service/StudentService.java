@@ -11,7 +11,9 @@ public interface StudentService {
 
     Student findStudentById(Long id);
 
+    Student findStudentByEmail(String email);
+
     Student updateStudent(Long id, StudentDTO updatedStudent);
 
-    void deleteStudent(Long id);
+    boolean deleteStudent(Long id);
 }

@@ -15,37 +15,50 @@ import org.springframework.stereotype.Service;
 @Primary
 public class StudentServiceImpl implements StudentService {
 
-    private final StudentRepository studentRepository;
+    private final StudentRepository repository;
 
-    private final StudentMapper studentMapper;
+    private final StudentMapper mapper;
+
     @Override
     public List<Student> findAllStudents() {
-        return studentRepository.findAll();
+        return repository.findAll();
     }
 
     @Override
-    public Student createStudent(final StudentDTO studentDTO) {
-        Student student = studentMapper.toEntity(studentDTO);
-        studentRepository.save(student);
+    public Student createStudent(final StudentDTO dto) {
+        Student student = mapper.toEntity(dto);
+        repository.save(student);
         return student;
     }
 
     @Override
     public Student findStudentById(Long id) {
-        return studentRepository.findById(id).orElse(null);
+        return repository.findById(id)
+                .orElse(null);
     }
 
     @Override
-    public void deleteStudent(Long id) {
-        studentRepository.deleteById(id);
+    public Student findStudentByEmail(String email) {
+        return repository.findByEmail(email)
+                .orElse(null);
+    }
+
+    @Override
+    public boolean deleteStudent(Long id) {
+        return repository.findById(id)
+                .map(user -> {
+                    repository.delete(user);
+                    return true;
+                })
+                .orElse(false);
     }
 
     @Override
     public Student updateStudent(Long id, StudentDTO updatedStudent) {
-        Student existingStudent = studentRepository.findById(id)
+        Student existingStudent = repository.findById(id)
                 .orElse(new Student());
-        studentMapper.updateEntity(existingStudent, updatedStudent);
-        studentRepository.save(existingStudent);
+        mapper.updateEntity(existingStudent, updatedStudent);
+        repository.save(existingStudent);
         return existingStudent;
     }
 }

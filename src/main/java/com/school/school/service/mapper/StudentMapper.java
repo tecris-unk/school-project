@@ -10,10 +10,25 @@ public final class StudentMapper {
 
     @NotNull
     public StudentDTO toDTO(final Student student) {
-        return new StudentDTO(student);
+        if (student == null) {
+           return null;
+        }
+
+        return new StudentDTO(
+                student.getId(),
+                student.getFirstName(),
+                student.getLastName(),
+                student.getGrade(),
+                student.getGender().name(),
+                student.getEmail()
+        );
     }
 
     public Student toEntity(final StudentDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
         Student student = new Student();
         // ID НЕ ТРОГАЕМ ОНО ГЕНЕРИТСЯ САМО
         student.setFirstName(dto.getFirstName());
@@ -21,6 +36,7 @@ public final class StudentMapper {
         student.setGrade(dto.getGrade());
         student.setGender(Student.Gender.valueOf(dto.getGender()));
         student.setEmail(dto.getEmail());
+
         return student;
     }
 
@@ -28,5 +44,7 @@ public final class StudentMapper {
         student.setFirstName(dto.getFirstName());
         student.setLastName(dto.getLastName());
         student.setGrade(dto.getGrade());
+        student.setGender(Student.Gender.valueOf(dto.getGender()));
+        student.setEmail(dto.getEmail());
     }
 }

@@ -1,7 +1,6 @@
 package com.school.school.service.dto;
 
-import com.school.school.model.Student;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,23 +12,20 @@ public class StudentDTO {
 
     private Long id;
 
+    @NotBlank
     private String firstName;
 
+    @NotBlank
     private String lastName;
 
+    @Min(1)
+    @Max(11)
     private int grade;
 
+    @NotBlank
     private String gender;
 
+    @NotBlank
+    @Email
     private String email;
-
-    @NotNull
-    public StudentDTO(Student student) {
-        this.id = student.getId();
-        this.firstName = student.getFirstName();
-        this.lastName = student.getLastName();
-        this.grade = student.getGrade();
-        this.gender = student.getGender().name();
-        this.email = student.getEmail();
-    }
 }

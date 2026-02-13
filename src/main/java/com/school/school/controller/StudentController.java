@@ -26,7 +26,7 @@ public final class StudentController {
     ) {
         Student student = service.findStudentById(id);
         if (student == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(mapper.toDTO(student));
     }
@@ -35,7 +35,7 @@ public final class StudentController {
     public ResponseEntity<@NonNull List<StudentDTO>> getAllStudents() {
         List<Student> students = service.findAllStudents();
         if (students.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         List<StudentDTO> dtoList = students.stream()
                 .map(mapper::toDTO)
@@ -72,7 +72,7 @@ public final class StudentController {
             @RequestBody final StudentDTO updatedStudent) {
         Student student = service.updateStudent(id, updatedStudent);
         if (student == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(mapper.toDTO(student));
     }
@@ -81,7 +81,7 @@ public final class StudentController {
     public ResponseEntity<Void> deleteStudent(@PathVariable final Long id) {
         boolean isDeleted = service.deleteStudent(id);
         if (!isDeleted) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.noContent().build();
     }

@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudentDTO {
-
+    public static final int MIN_GRADE = 1;
+    public static final int MAX_GRADE = 11;
     private Long id;
 
     @NotBlank
@@ -18,8 +19,8 @@ public class StudentDTO {
     @NotBlank
     private String lastName;
 
-    @Min(1)
-    @Max(11)
+    @Min(MIN_GRADE)
+    @Max(MAX_GRADE)
     private int grade;
 
     @NotBlank

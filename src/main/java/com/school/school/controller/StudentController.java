@@ -6,7 +6,6 @@ import com.school.school.service.dto.StudentDTO;
 import com.school.school.service.mapper.StudentMapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +20,7 @@ public final class StudentController {
     private final StudentMapper mapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<@NonNull StudentDTO> findById(
-            @PathVariable final Long id
-    ) {
+    public ResponseEntity<StudentDTO> findById(@PathVariable final Long id) {
         Student student = service.findStudentById(id);
         if (student == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -32,7 +29,7 @@ public final class StudentController {
     }
 
     @GetMapping()
-    public ResponseEntity<@NonNull List<StudentDTO>> getAllStudents() {
+    public ResponseEntity<List<StudentDTO>> getAllStudents() {
         List<Student> students = service.findAllStudents();
         if (students.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -45,8 +42,7 @@ public final class StudentController {
 
     @GetMapping("/by-email")
     public ResponseEntity<StudentDTO> findByEmail(
-            @RequestParam final String email
-    ) {
+            @RequestParam final String email) {
         Student student = service.findStudentByEmail(email);
         if (student == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -55,9 +51,8 @@ public final class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<@NonNull StudentDTO> addStudent(
-            @RequestBody final StudentDTO studentDTO
-    ) {
+    public ResponseEntity<StudentDTO> addStudent(
+            @RequestBody final StudentDTO studentDTO) {
         Student student = service.createStudent(studentDTO);
         if (student == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -67,7 +62,7 @@ public final class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<@NonNull StudentDTO> updateStudent(
+    public ResponseEntity<StudentDTO> updateStudent(
             @PathVariable final Long id,
             @RequestBody final StudentDTO updatedStudent) {
         Student student = service.updateStudent(id, updatedStudent);

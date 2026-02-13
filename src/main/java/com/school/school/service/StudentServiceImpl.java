@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 @Primary
-public class StudentServiceImpl implements StudentService {
+public final class StudentServiceImpl implements StudentService {
 
     private final StudentRepository repository;
 
@@ -32,19 +32,19 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student findStudentById(Long id) {
+    public Student findStudentById(final Long id) {
         return repository.findById(id)
                 .orElse(null);
     }
 
     @Override
-    public Student findStudentByEmail(String email) {
+    public Student findStudentByEmail(final String email) {
         return repository.findByEmail(email)
                 .orElse(null);
     }
 
     @Override
-    public boolean deleteStudent(Long id) {
+    public boolean deleteStudent(final Long id) {
         return repository.findById(id)
                 .map(user -> {
                     repository.delete(user);
@@ -54,7 +54,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student updateStudent(Long id, StudentDTO updatedStudent) {
+    public Student updateStudent(
+            final Long id,
+            final StudentDTO updatedStudent) {
         Student existingStudent = repository.findById(id)
                 .orElse(new Student());
         mapper.updateEntity(existingStudent, updatedStudent);

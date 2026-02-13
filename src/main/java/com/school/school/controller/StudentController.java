@@ -45,7 +45,7 @@ public final class StudentController {
 
     @GetMapping("/by-email")
     public ResponseEntity<StudentDTO> findByEmail(
-            @RequestParam String email
+            @RequestParam final String email
     ) {
         Student student = service.findStudentByEmail(email);
         if (student == null) {
@@ -55,10 +55,13 @@ public final class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<@NonNull StudentDTO> addStudent(@RequestBody final StudentDTO studentDTO) {
+    public ResponseEntity<@NonNull StudentDTO> addStudent(
+            @RequestBody final StudentDTO studentDTO
+    ) {
         Student student = service.createStudent(studentDTO);
         if (student == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
         return ResponseEntity.ok(mapper.toDTO(student));
     }

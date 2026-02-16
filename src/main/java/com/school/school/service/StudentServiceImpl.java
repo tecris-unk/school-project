@@ -1,9 +1,14 @@
 package com.school.school.service;
 
+import com.school.school.model.Grade;
+import com.school.school.model.Subject;
+import com.school.school.repository.GradeRepository;
 import com.school.school.repository.StudentRepository;
 import com.school.school.model.Student;
+import com.school.school.repository.SubjectRepository;
 import com.school.school.service.mapper.StudentMapper;
 import com.school.school.service.dto.StudentDTO;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import java.util.List;
 import org.springframework.context.annotation.Primary;
@@ -16,6 +21,10 @@ import org.springframework.stereotype.Service;
 public final class StudentServiceImpl implements StudentService {
 
     private final StudentRepository repository;
+
+    private final SubjectRepository subjectRepository;
+
+    private final GradeRepository gradeRepository;
 
     private final StudentMapper mapper;
 
@@ -62,5 +71,17 @@ public final class StudentServiceImpl implements StudentService {
         mapper.updateEntity(existingStudent, updatedStudent);
         repository.save(existingStudent);
         return existingStudent;
+    }
+
+    @Transactional
+    public void saveStudentWithGradesWithTransaction(Student student, List<Grade> grades) {
+        repository.save(student);
+        for (Grade grade : grades) {
+            grade.setStudent(student);
+            Subject subject = subjectRepository.findById(grade.getSubject().getId())
+                    .orElseThrow(() -> new RuntimeException("Subject not found"));
+            grade.setSubject(subject);
+            gradeRepository.save(grade);
+        }
     }
 }

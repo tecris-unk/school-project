@@ -18,5 +18,5 @@ public interface StudentService {
 
     boolean deleteStudent(Long id);
 
-    public void saveStudentWithGradesWithTransaction(Student student, List<Grade> grades);
+    void saveStudentWithGradesWithTransaction(Student student, List<Grade> grades);
 }

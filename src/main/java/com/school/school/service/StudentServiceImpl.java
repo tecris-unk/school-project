@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 @Primary
-public final class StudentServiceImpl implements StudentService {
+public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository repository;
 

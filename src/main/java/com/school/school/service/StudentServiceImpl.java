@@ -74,7 +74,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Transactional
-    public void saveStudentWithGradesWithTransaction(Student student, List<Grade> grades) {
+    public void saveStudentWithGradesWithTransaction(
+            Student student,
+            List<Grade> grades) {
         repository.save(student);
         for (Grade grade : grades) {
             grade.setStudent(student);

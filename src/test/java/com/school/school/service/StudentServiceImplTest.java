@@ -8,10 +8,10 @@ import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.StudentDTO;
 import com.school.school.service.mapper.StudentMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,22 +33,26 @@ class StudentServiceImplTest {
     @Mock
     private GradeRepository gradeRepository;
 
-    @Mock
-    private StudentMapper mapper;
-
-    @InjectMocks
     private StudentServiceImpl service;
+
+    @BeforeEach
+    void setUp() {
+        service = new StudentServiceImpl(repository, subjectRepository, gradeRepository, new StudentMapper());
+    }
 
     @Test
     void createStudentShouldMapAndSaveEntity() {
         StudentDTO dto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
-        Student student = new Student();
-        when(mapper.toEntity(dto)).thenReturn(student);
-
         Student result = service.createStudent(dto);
 
-        assertSame(student, result);
-        verify(repository).save(student);
+        assertAll(
+                () -> assertEquals("Ivan", result.getFirstName()),
+                () -> assertEquals("Petrov", result.getLastName()),
+                () -> assertEquals(10, result.getGrade()),
+                () -> assertEquals(Student.Gender.MALE, result.getGender()),
+                () -> assertEquals("ivan@mail.com", result.getEmail())
+        );
+        verify(repository).save(result);
     }
 
     @Test
@@ -74,13 +78,19 @@ class StudentServiceImplTest {
     @Test
     void updateStudentShouldUseExistingEntityIfFound() {
         Student existing = new Student();
-        StudentDTO dto = new StudentDTO();
+        StudentDTO dto = new StudentDTO(null, "New", "Name", 11, "FEMALE", "new@mail.com");
         when(repository.findById(2L)).thenReturn(Optional.of(existing));
 
         Student result = service.updateStudent(2L, dto);
 
         assertSame(existing, result);
-        verify(mapper).updateEntity(existing, dto);
+        assertAll(
+                () -> assertEquals("New", result.getFirstName()),
+                () -> assertEquals("Name", result.getLastName()),
+                () -> assertEquals(11, result.getGrade()),
+                () -> assertEquals(Student.Gender.FEMALE, result.getGender()),
+                () -> assertEquals("new@mail.com", result.getEmail())
+        );
         verify(repository).save(existing);
     }
 

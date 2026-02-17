@@ -58,7 +58,4 @@ class StudentServiceUnitTest {
         // gradeRepository.save не должен вызываться после ошибки, т.к. транзакция прервана
         verify(gradeRepository, never()).save(any(Grade.class));
     }
-
-    // Тесты для CRUD операций (например, создание учителя, предмета и т.д.)
-    // ...
 }

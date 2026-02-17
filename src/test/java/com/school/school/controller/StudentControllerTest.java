@@ -53,7 +53,7 @@ class StudentControllerTest {
     @Test
     void addStudentShouldReturnCreatedDtoBody() throws Exception {
         StudentDTO requestDto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
-        Student saved = new Student(1L, "Ivan", "Petrov", 10, Student.Gender.MALE, "ivan@mail.com");
+        Student saved = new Student(1L, "Ivan", "Petrov", 10, Student.Gender.MALE, "ivan@mail.com", null);
         StudentDTO responseDto = new StudentDTO(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
 
         when(service.createStudent(any(StudentDTO.class))).thenReturn(saved);

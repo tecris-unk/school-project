@@ -33,4 +33,9 @@ public class Student {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "school_class_id")
+    private SchoolClass schoolClass;
+
 }

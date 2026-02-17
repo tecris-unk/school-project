@@ -96,7 +96,7 @@ class StudentServiceImplTest {
 
     @Test
     void saveStudentWithGradesWithTransactionShouldSetStudentAndManagedSubject() {
-        Student student = new Student(11L, "A", "B", 8, Student.Gender.MALE, "a@mail.com");
+        Student student = new Student(11L, "A", "B", 8, Student.Gender.MALE, "a@mail.com", null);
         Subject gradeSubjectRef = new Subject();
         gradeSubjectRef.setId(5L);
 

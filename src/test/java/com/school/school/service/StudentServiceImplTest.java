@@ -130,9 +130,10 @@ class StudentServiceImplTest {
         grade.setSubject(gradeSubjectRef);
 
         when(subjectRepository.findById(404L)).thenReturn(Optional.empty());
+        List<Grade> grades = List.of(grade);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> service.saveStudentWithGradesWithTransaction(student, List.of(grade)));
+                () -> service.saveStudentWithGradesWithTransaction(student, grades));
 
         assertEquals("Subject not found", ex.getMessage());
         verify(gradeRepository, never()).save(any());

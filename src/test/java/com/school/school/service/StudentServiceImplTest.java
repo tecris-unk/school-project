@@ -35,24 +35,11 @@ class StudentServiceImplTest {
 
     private StudentServiceImpl service;
 
+    private StudentMapper mapper;
+
     @BeforeEach
     void setUp() {
         service = new StudentServiceImpl(repository, subjectRepository, gradeRepository, new StudentMapper());
-    }
-
-    @Test
-    void createStudentShouldMapAndSaveEntity() {
-        StudentDTO dto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
-        Student result = service.createStudent(dto);
-
-        assertAll(
-                () -> assertEquals("Ivan", result.getFirstName()),
-                () -> assertEquals("Petrov", result.getLastName()),
-                () -> assertEquals(10, result.getGrade()),
-                () -> assertEquals(Student.Gender.MALE, result.getGender()),
-                () -> assertEquals("ivan@mail.com", result.getEmail())
-        );
-        verify(repository).save(result);
     }
 
     @Test
@@ -95,8 +82,9 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void saveStudentWithGradesWithTransactionShouldSetStudentAndManagedSubject() {
+    void createStudentWithGradesShouldSetStudentAndManagedSubject() {
         Student student = new Student(11L, "A", "B", 8, Student.Gender.MALE, "a@mail.com", null);
+        StudentDTO dto = mapper.toDTO(student);
         Subject gradeSubjectRef = new Subject();
         gradeSubjectRef.setId(5L);
 
@@ -107,7 +95,7 @@ class StudentServiceImplTest {
         managedSubject.setId(5L);
         when(subjectRepository.findById(5L)).thenReturn(Optional.of(managedSubject));
 
-        service.saveStudentWithGradesWithTransaction(student, List.of(grade));
+        service.createStudentWithGrades(dto, List.of(grade));
 
         verify(repository).save(student);
         ArgumentCaptor<Grade> captor = ArgumentCaptor.forClass(Grade.class);
@@ -121,8 +109,9 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void saveStudentWithGradesWithTransactionShouldThrowIfSubjectMissing() {
+    void createStudentWithGradesShouldThrowIfSubjectMissing() {
         Student student = new Student();
+        StudentDTO dto = mapper.toDTO(student);
         Subject gradeSubjectRef = new Subject();
         gradeSubjectRef.setId(404L);
 
@@ -133,7 +122,7 @@ class StudentServiceImplTest {
         List<Grade> grades = List.of(grade);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> service.saveStudentWithGradesWithTransaction(student, grades));
+                () -> service.createStudentWithGrades(dto, grades));
 
         assertEquals("Subject not found", ex.getMessage());
         verify(gradeRepository, never()).save(any());

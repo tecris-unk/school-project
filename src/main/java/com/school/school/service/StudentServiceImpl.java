@@ -34,10 +34,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student createStudent(final StudentDTO dto) {
+    public void createStudent(final StudentDTO dto) {
         Student student = mapper.toEntity(dto);
         repository.save(student);
-        return student;
     }
 
     @Override
@@ -74,9 +73,11 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Transactional
-    public void saveStudentWithGradesWithTransaction(
-            Student student,
-            List<Grade> grades) {
+    @Override
+    public void createStudentWithGrades(
+            final StudentDTO dto,
+            final List<Grade> grades) {
+        Student student = mapper.toEntity(dto);
         repository.save(student);
         for (Grade grade : grades) {
             grade.setStudent(student);

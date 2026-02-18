@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 @Component
 public final class StudentMapper {
 
+    /**
+     * Функция, преобразующая Entity в DTO.
+     *
+     * @param student entity
+     * @return DTO
+     */
     @NotNull
     public StudentDTO toDTO(final Student student) {
         if (student == null) {
@@ -24,6 +30,12 @@ public final class StudentMapper {
         );
     }
 
+    /**
+     * Функция, преобразующая DTO в Entity.
+     *
+     * @param dto DTO
+     * @return Entity
+     */
     public Student toEntity(final StudentDTO dto) {
         if (dto == null) {
             return null;
@@ -40,6 +52,12 @@ public final class StudentMapper {
         return student;
     }
 
+    /**
+     * функция, изменяющая Entity из DTO
+     *
+     * @param student Entity, который будет изменен
+     * @param dto DTO, обновление
+     */
     public void updateEntity(final Student student, final StudentDTO dto) {
         student.setFirstName(dto.getFirstName());
         student.setLastName(dto.getLastName());

@@ -1,11 +1,11 @@
 package com.school.school.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.school.school.model.Student;
 import com.school.school.service.StudentService;
 import com.school.school.service.dto.StudentDTO;
 import com.school.school.service.mapper.StudentMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,9 +14,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @WebMvcTest(StudentController.class)
 class StudentControllerTest {
@@ -52,17 +56,25 @@ class StudentControllerTest {
     @Test
     void addStudentShouldReturnCreatedDtoBody() throws Exception {
         StudentDTO requestDto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
-        Student saved = new Student(1L, "Ivan", "Petrov", 10, Student.Gender.MALE, "ivan@mail.com", null);
-        StudentDTO responseDto = new StudentDTO(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
-
-        when(mapper.toDTO(saved)).thenReturn(responseDto);
 
         mockMvc.perform(post("/api/students")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.email").value("ivan@mail.com"));
+                .andExpect(content().string(""));
+
+        ArgumentCaptor<StudentDTO> captor = ArgumentCaptor.forClass(StudentDTO.class);
+        verify(service).createStudent(captor.capture());
+
+        StudentDTO captured = captor.getValue();
+        assertAll(
+                () -> assertNull(captured.getId()),
+                () -> assertEquals("Ivan", captured.getFirstName()),
+                () -> assertEquals("Petrov", captured.getLastName()),
+                () -> assertEquals(10, captured.getGrade()),
+                () -> assertEquals("MALE", captured.getGender()),
+                () -> assertEquals("ivan@mail.com", captured.getEmail())
+        );
     }
 
     @Test

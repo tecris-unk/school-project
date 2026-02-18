@@ -11,7 +11,6 @@ import com.school.school.service.mapper.StudentMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,11 +32,7 @@ class StudentServiceImplTest {
     @Mock
     private GradeRepository gradeRepository;
 
-    @Mock
     private StudentServiceImpl service;
-
-    @Mock
-    private StudentMapper mapper;
 
     @BeforeEach
     void setUp() {
@@ -85,8 +80,7 @@ class StudentServiceImplTest {
 
     @Test
     void createStudentWithGradesShouldThrowIfSubjectMissing() {
-        Student student = new Student();
-        StudentDTO dto = mapper.toDTO(student);
+        StudentDTO dto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
         Subject gradeSubjectRef = new Subject();
         gradeSubjectRef.setId(404L);
 

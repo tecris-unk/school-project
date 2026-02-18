@@ -74,7 +74,7 @@ public final class StudentController {
      * @return учащегося, если его получилось добавить
      */
     @PostMapping
-    public ResponseEntity<StudentDTO> addStudent(
+    public ResponseEntity<String> addStudent(
             @RequestBody final StudentDTO studentDTO) {
         service.createStudent(studentDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);

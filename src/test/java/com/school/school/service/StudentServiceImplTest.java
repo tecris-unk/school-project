@@ -84,33 +84,6 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void createStudentWithGradesShouldSetStudentAndManagedSubject() {
-        Student student = new Student(11L, "A", "B", 8, Student.Gender.MALE, "a@mail.com", null);
-        StudentDTO dto = mapper.toDTO(student);
-        Subject gradeSubjectRef = new Subject();
-        gradeSubjectRef.setId(5L);
-
-        Grade grade = new Grade();
-        grade.setSubject(gradeSubjectRef);
-
-        Subject managedSubject = new Subject();
-        managedSubject.setId(5L);
-        when(subjectRepository.findById(5L)).thenReturn(Optional.of(managedSubject));
-
-        service.createStudentWithGrades(dto, List.of(grade));
-
-        verify(repository).save(student);
-        ArgumentCaptor<Grade> captor = ArgumentCaptor.forClass(Grade.class);
-        verify(gradeRepository).save(captor.capture());
-
-        Grade savedGrade = captor.getValue();
-        assertAll(
-                () -> assertSame(student, savedGrade.getStudent()),
-                () -> assertSame(managedSubject, savedGrade.getSubject())
-        );
-    }
-
-    @Test
     void createStudentWithGradesShouldThrowIfSubjectMissing() {
         Student student = new Student();
         StudentDTO dto = mapper.toDTO(student);

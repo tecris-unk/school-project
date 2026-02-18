@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -56,7 +55,6 @@ class StudentControllerTest {
         Student saved = new Student(1L, "Ivan", "Petrov", 10, Student.Gender.MALE, "ivan@mail.com", null);
         StudentDTO responseDto = new StudentDTO(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
 
-        when(service.createStudent(any(StudentDTO.class))).thenReturn(saved);
         when(mapper.toDTO(saved)).thenReturn(responseDto);
 
         mockMvc.perform(post("/api/students")

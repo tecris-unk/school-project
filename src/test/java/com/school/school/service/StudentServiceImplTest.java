@@ -33,8 +33,10 @@ class StudentServiceImplTest {
     @Mock
     private GradeRepository gradeRepository;
 
+    @Mock
     private StudentServiceImpl service;
 
+    @Mock
     private StudentMapper mapper;
 
     @BeforeEach

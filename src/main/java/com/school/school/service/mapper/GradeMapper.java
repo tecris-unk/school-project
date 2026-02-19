@@ -1,8 +1,6 @@
 package com.school.school.service.mapper;
 
 import com.school.school.model.Grade;
-import com.school.school.model.Student;
-import com.school.school.model.Subject;
 import com.school.school.service.dto.GradeDTO;
 import org.springframework.stereotype.Component;
 
@@ -32,28 +30,12 @@ public final class GradeMapper {
         }
 
         Grade grade = new Grade();
-
-        Student student = new Student();
-        student.setId(dto.getStudentId());
-        grade.setStudent(student);
-
-        Subject subject = new Subject();
-        subject.setId(dto.getSubjectId());
-        grade.setSubject(subject);
-
         grade.setScore(dto.getScore());
         grade.setDate(dto.getDate());
         return grade;
     }
 
     public void updateEntity(final Grade grade, final GradeDTO dto) {
-        Student student = new Student();
-        student.setId(dto.getStudentId());
-        grade.setStudent(student);
-
-        Subject subject = new Subject();
-        subject.setId(dto.getSubjectId());
-        grade.setSubject(subject);
 
         grade.setScore(dto.getScore());
         grade.setDate(dto.getDate());

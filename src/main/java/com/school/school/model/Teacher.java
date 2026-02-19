@@ -24,6 +24,10 @@ public class Teacher {
     @Column(unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "teacher", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "teacher",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.LAZY
+    )
     private List<Subject> subjects = new ArrayList<>();
 }

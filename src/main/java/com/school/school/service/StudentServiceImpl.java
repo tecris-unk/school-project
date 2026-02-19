@@ -65,11 +65,13 @@ public class StudentServiceImpl implements StudentService {
     public Student updateStudent(
             final Long id,
             final StudentDTO updatedStudent) {
-        Student existingStudent = repository.findById(id)
-                .orElse(new Student());
-        mapper.updateEntity(existingStudent, updatedStudent);
-        repository.save(existingStudent);
-        return existingStudent;
+        return repository.findById(id)
+                .map(existingStudent -> {
+                    mapper.updateEntity(existingStudent, updatedStudent);
+                    repository.save(existingStudent);
+                    return existingStudent;
+                })
+                .orElse(null);
     }
 
     @Transactional

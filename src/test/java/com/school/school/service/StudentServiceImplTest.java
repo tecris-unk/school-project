@@ -144,21 +144,14 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void updateStudentShouldCreateNewEntityWhenMissing() {
+    void updateStudentShouldReturnNullWhenMissing() {
         StudentDTO dto = new StudentDTO(null, "New", "Student", 8, "MALE", "new@student.com");
         when(repository.findById(2L)).thenReturn(Optional.empty());
 
         Student result = service.updateStudent(2L, dto);
 
-        assertNotNull(result);
-        assertAll(
-                () -> assertEquals("New", result.getFirstName()),
-                () -> assertEquals("Student", result.getLastName()),
-                () -> assertEquals(8, result.getGrade()),
-                () -> assertEquals(Student.Gender.MALE, result.getGender()),
-                () -> assertEquals("new@student.com", result.getEmail())
-        );
-        verify(repository).save(result);
+        assertNull(result);
+        verify(repository, never()).save(any());
     }
 
     @Test

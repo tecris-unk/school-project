@@ -3,6 +3,7 @@ package com.school.school.service.mapper;
 import com.school.school.model.Student;
 import com.school.school.service.dto.StudentDTO;
 import jakarta.validation.constraints.NotNull;
+import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +26,7 @@ public final class StudentMapper {
                 student.getFirstName(),
                 student.getLastName(),
                 student.getGrade(),
-                student.getGender().name(),
+                student.getGender() != null ? student.getGender().name() : null,
                 student.getEmail()
         );
     }
@@ -46,7 +47,7 @@ public final class StudentMapper {
         student.setFirstName(dto.getFirstName());
         student.setLastName(dto.getLastName());
         student.setGrade(dto.getGrade());
-        student.setGender(Student.Gender.valueOf(dto.getGender()));
+        student.setGender(parseGender(dto.getGender()));
         student.setEmail(dto.getEmail());
 
         return student;
@@ -62,7 +63,14 @@ public final class StudentMapper {
         student.setFirstName(dto.getFirstName());
         student.setLastName(dto.getLastName());
         student.setGrade(dto.getGrade());
-        student.setGender(Student.Gender.valueOf(dto.getGender()));
+        student.setGender(parseGender(dto.getGender()));
         student.setEmail(dto.getEmail());
+    }
+
+    private Student.Gender parseGender(final String gender) {
+        if (gender == null) {
+            return null;
+        }
+        return Student.Gender.valueOf(gender.trim().toUpperCase(Locale.ROOT));
     }
 }

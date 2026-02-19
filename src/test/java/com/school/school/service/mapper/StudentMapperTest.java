@@ -72,4 +72,13 @@ class StudentMapperTest {
                 () -> assertEquals("new@mail.com", existing.getEmail())
         );
     }
+
+    @Test
+    void toEntityShouldSupportCaseInsensitiveGender() {
+        StudentDTO dto = new StudentDTO(null, "Anna", "Smirnova", 9, "female", "anna@mail.com");
+
+        Student result = mapper.toEntity(dto);
+
+        assertEquals(Student.Gender.FEMALE, result.getGender());
+    }
 }

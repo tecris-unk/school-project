@@ -49,7 +49,9 @@ public class SubjectServiceImpl implements SubjectService {
         return repository.findById(id)
                 .map(existingSubject -> {
                     mapper.updateEntity(existingSubject, subjectDTO);
-                    if (subjectDTO.getTeacherId() != null) {
+                    if (subjectDTO.getTeacherId() == null) {
+                        existingSubject.setTeacher(null);
+                    } else {
                         Teacher teacher = teacherRepository.findById(subjectDTO.getTeacherId()).orElse(null);
                         if (teacher == null) {
                             return null;

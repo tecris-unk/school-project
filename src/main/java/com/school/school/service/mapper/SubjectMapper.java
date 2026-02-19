@@ -1,7 +1,6 @@
 package com.school.school.service.mapper;
 
 import com.school.school.model.Subject;
-import com.school.school.model.Teacher;
 import com.school.school.service.dto.SubjectDTO;
 import org.springframework.stereotype.Component;
 
@@ -34,23 +33,11 @@ public final class SubjectMapper {
         Subject subject = new Subject();
         subject.setName(dto.getName());
         subject.setDescription(dto.getDescription());
-        if (dto.getTeacherId() != null) {
-            Teacher teacher = new Teacher();
-            teacher.setId(dto.getTeacherId());
-            subject.setTeacher(teacher);
-        }
         return subject;
     }
 
     public void updateEntity(final Subject subject, final SubjectDTO dto) {
         subject.setName(dto.getName());
         subject.setDescription(dto.getDescription());
-        if (dto.getTeacherId() == null) {
-            subject.setTeacher(null);
-            return;
-        }
-        Teacher teacher = new Teacher();
-        teacher.setId(dto.getTeacherId());
-        subject.setTeacher(teacher);
     }
 }

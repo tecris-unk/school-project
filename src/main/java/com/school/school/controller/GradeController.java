@@ -5,6 +5,8 @@ import com.school.school.service.GradeService;
 import com.school.school.service.dto.GradeDTO;
 import com.school.school.service.mapper.GradeMapper;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,8 @@ public final class GradeController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addGrade(@RequestBody final GradeDTO gradeDTO) {
+    public ResponseEntity<Void> addGrade(
+            @Valid @RequestBody final GradeDTO gradeDTO) {
         Grade grade = service.createGrade(gradeDTO);
         if (grade == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -53,7 +56,7 @@ public final class GradeController {
     @PutMapping("/{id}")
     public ResponseEntity<GradeDTO> updateGrade(
             @PathVariable final Long id,
-            @RequestBody final GradeDTO gradeDTO) {
+            @Valid @RequestBody final GradeDTO gradeDTO) {
         Grade grade = service.updateGrade(id, gradeDTO);
         if (grade == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

@@ -5,6 +5,8 @@ import com.school.school.service.SubjectService;
 import com.school.school.service.dto.SubjectDTO;
 import com.school.school.service.mapper.SubjectMapper;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +45,7 @@ public final class SubjectController {
 
     @PostMapping
     public ResponseEntity<Void> addSubject(
-            @RequestBody final SubjectDTO subjectDTO) {
+            @Valid @RequestBody final SubjectDTO subjectDTO) {
         Subject subject = service.createSubject(subjectDTO);
         if (subject == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -54,7 +56,7 @@ public final class SubjectController {
     @PutMapping("/{id}")
     public ResponseEntity<SubjectDTO> updateSubject(
             @PathVariable final Long id,
-            @RequestBody final SubjectDTO subjectDTO) {
+            @Valid @RequestBody final SubjectDTO subjectDTO) {
         Subject subject = service.updateSubject(id, subjectDTO);
         if (subject == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

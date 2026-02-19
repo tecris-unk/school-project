@@ -5,6 +5,8 @@ import com.school.school.service.SchoolClassService;
 import com.school.school.service.dto.SchoolClassDTO;
 import com.school.school.service.mapper.SchoolClassMapper;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +46,7 @@ public final class SchoolClassController {
 
     @PostMapping
     public ResponseEntity<Void> addClass(
-            @RequestBody final SchoolClassDTO classDTO) {
+           @Valid @RequestBody final SchoolClassDTO classDTO) {
         service.createClass(classDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -52,7 +54,7 @@ public final class SchoolClassController {
     @PutMapping("/{id}")
     public ResponseEntity<SchoolClassDTO> updateClass(
             @PathVariable final Long id,
-            @RequestBody final SchoolClassDTO classDTO) {
+            @Valid @RequestBody final SchoolClassDTO classDTO) {
         SchoolClass schoolClass = service.updateClass(id, classDTO);
         if (schoolClass == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

@@ -5,6 +5,8 @@ import com.school.school.service.StudentService;
 import com.school.school.service.dto.StudentDTO;
 import com.school.school.service.mapper.StudentMapper;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +77,7 @@ public final class StudentController {
      */
     @PostMapping
     public ResponseEntity<Void> addStudent(
-            @RequestBody final StudentDTO studentDTO) {
+           @Valid @RequestBody final StudentDTO studentDTO) {
         service.createStudent(studentDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -90,7 +92,7 @@ public final class StudentController {
     @PutMapping("/{id}")
     public ResponseEntity<StudentDTO> updateStudent(
             @PathVariable final Long id,
-            @RequestBody final StudentDTO updatedStudent) {
+            @Valid @RequestBody final StudentDTO updatedStudent) {
         Student student = service.updateStudent(id, updatedStudent);
         if (student == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

@@ -21,6 +21,10 @@ public class SchoolClass {
     private Integer grade;
     private String letter;
 
-    @OneToMany(mappedBy = "schoolClass", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "schoolClass",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.LAZY
+    )
     private List<Student> students = new ArrayList<>();
 }

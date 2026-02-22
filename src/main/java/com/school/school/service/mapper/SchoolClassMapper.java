@@ -30,7 +30,9 @@ public final class SchoolClassMapper {
         return schoolClass;
     }
 
-    public void updateEntity(final SchoolClass schoolClass, final SchoolClassDTO dto) {
+    public void updateEntity(
+            final SchoolClass schoolClass,
+            final SchoolClassDTO dto) {
         schoolClass.setGrade(dto.getGrade());
         schoolClass.setLetter(dto.getLetter());
     }

@@ -34,7 +34,8 @@ public class SubjectServiceImpl implements SubjectService {
     public Subject createSubject(final SubjectDTO subjectDTO) {
         Subject subject = mapper.toEntity(subjectDTO);
         if (subjectDTO.getTeacherId() != null) {
-            Teacher teacher = teacherRepository.findById(subjectDTO.getTeacherId()).orElse(null);
+            Teacher teacher = teacherRepository.
+                    findById(subjectDTO.getTeacherId()).orElse(null);
             if (teacher == null) {
                 return null;
             }
@@ -52,7 +53,8 @@ public class SubjectServiceImpl implements SubjectService {
                     if (subjectDTO.getTeacherId() == null) {
                         existingSubject.setTeacher(null);
                     } else {
-                        Teacher teacher = teacherRepository.findById(subjectDTO.getTeacherId()).orElse(null);
+                        Teacher teacher = teacherRepository.
+                                findById(subjectDTO.getTeacherId()).orElse(null);
                         if (teacher == null) {
                             return null;
                         }

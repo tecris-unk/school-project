@@ -54,7 +54,7 @@ public final class StudentMapper {
     }
 
     /**
-     * функция, изменяющая Entity из DTO
+     * функция, изменяющая Entity из DTO.
      *
      * @param student Entity, который будет изменен
      * @param dto DTO, обновление

@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @Table(name = "students")
@@ -38,4 +41,11 @@ public class Student {
     @JoinColumn(name = "school_class_id")
     private SchoolClass schoolClass;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "students_subjects",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private List<Subject> subjects = new ArrayList<>();
 }

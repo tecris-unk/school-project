@@ -3,6 +3,7 @@ package com.school.school.service;
 import com.school.school.model.Grade;
 import com.school.school.model.Student;
 import com.school.school.service.dto.StudentDTO;
+
 import java.util.List;
 
 public interface StudentService {
@@ -13,6 +14,13 @@ public interface StudentService {
      * @return все учащиеся, если таковы есть
      */
     List<Student> findAllStudents();
+
+    /**
+     * Функция, возвращающая всех учащихся вместе с предметами.
+     *
+     * @return все учащиеся с загруженной коллекцией предметов
+     */
+    List<Student> findAllStudentsWithSubjects();
 
     /**
      * Функция, создающая учащегося.

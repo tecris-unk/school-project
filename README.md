@@ -23,6 +23,8 @@
 6. Реализовать метод, сохраняющий несколько связанных сущностей. Продемонстрировать частичное сохранение данных без @Transactional и полное откатывание операции с @Transactional при возникновении ошибки.
 7. Нарисовать ER-диаграмму с указанием PK/FK и связей.
 
+[Сонар](https://sonarcloud.io/project/overview?id=tecris-unk_school-project)
+
 ```mermaid
 erDiagram
     SCHOOL_CLASSES ||--o{ STUDENTS : "1:N"

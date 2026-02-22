@@ -25,6 +25,7 @@
 
 [Сонар](https://sonarcloud.io/project/overview?id=tecris-unk_school-project)
 
+
 ```mermaid
 erDiagram
     SCHOOL_CLASSES ||--o{ STUDENTS : "1:N"

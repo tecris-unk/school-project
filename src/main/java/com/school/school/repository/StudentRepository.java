@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
+
     /**
      * Функция поиска учащегося в базе данных по электронной почте.
      *

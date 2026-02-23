@@ -11,6 +11,7 @@ src/test/java/splitmindq/caloriecounter/CalorieCounterApplicationTests.java
 mvnw.cmd
 mvnw
 startjava_checks.xml
+checkstyle.xml
 docker-compose.yml
 db
 .env

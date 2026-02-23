@@ -1,7 +1,7 @@
 package com.school.school.service;
 
 import com.school.school.model.SchoolClass;
-import com.school.school.service.dto.SchoolClassDTO;
+import com.school.school.service.dto.SchoolClassDto;
 import java.util.List;
 
 public interface SchoolClassService {
@@ -10,9 +10,9 @@ public interface SchoolClassService {
 
     SchoolClass findClassById(Long id);
 
-    void createClass(SchoolClassDTO classDTO);
+    void createClass(SchoolClassDto classDto);
 
-    SchoolClass updateClass(Long id, SchoolClassDTO classDTO);
+    SchoolClass updateClass(Long id, SchoolClassDto classDto);
 
     boolean deleteClass(Long id);
 }

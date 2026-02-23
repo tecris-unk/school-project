@@ -1,18 +1,18 @@
 package com.school.school.service.mapper;
 
 import com.school.school.model.Teacher;
-import com.school.school.service.dto.TeacherDTO;
+import com.school.school.service.dto.TeacherDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class TeacherMapper {
 
-    public TeacherDTO toDTO(final Teacher teacher) {
+    public TeacherDto toDto(final Teacher teacher) {
         if (teacher == null) {
             return null;
         }
 
-        return new TeacherDTO(
+        return new TeacherDto(
                 teacher.getId(),
                 teacher.getFirstName(),
                 teacher.getLastName(),
@@ -20,7 +20,7 @@ public final class TeacherMapper {
         );
     }
 
-    public Teacher toEntity(final TeacherDTO dto) {
+    public Teacher toEntity(final TeacherDto dto) {
         if (dto == null) {
             return null;
         }
@@ -32,7 +32,7 @@ public final class TeacherMapper {
         return teacher;
     }
 
-    public void updateEntity(final Teacher teacher, final TeacherDTO dto) {
+    public void updateEntity(final Teacher teacher, final TeacherDto dto) {
         teacher.setFirstName(dto.getFirstName());
         teacher.setLastName(dto.getLastName());
         teacher.setEmail(dto.getEmail());

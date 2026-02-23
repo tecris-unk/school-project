@@ -3,7 +3,7 @@ package com.school.school.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.school.school.model.Student;
 import com.school.school.service.StudentService;
-import com.school.school.service.dto.StudentDTO;
+import com.school.school.service.dto.StudentDto;
 import com.school.school.service.mapper.StudentMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,9 +45,9 @@ class StudentControllerTest {
     @Test
     void findByIdShouldReturnStudentWhenFound() throws Exception {
         Student student = new Student();
-        StudentDTO dto = new StudentDTO(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+        StudentDto dto = new StudentDto(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
         when(service.findStudentById(1L)).thenReturn(student);
-        when(mapper.toDTO(student)).thenReturn(dto);
+        when(mapper.toDto(student)).thenReturn(dto);
 
         mockMvc.perform(get("/api/students/1"))
                 .andExpect(status().isOk())
@@ -67,9 +67,9 @@ class StudentControllerTest {
     @Test
     void findByEmailShouldReturnStudentWhenFound() throws Exception {
         Student student = new Student();
-        StudentDTO dto = new StudentDTO(2L, "Anna", "Smirnova", 9, "FEMALE", "anna@mail.com");
+        StudentDto dto = new StudentDto(2L, "Anna", "Smirnova", 9, "FEMALE", "anna@mail.com");
         when(service.findStudentByEmail("anna@mail.com")).thenReturn(student);
-        when(mapper.toDTO(student)).thenReturn(dto);
+        when(mapper.toDto(student)).thenReturn(dto);
 
         mockMvc.perform(get("/api/students/by-email").param("email", "anna@mail.com"))
                 .andExpect(status().isOk())
@@ -89,10 +89,10 @@ class StudentControllerTest {
     void getAllStudentsWithSubjectsShouldReturnMappedStudentsWhenPresent() throws Exception {
         Student first = new Student();
         first.setId(1L);
-        StudentDTO firstDto = new StudentDTO(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+        StudentDto firstDto = new StudentDto(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
 
         when(service.findAllStudentsWithSubjects()).thenReturn(List.of(first));
-        when(mapper.toDTO(first)).thenReturn(firstDto);
+        when(mapper.toDto(first)).thenReturn(firstDto);
 
         mockMvc.perform(get("/api/students/with-subjects"))
                 .andExpect(status().isOk())
@@ -117,7 +117,7 @@ class StudentControllerTest {
 
     @Test
     void addStudentShouldReturnCreatedDtoBody() throws Exception {
-        StudentDTO requestDto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+        StudentDto requestDto = new StudentDto(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
 
         mockMvc.perform(post("/api/students")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -125,10 +125,10 @@ class StudentControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string(""));
 
-        ArgumentCaptor<StudentDTO> captor = ArgumentCaptor.forClass(StudentDTO.class);
+        ArgumentCaptor<StudentDto> captor = ArgumentCaptor.forClass(StudentDto.class);
         verify(service).createStudent(captor.capture());
 
-        StudentDTO captured = captor.getValue();
+        StudentDto captured = captor.getValue();
         assertAll(
                 () -> assertNull(captured.getId()),
                 () -> assertEquals("Ivan", captured.getFirstName()),
@@ -145,12 +145,12 @@ class StudentControllerTest {
         first.setId(1L);
         Student second = new Student();
         second.setId(2L);
-        StudentDTO firstDto = new StudentDTO(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
-        StudentDTO secondDto = new StudentDTO(2L, "Anna", "Smirnova", 9, "FEMALE", "anna@mail.com");
+        StudentDto firstDto = new StudentDto(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+        StudentDto secondDto = new StudentDto(2L, "Anna", "Smirnova", 9, "FEMALE", "anna@mail.com");
 
         when(service.findAllStudents()).thenReturn(List.of(first, second));
-        when(mapper.toDTO(first)).thenReturn(firstDto);
-        when(mapper.toDTO(second)).thenReturn(secondDto);
+        when(mapper.toDto(first)).thenReturn(firstDto);
+        when(mapper.toDto(second)).thenReturn(secondDto);
 
         mockMvc.perform(get("/api/students"))
                 .andExpect(status().isOk())
@@ -168,11 +168,11 @@ class StudentControllerTest {
     @Test
     void updateStudentShouldReturnMappedStudent() throws Exception {
         Student updated = new Student();
-        StudentDTO requestDto = new StudentDTO(null, "Ivan", "Updated", 11, "MALE", "ivan@mail.com");
-        StudentDTO responseDto = new StudentDTO(1L, "Ivan", "Updated", 11, "MALE", "ivan@mail.com");
+        StudentDto requestDto = new StudentDto(null, "Ivan", "Updated", 11, "MALE", "ivan@mail.com");
+        StudentDto responseDto = new StudentDto(1L, "Ivan", "Updated", 11, "MALE", "ivan@mail.com");
 
-        when(service.updateStudent(eq(1L), any(StudentDTO.class))).thenReturn(updated);
-        when(mapper.toDTO(updated)).thenReturn(responseDto);
+        when(service.updateStudent(eq(1L), any(StudentDto.class))).thenReturn(updated);
+        when(mapper.toDto(updated)).thenReturn(responseDto);
 
         mockMvc.perform(put("/api/students/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -183,8 +183,8 @@ class StudentControllerTest {
 
     @Test
     void updateStudentShouldReturnNotFoundWhenServiceReturnsNull() throws Exception {
-        StudentDTO requestDto = new StudentDTO(null, "Ivan", "Updated", 11, "MALE", "ivan@mail.com");
-        when(service.updateStudent(eq(1L), any(StudentDTO.class))).thenReturn(null);
+        StudentDto requestDto = new StudentDto(null, "Ivan", "Updated", 11, "MALE", "ivan@mail.com");
+        when(service.updateStudent(eq(1L), any(StudentDto.class))).thenReturn(null);
 
         mockMvc.perform(put("/api/students/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -193,13 +193,13 @@ class StudentControllerTest {
     }
     @Test
     void addStudentShouldReturnBadRequestForInvalidPayload() throws Exception {
-        StudentDTO invalidDto = new StudentDTO(null, "", "Petrov", 20, "", "not-an-email");
+        StudentDto invalidDto = new StudentDto(null, "", "Petrov", 20, "", "not-an-email");
 
         mockMvc.perform(post("/api/students")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest());
 
-        verify(service, never()).createStudent(any(StudentDTO.class));
+        verify(service, never()).createStudent(any(StudentDto.class));
     }
 }

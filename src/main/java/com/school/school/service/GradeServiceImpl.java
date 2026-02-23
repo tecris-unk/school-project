@@ -6,7 +6,7 @@ import com.school.school.model.Subject;
 import com.school.school.repository.GradeRepository;
 import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
-import com.school.school.service.dto.GradeDTO;
+import com.school.school.service.dto.GradeDto;
 import com.school.school.service.mapper.GradeMapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -35,14 +35,14 @@ public class GradeServiceImpl implements GradeService {
     }
 
     @Override
-    public Grade createGrade(final GradeDTO gradeDTO) {
-        Student student = studentRepository.findById(gradeDTO.getStudentId()).orElse(null);
-        Subject subject = subjectRepository.findById(gradeDTO.getSubjectId()).orElse(null);
+    public Grade createGrade(final GradeDto gradeDto) {
+        Student student = studentRepository.findById(gradeDto.getStudentId()).orElse(null);
+        Subject subject = subjectRepository.findById(gradeDto.getSubjectId()).orElse(null);
         if (student == null || subject == null) {
             return null;
         }
 
-        Grade grade = mapper.toEntity(gradeDTO);
+        Grade grade = mapper.toEntity(gradeDto);
         grade.setStudent(student);
         grade.setSubject(subject);
         repository.save(grade);
@@ -50,16 +50,16 @@ public class GradeServiceImpl implements GradeService {
     }
 
     @Override
-    public Grade updateGrade(final Long id, final GradeDTO gradeDTO) {
-        Student student = studentRepository.findById(gradeDTO.getStudentId()).orElse(null);
-        Subject subject = subjectRepository.findById(gradeDTO.getSubjectId()).orElse(null);
+    public Grade updateGrade(final Long id, final GradeDto gradeDto) {
+        Student student = studentRepository.findById(gradeDto.getStudentId()).orElse(null);
+        Subject subject = subjectRepository.findById(gradeDto.getSubjectId()).orElse(null);
         if (student == null || subject == null) {
             return null;
         }
 
         return repository.findById(id)
                 .map(existingGrade -> {
-                    mapper.updateEntity(existingGrade, gradeDTO);
+                    mapper.updateEntity(existingGrade, gradeDto);
                     existingGrade.setStudent(student);
                     existingGrade.setSubject(subject);
                     repository.save(existingGrade);

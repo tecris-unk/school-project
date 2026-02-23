@@ -1,19 +1,18 @@
 package com.school.school.service;
 
 import com.school.school.model.Grade;
+import com.school.school.model.Student;
 import com.school.school.model.Subject;
 import com.school.school.repository.GradeRepository;
 import com.school.school.repository.StudentRepository;
-import com.school.school.model.Student;
 import com.school.school.repository.SubjectRepository;
+import com.school.school.service.dto.StudentDto;
 import com.school.school.service.mapper.StudentMapper;
-import com.school.school.service.dto.StudentDTO;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-
 
 @Service
 @AllArgsConstructor
@@ -39,7 +38,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public void createStudent(final StudentDTO dto) {
+    public void createStudent(final StudentDto dto) {
         repository.save(mapper.toEntity(dto));
     }
 
@@ -68,7 +67,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Student updateStudent(
             final Long id,
-            final StudentDTO updatedStudent) {
+            final StudentDto updatedStudent) {
         return repository.findById(id)
                 .map(existingStudent -> {
                     mapper.updateEntity(existingStudent, updatedStudent);
@@ -81,7 +80,7 @@ public class StudentServiceImpl implements StudentService {
     @Transactional
     @Override
     public void createStudentWithGrades(
-            final StudentDTO dto,
+            final StudentDto dto,
             final List<Grade> grades) {
         Student student = mapper.toEntity(dto);
         repository.save(student);

@@ -6,7 +6,7 @@ import com.school.school.model.Subject;
 import com.school.school.repository.GradeRepository;
 import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
-import com.school.school.service.dto.StudentDTO;
+import com.school.school.service.dto.StudentDto;
 import com.school.school.service.mapper.StudentMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class StudentServiceImplTest {
 
     @Test
     void createStudentShouldMapAndSaveEntity() {
-        StudentDTO dto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+        StudentDto dto = new StudentDto(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
 
         service.createStudent(dto);
 
@@ -127,7 +127,7 @@ class StudentServiceImplTest {
     @Test
     void updateStudentShouldUseExistingEntityIfFound() {
         Student existing = new Student();
-        StudentDTO dto = new StudentDTO(null, "New", "Name", 11, "FEMALE", "new@mail.com");
+        StudentDto dto = new StudentDto(null, "New", "Name", 11, "FEMALE", "new@mail.com");
         when(repository.findById(2L)).thenReturn(Optional.of(existing));
 
         Student result = service.updateStudent(2L, dto);
@@ -145,7 +145,7 @@ class StudentServiceImplTest {
 
     @Test
     void updateStudentShouldReturnNullWhenMissing() {
-        StudentDTO dto = new StudentDTO(null, "New", "Student", 8, "MALE", "new@student.com");
+        StudentDto dto = new StudentDto(null, "New", "Student", 8, "MALE", "new@student.com");
         when(repository.findById(2L)).thenReturn(Optional.empty());
 
         Student result = service.updateStudent(2L, dto);
@@ -156,7 +156,7 @@ class StudentServiceImplTest {
 
     @Test
     void createStudentWithGradesShouldSaveStudentAndGrades() {
-        StudentDTO dto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+        StudentDto dto = new StudentDto(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
         Subject subjectReference = new Subject();
         subjectReference.setId(10L);
 
@@ -179,7 +179,7 @@ class StudentServiceImplTest {
 
     @Test
     void createStudentWithGradesShouldThrowIfSubjectMissing() {
-        StudentDTO dto = new StudentDTO(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+        StudentDto dto = new StudentDto(null, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
         Subject gradeSubjectRef = new Subject();
         gradeSubjectRef.setId(404L);
 

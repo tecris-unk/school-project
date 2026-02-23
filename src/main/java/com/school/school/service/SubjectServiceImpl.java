@@ -4,7 +4,7 @@ import com.school.school.model.Subject;
 import com.school.school.model.Teacher;
 import com.school.school.repository.SubjectRepository;
 import com.school.school.repository.TeacherRepository;
-import com.school.school.service.dto.SubjectDTO;
+import com.school.school.service.dto.SubjectDto;
 import com.school.school.service.mapper.SubjectMapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -31,11 +31,11 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject createSubject(final SubjectDTO subjectDTO) {
-        Subject subject = mapper.toEntity(subjectDTO);
-        if (subjectDTO.getTeacherId() != null) {
-            Teacher teacher = teacherRepository.
-                    findById(subjectDTO.getTeacherId()).orElse(null);
+    public Subject createSubject(final SubjectDto subjectDto) {
+        Subject subject = mapper.toEntity(subjectDto);
+        if (subjectDto.getTeacherId() != null) {
+            Teacher teacher = teacherRepository
+                    .findById(subjectDto.getTeacherId()).orElse(null);
             if (teacher == null) {
                 return null;
             }
@@ -46,15 +46,15 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject updateSubject(final Long id, final SubjectDTO subjectDTO) {
+    public Subject updateSubject(final Long id, final SubjectDto subjectDto) {
         return repository.findById(id)
                 .map(existingSubject -> {
-                    mapper.updateEntity(existingSubject, subjectDTO);
-                    if (subjectDTO.getTeacherId() == null) {
+                    mapper.updateEntity(existingSubject, subjectDto);
+                    if (subjectDto.getTeacherId() == null) {
                         existingSubject.setTeacher(null);
                     } else {
-                        Teacher teacher = teacherRepository.
-                                findById(subjectDTO.getTeacherId()).orElse(null);
+                        Teacher teacher = teacherRepository
+                                .findById(subjectDto.getTeacherId()).orElse(null);
                         if (teacher == null) {
                             return null;
                         }

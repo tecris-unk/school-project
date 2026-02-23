@@ -1,7 +1,7 @@
 package com.school.school.service.mapper;
 
 import com.school.school.model.Student;
-import com.school.school.service.dto.StudentDTO;
+import com.school.school.service.dto.StudentDto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,17 +11,17 @@ class StudentMapperTest {
     private final StudentMapper mapper = new StudentMapper();
 
     @Test
-    void toDTOShouldReturnNullWhenStudentIsNull() {
-        StudentDTO result = mapper.toDTO(null);
+    void toDtoShouldReturnNullWhenStudentIsNull() {
+        StudentDto result = mapper.toDto(null);
 
         assertNull(result);
     }
 
     @Test
-    void toDTOShouldMapAllFields() {
+    void toDtoShouldMapAllFields() {
         Student student = new Student(1L, "Ivan", "Petrov", 10, Student.Gender.MALE, "ivan@mail.com", null, null);
 
-        StudentDTO result = mapper.toDTO(student);
+        StudentDto result = mapper.toDto(student);
 
         assertAll(
                 () -> assertEquals(1L, result.getId()),
@@ -42,7 +42,7 @@ class StudentMapperTest {
 
     @Test
     void toEntityShouldMapAllFieldsExceptId() {
-        StudentDTO dto = new StudentDTO(7L, "Anna", "Smirnova", 9, "FEMALE", "anna@mail.com");
+        StudentDto dto = new StudentDto(7L, "Anna", "Smirnova", 9, "FEMALE", "anna@mail.com");
 
         Student result = mapper.toEntity(dto);
 
@@ -59,7 +59,7 @@ class StudentMapperTest {
     @Test
     void updateEntityShouldOverwriteExistingFields() {
         Student existing = new Student(3L, "Old", "Name", 5, Student.Gender.MALE, "old@mail.com", null, null);
-        StudentDTO dto = new StudentDTO(null, "New", "Student", 11, "FEMALE", "new@mail.com");
+        StudentDto dto = new StudentDto(null, "New", "Student", 11, "FEMALE", "new@mail.com");
 
         mapper.updateEntity(existing, dto);
 
@@ -75,7 +75,7 @@ class StudentMapperTest {
 
     @Test
     void toEntityShouldSupportCaseInsensitiveGender() {
-        StudentDTO dto = new StudentDTO(null, "Anna", "Smirnova", 9, "female", "anna@mail.com");
+        StudentDto dto = new StudentDto(null, "Anna", "Smirnova", 9, "female", "anna@mail.com");
 
         Student result = mapper.toEntity(dto);
 

@@ -2,7 +2,7 @@ package com.school.school.service;
 
 import com.school.school.model.SchoolClass;
 import com.school.school.repository.SchoolClassRepository;
-import com.school.school.service.dto.SchoolClassDTO;
+import com.school.school.service.dto.SchoolClassDto;
 import com.school.school.service.mapper.SchoolClassMapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -27,15 +27,15 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     }
 
     @Override
-    public void createClass(final SchoolClassDTO classDTO) {
-        repository.save(mapper.toEntity(classDTO));
+    public void createClass(final SchoolClassDto classDto) {
+        repository.save(mapper.toEntity(classDto));
     }
 
     @Override
-    public SchoolClass updateClass(final Long id, final SchoolClassDTO classDTO) {
+    public SchoolClass updateClass(final Long id, final SchoolClassDto classDto) {
         return repository.findById(id)
                 .map(existingClass -> {
-                    mapper.updateEntity(existingClass, classDTO);
+                    mapper.updateEntity(existingClass, classDto);
                     repository.save(existingClass);
                     return existingClass;
                 })

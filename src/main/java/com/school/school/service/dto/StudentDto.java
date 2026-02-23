@@ -1,6 +1,8 @@
 package com.school.school.service.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +13,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TeacherDTO {
+public class StudentDto {
+    /**
+     * Минимальная оценка.
+     */
+    public static final int MIN_GRADE = 1;
+    /**
+     * Максимальная оценка.
+     */
+    public static final int MAX_GRADE = 11;
+
     private Long id;
 
     @NotBlank
@@ -19,6 +30,13 @@ public class TeacherDTO {
 
     @NotBlank
     private String lastName;
+
+    @Min(MIN_GRADE)
+    @Max(MAX_GRADE)
+    private int grade;
+
+    @NotBlank
+    private String gender;
 
     @NotBlank
     @Email

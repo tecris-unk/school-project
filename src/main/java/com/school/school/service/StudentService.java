@@ -2,8 +2,7 @@ package com.school.school.service;
 
 import com.school.school.model.Grade;
 import com.school.school.model.Student;
-import com.school.school.service.dto.StudentDTO;
-
+import com.school.school.service.dto.StudentDto;
 import java.util.List;
 
 public interface StudentService {
@@ -27,7 +26,7 @@ public interface StudentService {
      *
      * @param student учашийся DTO
      */
-    void createStudent(StudentDTO student);
+    void createStudent(StudentDto student);
 
     /**
      * Функция по нахождению учащегося по индетификатору.
@@ -48,11 +47,11 @@ public interface StudentService {
     /**
      * Функция по обновлению учащегося.
      *
-     * @param id индетификатор учащегося, которого нужно изменить.
+     * @param id             индетификатор учащегося, которого нужно изменить.
      * @param updatedStudent обновление учащегося DTO
      * @return обновленный учащийся
      */
-    Student updateStudent(Long id, StudentDTO updatedStudent);
+    Student updateStudent(Long id, StudentDto updatedStudent);
 
     /**
      * Фукнция по удалению учащегося.
@@ -66,7 +65,7 @@ public interface StudentService {
      * Функция по созданию учащегося с оценками.
      *
      * @param student учащийся DTO
-     * @param grades оценки учащегося
+     * @param grades  оценки учащегося
      */
-    void createStudentWithGrades(StudentDTO student, List<Grade> grades);
+    void createStudentWithGrades(StudentDto student, List<Grade> grades);
 }

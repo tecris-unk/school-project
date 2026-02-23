@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SchoolClassDTO {
+public class SchoolClassDto {
     /**
      * Минимальная оценка.
      */

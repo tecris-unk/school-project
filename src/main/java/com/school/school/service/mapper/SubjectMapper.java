@@ -1,13 +1,13 @@
 package com.school.school.service.mapper;
 
 import com.school.school.model.Subject;
-import com.school.school.service.dto.SubjectDTO;
+import com.school.school.service.dto.SubjectDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class SubjectMapper {
 
-    public SubjectDTO toDTO(final Subject subject) {
+    public SubjectDto toDto(final Subject subject) {
         if (subject == null) {
             return null;
         }
@@ -17,7 +17,7 @@ public final class SubjectMapper {
             teacherId = subject.getTeacher().getId();
         }
 
-        return new SubjectDTO(
+        return new SubjectDto(
                 subject.getId(),
                 subject.getName(),
                 subject.getDescription(),
@@ -25,7 +25,7 @@ public final class SubjectMapper {
         );
     }
 
-    public Subject toEntity(final SubjectDTO dto) {
+    public Subject toEntity(final SubjectDto dto) {
         if (dto == null) {
             return null;
         }
@@ -36,7 +36,7 @@ public final class SubjectMapper {
         return subject;
     }
 
-    public void updateEntity(final Subject subject, final SubjectDTO dto) {
+    public void updateEntity(final Subject subject, final SubjectDto dto) {
         subject.setName(dto.getName());
         subject.setDescription(dto.getDescription());
     }

@@ -1,5 +1,6 @@
 package com.school.school.service.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,13 +11,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SubjectDTO {
+public class TeacherDto {
     private Long id;
 
     @NotBlank
-    private String name;
+    private String firstName;
 
-    private String description;
+    @NotBlank
+    private String lastName;
 
-    private Long teacherId;
+    @NotBlank
+    @Email
+    private String email;
 }

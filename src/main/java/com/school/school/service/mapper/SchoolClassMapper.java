@@ -1,25 +1,25 @@
 package com.school.school.service.mapper;
 
 import com.school.school.model.SchoolClass;
-import com.school.school.service.dto.SchoolClassDTO;
+import com.school.school.service.dto.SchoolClassDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class SchoolClassMapper {
 
-    public SchoolClassDTO toDTO(final SchoolClass schoolClass) {
+    public SchoolClassDto toDto(final SchoolClass schoolClass) {
         if (schoolClass == null) {
             return null;
         }
 
-        return new SchoolClassDTO(
+        return new SchoolClassDto(
                 schoolClass.getId(),
                 schoolClass.getGrade(),
                 schoolClass.getLetter()
         );
     }
 
-    public SchoolClass toEntity(final SchoolClassDTO dto) {
+    public SchoolClass toEntity(final SchoolClassDto dto) {
         if (dto == null) {
             return null;
         }
@@ -32,7 +32,7 @@ public final class SchoolClassMapper {
 
     public void updateEntity(
             final SchoolClass schoolClass,
-            final SchoolClassDTO dto) {
+            final SchoolClassDto dto) {
         schoolClass.setGrade(dto.getGrade());
         schoolClass.setLetter(dto.getLetter());
     }

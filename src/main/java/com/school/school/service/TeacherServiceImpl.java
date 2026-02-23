@@ -2,7 +2,7 @@ package com.school.school.service;
 
 import com.school.school.model.Teacher;
 import com.school.school.repository.TeacherRepository;
-import com.school.school.service.dto.TeacherDTO;
+import com.school.school.service.dto.TeacherDto;
 import com.school.school.service.mapper.TeacherMapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -27,15 +27,15 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public void createTeacher(final TeacherDTO teacherDTO) {
-        repository.save(mapper.toEntity(teacherDTO));
+    public void createTeacher(final TeacherDto teacherDto) {
+        repository.save(mapper.toEntity(teacherDto));
     }
 
     @Override
-    public Teacher updateTeacher(final Long id, final TeacherDTO teacherDTO) {
+    public Teacher updateTeacher(final Long id, final TeacherDto teacherDto) {
         return repository.findById(id)
                 .map(existingTeacher -> {
-                    mapper.updateEntity(existingTeacher, teacherDTO);
+                    mapper.updateEntity(existingTeacher, teacherDto);
                     repository.save(existingTeacher);
                     return existingTeacher;
                 })

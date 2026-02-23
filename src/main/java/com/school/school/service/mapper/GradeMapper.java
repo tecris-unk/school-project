@@ -1,13 +1,13 @@
 package com.school.school.service.mapper;
 
 import com.school.school.model.Grade;
-import com.school.school.service.dto.GradeDTO;
+import com.school.school.service.dto.GradeDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class GradeMapper {
 
-    public GradeDTO toDTO(final Grade grade) {
+    public GradeDto toDto(final Grade grade) {
         if (grade == null) {
             return null;
         }
@@ -15,7 +15,7 @@ public final class GradeMapper {
         Long studentId = grade.getStudent() != null ? grade.getStudent().getId() : null;
         Long subjectId = grade.getSubject() != null ? grade.getSubject().getId() : null;
 
-        return new GradeDTO(
+        return new GradeDto(
                 grade.getId(),
                 studentId,
                 subjectId,
@@ -24,7 +24,7 @@ public final class GradeMapper {
         );
     }
 
-    public Grade toEntity(final GradeDTO dto) {
+    public Grade toEntity(final GradeDto dto) {
         if (dto == null) {
             return null;
         }
@@ -35,7 +35,7 @@ public final class GradeMapper {
         return grade;
     }
 
-    public void updateEntity(final Grade grade, final GradeDTO dto) {
+    public void updateEntity(final Grade grade, final GradeDto dto) {
 
         grade.setScore(dto.getScore());
         grade.setDate(dto.getDate());

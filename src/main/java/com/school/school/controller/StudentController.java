@@ -70,6 +70,23 @@ public final class StudentController {
     }
 
     /**
+     * {@code GET} : получить всех учащихся с загруженными предметами.
+     *
+     * @return список всех пользователей с предзагруженными предметами
+     */
+    @GetMapping("/with-subjects")
+    public ResponseEntity<List<StudentDTO>> getAllStudentsWithSubjects() {
+        List<Student> students = service.findAllStudentsWithSubjects();
+        if (students.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        List<StudentDTO> dtoList = students.stream()
+                .map(mapper::toDTO)
+                .toList();
+        return new ResponseEntity<>(dtoList, HttpStatus.OK);
+    }
+
+    /**
      * {@code POST} : добавить нового учащегося.
      *
      * @param studentDTO учащийся, которого нужно добавить

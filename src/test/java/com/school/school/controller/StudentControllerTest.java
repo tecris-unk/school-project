@@ -78,6 +78,28 @@ class StudentControllerTest {
     }
 
     @Test
+    void getAllStudentsWithSubjectsShouldReturnNoContentWhenEmpty() throws Exception {
+        when(service.findAllStudentsWithSubjects()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/students/with-subjects"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getAllStudentsWithSubjectsShouldReturnMappedStudentsWhenPresent() throws Exception {
+        Student first = new Student();
+        first.setId(1L);
+        StudentDTO firstDto = new StudentDTO(1L, "Ivan", "Petrov", 10, "MALE", "ivan@mail.com");
+
+        when(service.findAllStudentsWithSubjects()).thenReturn(List.of(first));
+        when(mapper.toDTO(first)).thenReturn(firstDto);
+
+        mockMvc.perform(get("/api/students/with-subjects"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].firstName").value("Ivan"));
+    }
+
+    @Test
     void findByIdShouldReturnNotFoundWhenStudentMissing() throws Exception {
         when(service.findStudentById(1L)).thenReturn(null);
 

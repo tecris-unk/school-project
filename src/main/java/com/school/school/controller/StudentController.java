@@ -79,10 +79,10 @@ public final class StudentController {
             @ApiResponse(responseCode = "201", description = "Ученик создан")
     })
     @PostMapping("/")
-    public ResponseEntity<Void> addStudentWithGrades(
+    public ResponseEntity<StudentDto> addStudentWithGrades(
             @Valid @RequestBody final StudentDto studentDto, final List<GradeDto> gradesDto) {
-        service.createStudentWithGrades(studentDto, gradesDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        StudentDto created = service.createStudentWithGrades(studentDto, gradesDto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Обновить ученика")

@@ -44,6 +44,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<StudentDto> findAllStudentsWithGrades() {
+        return repository.findAllWithGradesBy().stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
+    @Override
     public StudentDto createStudent(final StudentDto dto) {
         validateEmail(dto.getEmail());
         ensureEmailUnique(dto.getEmail());
@@ -101,9 +109,10 @@ public class StudentServiceImpl implements StudentService {
         for (GradeDto gradeDto : grades) {
             Grade grade = gradeMapper.toEntity(gradeDto);
             grade.setStudent(student);
-            Subject subject = subjectRepository.findById(gradeDto.getSubjectId())
+            Long subjectId = gradeDto.getSubject() != null ? gradeDto.getSubject().getId() : 0;
+            Subject subject = subjectRepository.findById(subjectId)
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId())
+                            SUBJECT_NOT_FOUND_MSG + " with id: " + subjectId)
                     );
             grade.setSubject(subject);
             gradeRepository.save(grade);

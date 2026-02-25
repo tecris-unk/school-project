@@ -2,6 +2,8 @@ package com.school.school.service.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +29,9 @@ public class StudentDto {
     @NotBlank
     @Email
     private String email;
+
+    private SchoolClassDto schoolClass;
+
+    private List<GradeDto> grades = new ArrayList<>();
+
 }

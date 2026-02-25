@@ -14,22 +14,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GradeDto {
-    /**
-     * Минимальная оценка.
-     */
+
     public static final int MIN_SCORE = 2;
-    /**
-     * Максимальная оценка.
-     */
     public static final int MAX_SCORE = 10;
 
     private Long id;
-
-    @NotNull
-    private Long studentId;
-
-    @NotNull
-    private Long subjectId;
 
     @Min(MIN_SCORE)
     @Max(MAX_SCORE)
@@ -37,4 +26,8 @@ public class GradeDto {
 
     @NotNull
     private LocalDate date;
+
+    private StudentDto student;
+
+    private SubjectDto subject;
 }

@@ -43,11 +43,12 @@ public class SubjectServiceImpl implements SubjectService {
     @Transactional
     public SubjectDto createSubject(final SubjectDto subjectDto) {
         Subject subject = mapper.toEntity(subjectDto);
-        if (subjectDto.getTeacherId() != null) {
+        if (subjectDto.getTeacher() != null && subjectDto.getTeacher().getId() != null) {
+            Long teacherId = subjectDto.getTeacher().getId();
             Teacher teacher = teacherRepository
-                    .findById(subjectDto.getTeacherId())
+                    .findById(teacherId)
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId())
+                            TEACHER_NOT_FOUND_MSG + " with id: " + teacherId)
                     );
             subject.setTeacher(teacher);
         }
@@ -60,13 +61,14 @@ public class SubjectServiceImpl implements SubjectService {
         Subject subject = repository.findById(id)
                 .map(existingSubject -> {
                     mapper.updateEntity(existingSubject, subjectDto);
-                    if (subjectDto.getTeacherId() == null) {
+                    if (subjectDto.getTeacher() == null || subjectDto.getTeacher().getId() == null) {
                         existingSubject.setTeacher(null);
                     } else {
+                        Long teacherId = subjectDto.getTeacher().getId();
                         Teacher teacher = teacherRepository
-                                .findById(subjectDto.getTeacherId())
+                                .findById(teacherId)
                                 .orElseThrow(() -> new ResourceNotFoundException(
-                                        TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId())
+                                        TEACHER_NOT_FOUND_MSG + " with id: " + teacherId)
                                 );
                         existingSubject.setTeacher(teacher);
                     }

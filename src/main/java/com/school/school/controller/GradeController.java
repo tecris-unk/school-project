@@ -31,7 +31,6 @@ public final class GradeController {
             @ApiResponse(responseCode = "200", description = "Оценка найдена"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
-
     @GetMapping("/{id}")
     public ResponseEntity<GradeDto> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findGradeById(id));
@@ -42,7 +41,6 @@ public final class GradeController {
             @ApiResponse(responseCode = "200", description = "Оценки найдены"),
             @ApiResponse(responseCode = "204", description = "Список оценок пуст")
     })
-
     @GetMapping
     public ResponseEntity<List<GradeDto>> getAllGrades() {
         List<GradeDto> grades = service.findAllGrades();
@@ -57,7 +55,6 @@ public final class GradeController {
             @ApiResponse(responseCode = "201", description = "Оценка добавлена"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
-
     @PostMapping
     public ResponseEntity<GradeDto> addGrade(
             @Valid @RequestBody final GradeDto gradeDto) {

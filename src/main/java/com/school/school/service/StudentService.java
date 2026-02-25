@@ -8,6 +8,8 @@ public interface StudentService {
 
     List<StudentDto> findAllStudents();
 
+    List<StudentDto> findAllStudentsWithGrades();
+
     StudentDto createStudent(StudentDto student);
 
     StudentDto findStudentById(Long id);

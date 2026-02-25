@@ -40,7 +40,7 @@ public final class SchoolClassController {
     @Operation(summary = "Получить все классы")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Классы получены"),
-            @ApiResponse(responseCode = "404", description = "Классы не найдены")
+            @ApiResponse(responseCode = "204", description = "Список классов пуст")
     })
     @GetMapping
     public ResponseEntity<List<SchoolClassDto>> getAllClasses() {
@@ -55,7 +55,7 @@ public final class SchoolClassController {
     @Operation(summary = "Получить все классы c загруженными предметами")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Классы получены"),
-            @ApiResponse(responseCode = "404", description = "Классы не найдены")
+            @ApiResponse(responseCode = "204", description = "Список классов пуст")
     })
     @GetMapping("/with-subjects")
     public ResponseEntity<List<SchoolClassDto>> getAllSchoolClassesWithSubjects() {
@@ -69,7 +69,8 @@ public final class SchoolClassController {
 
     @Operation(summary = "Создать новый класс")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Класс создан"),
+            @ApiResponse(responseCode = "201", description = "Класс создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
     })
     @PostMapping
     public ResponseEntity<SchoolClassDto> addClass(
@@ -81,6 +82,7 @@ public final class SchoolClassController {
     @Operation(summary = "Обновить класс")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Класс успешно обновлен"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Класс не найден")
     })
     @PutMapping("/{id}")
@@ -92,7 +94,7 @@ public final class SchoolClassController {
 
     @Operation(summary = "Удалить класс")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Класс успешно удален"),
+            @ApiResponse(responseCode = "204", description = "Класс успешно удален"),
             @ApiResponse(responseCode = "404", description = "Класс не найден")
     })
     @DeleteMapping("/{id}")

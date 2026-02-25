@@ -39,7 +39,7 @@ public final class SubjectController {
     @Operation(summary = "Получить все предметы")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Предметы найдены"),
-            @ApiResponse(responseCode = "204", description = "Предметы не найдены")
+            @ApiResponse(responseCode = "204", description = "Список предметов пуст")
     })
     @GetMapping
     public ResponseEntity<List<SubjectDto>> getAllSubjects() {
@@ -53,6 +53,7 @@ public final class SubjectController {
     @Operation(summary = "Создать предмет")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Предмет создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Связанные сущности не найдены")
     })
     @PostMapping
@@ -65,6 +66,7 @@ public final class SubjectController {
     @Operation(summary = "Обновить предмет")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Предмет обновлён"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
     @PutMapping("/{id}")

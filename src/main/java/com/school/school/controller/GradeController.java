@@ -39,7 +39,7 @@ public final class GradeController {
     @Operation(summary = "Найти все оценки")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Оценки найдены"),
-            @ApiResponse(responseCode = "404", description = "Оценки не найдены")
+            @ApiResponse(responseCode = "204", description = "Список оценок пуст")
     })
     @GetMapping
     public ResponseEntity<List<GradeDto>> getAllGrades() {
@@ -53,7 +53,7 @@ public final class GradeController {
     @Operation(summary = "Добавление оценки")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Оценка добавлена"),
-            @ApiResponse(responseCode = "404", description = "Оценка не найдена")
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
     @PostMapping
     public ResponseEntity<GradeDto> addGrade(
@@ -65,6 +65,7 @@ public final class GradeController {
     @Operation(summary = "Обновить оценку по индетификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Оценка успешно обновлена"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
     @PutMapping("/{id}")

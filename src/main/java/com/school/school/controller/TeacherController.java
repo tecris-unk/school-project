@@ -5,6 +5,7 @@ import com.school.school.service.dto.TeacherDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public final class TeacherController {
     @Operation(summary = "Найти всех учителей")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Учителя найдены"),
-            @ApiResponse(responseCode = "404", description = "Учителя не найдены")
+            @ApiResponse(responseCode = "204", description = "Список учителей пуст")
     })
     @GetMapping
     public ResponseEntity<List<TeacherDto>> getAllTeachers() {
@@ -51,11 +52,12 @@ public final class TeacherController {
 
     @Operation(summary = "Создать учителя")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Учитель создан")
+            @ApiResponse(responseCode = "201", description = "Учитель создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
     @PostMapping
     public ResponseEntity<TeacherDto> addTeacher(
-            @RequestBody final TeacherDto teacherDto) {
+            @Valid @RequestBody final TeacherDto teacherDto) {
         TeacherDto created = service.createTeacher(teacherDto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
@@ -63,12 +65,13 @@ public final class TeacherController {
     @Operation(summary = "Обновить учителя")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Учитель обновлён"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
     @PutMapping("/{id}")
     public ResponseEntity<TeacherDto> updateTeacher(
             @PathVariable final Long id,
-            @RequestBody final TeacherDto teacherDto) {
+           @Valid @RequestBody final TeacherDto teacherDto) {
         return ResponseEntity.ok(service.updateTeacher(id, teacherDto));
     }
 

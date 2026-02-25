@@ -52,7 +52,7 @@ public final class StudentController {
     @Operation(summary = "Получить всех учеников")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ученики найдены"),
-            @ApiResponse(responseCode = "204", description = "Ученики не найдены")
+            @ApiResponse(responseCode = "204", description = "Список учеников пуст")
     })
     @GetMapping("/")
     public ResponseEntity<List<StudentDto>> getAllStudents() {
@@ -65,7 +65,8 @@ public final class StudentController {
 
     @Operation(summary = "Создать ученика")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Ученик создан")
+            @ApiResponse(responseCode = "201", description = "Ученик создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
     @PostMapping("/")
     public ResponseEntity<StudentDto> addStudent(
@@ -76,9 +77,10 @@ public final class StudentController {
 
     @Operation(summary = "Создать ученика с оценками")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Ученик создан")
+            @ApiResponse(responseCode = "201", description = "Ученик создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
-    @PostMapping("/")
+    @PostMapping("/with_grades")
     public ResponseEntity<StudentDto> addStudentWithGrades(
             @Valid @RequestBody final StudentDto studentDto, final List<GradeDto> gradesDto) {
         StudentDto created = service.createStudentWithGrades(studentDto, gradesDto);
@@ -88,6 +90,7 @@ public final class StudentController {
     @Operation(summary = "Обновить ученика")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ученик обновлён"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @PutMapping("/{id}")

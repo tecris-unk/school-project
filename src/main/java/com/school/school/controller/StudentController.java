@@ -1,9 +1,8 @@
 package com.school.school.controller;
 
-import com.school.school.model.Student;
 import com.school.school.service.StudentService;
+import com.school.school.service.dto.GradeDto;
 import com.school.school.service.dto.StudentDto;
-import com.school.school.service.mapper.StudentMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -29,8 +28,6 @@ public final class StudentController {
 
     private final StudentService service;
 
-    private final StudentMapper mapper;
-
     @Operation(summary = "Получить ученика по id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ученик найден"),
@@ -38,8 +35,7 @@ public final class StudentController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<StudentDto> findById(@PathVariable final Long id) {
-        Student student = service.findStudentById(id);
-        return ResponseEntity.ok(mapper.toDto(student));
+        return ResponseEntity.ok(service.findStudentById(id));
     }
 
     @Operation(summary = "Получить ученика по email")
@@ -50,8 +46,7 @@ public final class StudentController {
     @GetMapping(path = "/", params = "email")
     public ResponseEntity<StudentDto> findByEmail(
             @RequestParam(required = false) final String email) {
-        Student student = service.findStudentByEmail(email);
-        return ResponseEntity.ok(mapper.toDto(student));
+        return ResponseEntity.ok(service.findStudentByEmail(email));
     }
 
     @Operation(summary = "Получить всех учеников")
@@ -61,14 +56,11 @@ public final class StudentController {
     })
     @GetMapping("/")
     public ResponseEntity<List<StudentDto>> getAllStudents() {
-        List<Student> students = service.findAllStudents();
+        List<StudentDto> students = service.findAllStudents();
         if (students.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        List<StudentDto> dtoList = students.stream()
-                .map(mapper::toDto)
-                .toList();
-        return new ResponseEntity<>(dtoList, HttpStatus.OK);
+        return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
     @Operation(summary = "Создать ученика")
@@ -76,9 +68,20 @@ public final class StudentController {
             @ApiResponse(responseCode = "201", description = "Ученик создан")
     })
     @PostMapping("/")
-    public ResponseEntity<Void> addStudent(
+    public ResponseEntity<StudentDto> addStudent(
             @Valid @RequestBody final StudentDto studentDto) {
-        service.createStudent(studentDto);
+        StudentDto created = service.createStudent(studentDto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Создать ученика с оценками")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Ученик создан")
+    })
+    @PostMapping("/")
+    public ResponseEntity<Void> addStudentWithGrades(
+            @Valid @RequestBody final StudentDto studentDto, final List<GradeDto> gradesDto) {
+        service.createStudentWithGrades(studentDto, gradesDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -91,8 +94,7 @@ public final class StudentController {
     public ResponseEntity<StudentDto> updateStudent(
             @PathVariable final Long id,
             @Valid @RequestBody final StudentDto updatedStudent) {
-        Student student = service.updateStudent(id, updatedStudent);
-        return ResponseEntity.ok(mapper.toDto(student));
+        return ResponseEntity.ok(service.updateStudent(id, updatedStudent));
     }
 
     @Operation(summary = "Удалить ученика")

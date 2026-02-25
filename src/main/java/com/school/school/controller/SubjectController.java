@@ -1,9 +1,7 @@
 package com.school.school.controller;
 
-import com.school.school.model.Subject;
 import com.school.school.service.SubjectService;
 import com.school.school.service.dto.SubjectDto;
-import com.school.school.service.mapper.SubjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,8 +26,6 @@ public final class SubjectController {
 
     private final SubjectService service;
 
-    private final SubjectMapper mapper;
-
     @Operation(summary = "Получить предмет по id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Предмет найден"),
@@ -37,8 +33,7 @@ public final class SubjectController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<SubjectDto> findById(@PathVariable final Long id) {
-        Subject subject = service.findSubjectById(id);
-        return ResponseEntity.ok(mapper.toDto(subject));
+        return ResponseEntity.ok(service.findSubjectById(id));
     }
 
     @Operation(summary = "Получить все предметы")
@@ -48,15 +43,11 @@ public final class SubjectController {
     })
     @GetMapping
     public ResponseEntity<List<SubjectDto>> getAllSubjects() {
-        List<Subject> subjects = service.findAllSubjects();
+        List<SubjectDto> subjects = service.findAllSubjects();
         if (subjects.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
-        List<SubjectDto> dtoList = subjects.stream()
-                .map(mapper::toDto)
-                .toList();
-        return ResponseEntity.ok(dtoList);
+        return ResponseEntity.ok(subjects);
     }
 
     @Operation(summary = "Создать предмет")
@@ -65,10 +56,10 @@ public final class SubjectController {
             @ApiResponse(responseCode = "404", description = "Связанные сущности не найдены")
     })
     @PostMapping
-    public ResponseEntity<Void> addSubject(
+    public ResponseEntity<SubjectDto> addSubject(
             @Valid @RequestBody final SubjectDto subjectDto) {
-        service.createSubject(subjectDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        SubjectDto created = service.createSubject(subjectDto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Обновить предмет")
@@ -80,8 +71,7 @@ public final class SubjectController {
     public ResponseEntity<SubjectDto> updateSubject(
             @PathVariable final Long id,
             @Valid @RequestBody final SubjectDto subjectDto) {
-        Subject subject = service.updateSubject(id, subjectDto);
-        return ResponseEntity.ok(mapper.toDto(subject));
+        return ResponseEntity.ok(service.updateSubject(id, subjectDto));
     }
 
     @Operation(summary = "Удалить предмет")
@@ -91,7 +81,7 @@ public final class SubjectController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubject(@PathVariable final Long id) {
-         service.deleteSubject(id);
+        service.deleteSubject(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,9 +1,7 @@
 package com.school.school.controller;
 
-import com.school.school.model.SchoolClass;
 import com.school.school.service.SchoolClassService;
 import com.school.school.service.dto.SchoolClassDto;
-import com.school.school.service.mapper.SchoolClassMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,8 +26,6 @@ public final class SchoolClassController {
 
     private final SchoolClassService service;
 
-    private final SchoolClassMapper mapper;
-
     @Operation(summary = "Найти класс по индетификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Класс найден"),
@@ -38,8 +34,7 @@ public final class SchoolClassController {
     @GetMapping("/{id}")
     public ResponseEntity<SchoolClassDto> findById(
             @PathVariable final Long id) {
-        SchoolClass schoolClass = service.findClassById(id);
-        return ResponseEntity.ok(mapper.toDto(schoolClass));
+        return ResponseEntity.ok(service.findClassById(id));
     }
 
     @Operation(summary = "Получить все классы")
@@ -49,15 +44,12 @@ public final class SchoolClassController {
     })
     @GetMapping
     public ResponseEntity<List<SchoolClassDto>> getAllClasses() {
-        List<SchoolClass> classes = service.findAllClasses();
+        List<SchoolClassDto> classes = service.findAllClasses();
         if (classes.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        List<SchoolClassDto> dtoList = classes.stream()
-                .map(mapper::toDto)
-                .toList();
-        return ResponseEntity.ok(dtoList);
+        return ResponseEntity.ok(classes);
     }
 
     @Operation(summary = "Получить все классы c загруженными предметами")
@@ -67,14 +59,12 @@ public final class SchoolClassController {
     })
     @GetMapping("/with-subjects")
     public ResponseEntity<List<SchoolClassDto>> getAllSchoolClassesWithSubjects() {
-        List<SchoolClass> schoolClasses = service.findAllSchoolClassesWithSubjects();
+        List<SchoolClassDto> schoolClasses = service.findAllSchoolClassesWithSubjects();
         if (schoolClasses.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        List<SchoolClassDto> dtoList = schoolClasses.stream()
-                .map(mapper::toDto)
-                .toList();
-        return new ResponseEntity<>(dtoList, HttpStatus.OK);
+
+        return new ResponseEntity<>(schoolClasses, HttpStatus.OK);
     }
 
     @Operation(summary = "Создать новый класс")
@@ -82,10 +72,10 @@ public final class SchoolClassController {
             @ApiResponse(responseCode = "200", description = "Класс создан"),
     })
     @PostMapping
-    public ResponseEntity<Void> addClass(
+    public ResponseEntity<SchoolClassDto> addClass(
             @Valid @RequestBody final SchoolClassDto classDto) {
-        service.createClass(classDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        SchoolClassDto created = service.createClass(classDto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Обновить класс")
@@ -97,8 +87,7 @@ public final class SchoolClassController {
     public ResponseEntity<SchoolClassDto> updateClass(
             @PathVariable final Long id,
             @Valid @RequestBody final SchoolClassDto classDto) {
-        SchoolClass schoolClass = service.updateClass(id, classDto);
-        return ResponseEntity.ok(mapper.toDto(schoolClass));
+        return ResponseEntity.ok(service.updateClass(id, classDto));
     }
 
     @Operation(summary = "Удалить класс")

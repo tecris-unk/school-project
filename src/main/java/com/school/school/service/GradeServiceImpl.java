@@ -29,20 +29,23 @@ public class GradeServiceImpl implements GradeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Grade> findAllGrades() {
-        return repository.findAll();
+    public List<GradeDto> findAllGrades() {
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Grade findGradeById(final Long id) {
-        return repository.findById(id)
+    public GradeDto findGradeById(final Long id) {
+        Grade grade = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(grade);
     }
 
     @Override
     @Transactional
-    public void createGrade(final GradeDto gradeDto) {
+    public GradeDto createGrade(final GradeDto gradeDto) {
         Student student = studentRepository.findById(gradeDto.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + gradeDto.getStudentId()));
         Subject subject = subjectRepository.findById(gradeDto.getSubjectId())
@@ -51,21 +54,18 @@ public class GradeServiceImpl implements GradeService {
         Grade grade = mapper.toEntity(gradeDto);
         grade.setStudent(student);
         grade.setSubject(subject);
-        repository.save(grade);
+        return mapper.toDto(repository.save(grade));
     }
 
     @Override
     @Transactional
-    public Grade updateGrade(final Long id, final GradeDto gradeDto) {
+    public GradeDto updateGrade(final Long id, final GradeDto gradeDto) {
         Student student = studentRepository.findById(gradeDto.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + gradeDto.getStudentId()));
         Subject subject = subjectRepository.findById(gradeDto.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId()));
-        if (student == null || subject == null) {
-            return null;
-        }
 
-        return repository.findById(id)
+        Grade grade = repository.findById(id)
                 .map(existingGrade -> {
                     mapper.updateEntity(existingGrade, gradeDto);
                     existingGrade.setStudent(student);
@@ -74,6 +74,7 @@ public class GradeServiceImpl implements GradeService {
                     return existingGrade;
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(grade);
     }
 
     @Override

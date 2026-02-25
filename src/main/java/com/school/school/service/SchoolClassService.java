@@ -1,20 +1,19 @@
 package com.school.school.service;
 
-import com.school.school.model.SchoolClass;
 import com.school.school.service.dto.SchoolClassDto;
 import java.util.List;
 
 public interface SchoolClassService {
 
-    List<SchoolClass> findAllClasses();
+    List<SchoolClassDto> findAllClasses();
 
-    List<SchoolClass> findAllSchoolClassesWithSubjects();
+    List<SchoolClassDto> findAllSchoolClassesWithSubjects();
 
-    SchoolClass findClassById(Long id);
+    SchoolClassDto findClassById(Long id);
 
-    void createClass(SchoolClassDto classDto);
+    SchoolClassDto createClass(SchoolClassDto classDto);
 
-    SchoolClass updateClass(Long id, SchoolClassDto classDto);
+    SchoolClassDto updateClass(Long id, SchoolClassDto classDto);
 
     void deleteClass(Long id);
 }

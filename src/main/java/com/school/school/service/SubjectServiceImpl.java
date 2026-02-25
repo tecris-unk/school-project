@@ -25,19 +25,23 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Subject> findAllSubjects() {
-        return repository.findAll();
+    public List<SubjectDto> findAllSubjects() {
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
+
     @Transactional(readOnly = true)
-    public Subject findSubjectById(final Long id) {
-        return repository.findById(id)
+    public SubjectDto findSubjectById(final Long id) {
+        Subject subject = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(subject);
     }
 
     @Override
     @Transactional
-    public void createSubject(final SubjectDto subjectDto) {
+    public SubjectDto createSubject(final SubjectDto subjectDto) {
         Subject subject = mapper.toEntity(subjectDto);
         if (subjectDto.getTeacherId() != null) {
             Teacher teacher = teacherRepository
@@ -45,13 +49,13 @@ public class SubjectServiceImpl implements SubjectService {
                     .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId()));
             subject.setTeacher(teacher);
         }
-        repository.save(subject);
+        return mapper.toDto(repository.save(subject));
     }
 
     @Override
     @Transactional
-    public Subject updateSubject(final Long id, final SubjectDto subjectDto) {
-        return repository.findById(id)
+    public SubjectDto updateSubject(final Long id, final SubjectDto subjectDto) {
+        Subject subject = repository.findById(id)
                 .map(existingSubject -> {
                     mapper.updateEntity(existingSubject, subjectDto);
                     if (subjectDto.getTeacherId() == null) {
@@ -62,10 +66,10 @@ public class SubjectServiceImpl implements SubjectService {
                                 .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId()));
                         existingSubject.setTeacher(teacher);
                     }
-                    repository.save(existingSubject);
-                    return existingSubject;
+                    return repository.save(existingSubject);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(subject);
     }
 
     @Override

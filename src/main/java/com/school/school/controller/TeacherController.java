@@ -1,9 +1,7 @@
 package com.school.school.controller;
 
-import com.school.school.model.Teacher;
 import com.school.school.service.TeacherService;
 import com.school.school.service.dto.TeacherDto;
-import com.school.school.service.mapper.TeacherMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,8 +25,6 @@ public final class TeacherController {
 
     private final TeacherService service;
 
-    private final TeacherMapper mapper;
-
     @Operation(summary = "Найти учителя по ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Учитель найден"),
@@ -36,8 +32,7 @@ public final class TeacherController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<TeacherDto> findById(@PathVariable final Long id) {
-        Teacher teacher = service.findTeacherById(id);
-        return ResponseEntity.ok(mapper.toDto(teacher));
+        return ResponseEntity.ok(service.findTeacherById(id));
     }
 
     @Operation(summary = "Найти всех учителей")
@@ -47,15 +42,11 @@ public final class TeacherController {
     })
     @GetMapping
     public ResponseEntity<List<TeacherDto>> getAllTeachers() {
-        List<Teacher> teachers = service.findAllTeachers();
+        List<TeacherDto> teachers = service.findAllTeachers();
         if (teachers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
-        List<TeacherDto> dtoList = teachers.stream()
-                .map(mapper::toDto)
-                .toList();
-        return ResponseEntity.ok(dtoList);
+        return ResponseEntity.ok(teachers);
     }
 
     @Operation(summary = "Создать учителя")
@@ -63,10 +54,10 @@ public final class TeacherController {
             @ApiResponse(responseCode = "201", description = "Учитель создан")
     })
     @PostMapping
-    public ResponseEntity<Void> addTeacher(
+    public ResponseEntity<TeacherDto> addTeacher(
             @RequestBody final TeacherDto teacherDto) {
-        service.createTeacher(teacherDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        TeacherDto created = service.createTeacher(teacherDto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Обновить учителя")
@@ -78,8 +69,7 @@ public final class TeacherController {
     public ResponseEntity<TeacherDto> updateTeacher(
             @PathVariable final Long id,
             @RequestBody final TeacherDto teacherDto) {
-        Teacher teacher = service.updateTeacher(id, teacherDto);
-        return ResponseEntity.ok(mapper.toDto(teacher));
+        return ResponseEntity.ok(service.updateTeacher(id, teacherDto));
     }
 
     @Operation(summary = "Удалить учителя")

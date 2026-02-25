@@ -21,33 +21,37 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Teacher> findAllTeachers() {
-        return repository.findAll();
+    public List<TeacherDto> findAllTeachers() {
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Teacher findTeacherById(final Long id) {
-        return repository.findById(id)
+    public TeacherDto findTeacherById(final Long id) {
+        Teacher teacher = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(teacher);
     }
 
     @Override
     @Transactional
-    public void createTeacher(final TeacherDto teacherDto) {
-        repository.save(mapper.toEntity(teacherDto));
+    public TeacherDto createTeacher(final TeacherDto teacherDto) {
+        Teacher teacher = repository.save(mapper.toEntity(teacherDto));
+        return mapper.toDto(teacher);
     }
 
     @Override
     @Transactional
-    public Teacher updateTeacher(final Long id, final TeacherDto teacherDto) {
-        return repository.findById(id)
+    public TeacherDto updateTeacher(final Long id, final TeacherDto teacherDto) {
+        Teacher teacher = repository.findById(id)
                 .map(existingTeacher -> {
                     mapper.updateEntity(existingTeacher, teacherDto);
-                    repository.save(existingTeacher);
-                    return existingTeacher;
+                    return repository.save(existingTeacher);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(teacher);
     }
 
     @Override

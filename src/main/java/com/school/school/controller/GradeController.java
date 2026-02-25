@@ -1,9 +1,7 @@
 package com.school.school.controller;
 
-import com.school.school.model.Grade;
 import com.school.school.service.GradeService;
 import com.school.school.service.dto.GradeDto;
-import com.school.school.service.mapper.GradeMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,8 +26,6 @@ public final class GradeController {
 
     private final GradeService service;
 
-    private final GradeMapper mapper;
-
     @Operation(summary = "Найти оценку по индетификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Оценка найдена"),
@@ -37,9 +33,7 @@ public final class GradeController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<GradeDto> findById(@PathVariable final Long id) {
-        Grade grade = service.findGradeById(id);
-
-        return ResponseEntity.ok(mapper.toDto(grade));
+        return ResponseEntity.ok(service.findGradeById(id));
     }
 
     @Operation(summary = "Найти все оценки")
@@ -49,15 +43,11 @@ public final class GradeController {
     })
     @GetMapping
     public ResponseEntity<List<GradeDto>> getAllGrades() {
-        List<Grade> grades = service.findAllGrades();
+        List<GradeDto> grades = service.findAllGrades();
         if (grades.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
-        List<GradeDto> dtoList = grades.stream()
-                .map(mapper::toDto)
-                .toList();
-        return ResponseEntity.ok(dtoList);
+        return ResponseEntity.ok(grades);
     }
 
     @Operation(summary = "Добавление оценки")
@@ -66,10 +56,10 @@ public final class GradeController {
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
     @PostMapping
-    public ResponseEntity<Void> addGrade(
+    public ResponseEntity<GradeDto> addGrade(
             @Valid @RequestBody final GradeDto gradeDto) {
-        service.createGrade(gradeDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        GradeDto created = service.createGrade(gradeDto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Обновить оценку по индетификатору")
@@ -81,8 +71,7 @@ public final class GradeController {
     public ResponseEntity<GradeDto> updateGrade(
             @PathVariable final Long id,
             @Valid @RequestBody final GradeDto gradeDto) {
-        Grade grade = service.updateGrade(id, gradeDto);
-        return ResponseEntity.ok(mapper.toDto(grade));
+        return ResponseEntity.ok(service.updateGrade(id, gradeDto));
     }
 
     @Operation(summary = "Удалить оценку по индетификатору")

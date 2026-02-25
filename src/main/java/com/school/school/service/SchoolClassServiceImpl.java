@@ -21,38 +21,44 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SchoolClass> findAllClasses() {
-        return repository.findAll();
+    public List<SchoolClassDto> findAllClasses() {
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<SchoolClass> findAllSchoolClassesWithSubjects() {
-        return repository.findAllWithSubjectsBy();
+    public List<SchoolClassDto> findAllSchoolClassesWithSubjects() {
+        return repository.findAllWithSubjectsBy().stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public SchoolClass findClassById(final Long id) {
-        return repository.findById(id)
+    public SchoolClassDto findClassById(final Long id) {
+        SchoolClass schoolClass = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(schoolClass);
     }
 
     @Override
-    public void createClass(final SchoolClassDto classDto) {
-        repository.save(mapper.toEntity(classDto));
+    public SchoolClassDto createClass(final SchoolClassDto classDto) {
+        SchoolClass schoolClass = repository.save(mapper.toEntity(classDto));
+        return mapper.toDto(schoolClass);
     }
 
     @Override
     @Transactional
-    public SchoolClass updateClass(final Long id, final SchoolClassDto classDto) {
-        return repository.findById(id)
+    public SchoolClassDto updateClass(final Long id, final SchoolClassDto classDto) {
+        SchoolClass schoolClass = repository.findById(id)
                 .map(existingClass -> {
                     mapper.updateEntity(existingClass, classDto);
-                    repository.save(existingClass);
-                    return existingClass;
+                    return repository.save(existingClass);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(schoolClass);
     }
 
     @Override

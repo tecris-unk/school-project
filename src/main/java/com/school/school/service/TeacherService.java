@@ -1,18 +1,17 @@
 package com.school.school.service;
 
-import com.school.school.model.Teacher;
 import com.school.school.service.dto.TeacherDto;
 import java.util.List;
 
 public interface TeacherService {
 
-    List<Teacher> findAllTeachers();
+    List<TeacherDto> findAllTeachers();
 
-    Teacher findTeacherById(Long id);
+    TeacherDto findTeacherById(Long id);
 
-    void createTeacher(TeacherDto teacherDto);
+    TeacherDto createTeacher(TeacherDto teacherDto);
 
-    Teacher updateTeacher(Long id, TeacherDto teacherDto);
+    TeacherDto updateTeacher(Long id, TeacherDto teacherDto);
 
     void deleteTeacher(Long id);
 }

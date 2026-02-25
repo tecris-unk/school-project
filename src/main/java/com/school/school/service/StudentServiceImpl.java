@@ -9,13 +9,15 @@ import com.school.school.model.Subject;
 import com.school.school.repository.GradeRepository;
 import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
+import com.school.school.service.dto.GradeDto;
 import com.school.school.service.dto.StudentDto;
+import com.school.school.service.mapper.GradeMapper;
 import com.school.school.service.mapper.StudentMapper;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -31,32 +33,39 @@ public class StudentServiceImpl implements StudentService {
     private final SubjectRepository subjectRepository;
     private final GradeRepository gradeRepository;
     private final StudentMapper mapper;
+    private final GradeMapper gradeMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Student> findAllStudents() {
-        return repository.findAll();
+    public List<StudentDto> findAllStudents() {
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override
-    public void createStudent(final StudentDto dto) {
+    public StudentDto createStudent(final StudentDto dto) {
         validateEmail(dto.getEmail());
         ensureEmailUnique(dto.getEmail());
         repository.save(mapper.toEntity(dto));
+        Student saved = repository.save(mapper.toEntity(dto));
+        return mapper.toDto(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Student findStudentById(final Long id) {
-        return repository.findById(id)
+    public StudentDto findStudentById(final Long id) {
+        Student student = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(student);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Student findStudentByEmail(final String email) {
-        return repository.findByEmail(email)
+    public StudentDto findStudentByEmail(final String email) {
+        Student student = repository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with email: " + email));
+        return mapper.toDto(student);
     }
 
     @Override
@@ -69,34 +78,35 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
-    public Student updateStudent(
+    public StudentDto updateStudent(
             final Long id,
             final StudentDto updatedStudent) {
         validateEmail(updatedStudent.getEmail());
-        return repository.findById(id)
+        Student student = repository.findById(id)
                 .map(existingStudent -> {
                     ensureEmailUniqueForUpdate(updatedStudent.getEmail(), existingStudent.getId());
                     mapper.updateEntity(existingStudent, updatedStudent);
-                    repository.save(existingStudent);
-                    return existingStudent;
+                    return repository.save(existingStudent);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
+        return mapper.toDto(student);
     }
 
     @Override
     @Transactional
-    public void createStudentWithGrades(
+    public StudentDto createStudentWithGrades(
             final StudentDto dto,
-            final List<Grade> grades) {
-        Student student = mapper.toEntity(dto);
-        repository.save(student);
-        for (Grade grade : grades) {
+            final List<GradeDto> grades) {
+        Student student = repository.save(mapper.toEntity(dto));
+        for (GradeDto gradeDto : grades) {
+            Grade grade = gradeMapper.toEntity(gradeDto);
             grade.setStudent(student);
-            Subject subject = subjectRepository.findById(grade.getSubject().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + grade.getSubject().getId()));
+            Subject subject = subjectRepository.findById(gradeDto.getSubjectId())
+                    .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId()));
             grade.setSubject(subject);
             gradeRepository.save(grade);
         }
+        return mapper.toDto(student);
     }
 
     private void validateEmail(final String email) {

@@ -31,8 +31,8 @@ erDiagram
     TEACHERS ||--o{ SUBJECTS : "1:N"
     STUDENTS ||--o{ GRADES : "1:N"
     SUBJECTS ||--o{ GRADES : "1:N"
-    STUDENTS ||--o{ STUDENT_SUBJECTS : "1:N"
-    SUBJECTS ||--o{ STUDENT_SUBJECTS : "1:N"
+    SCHOOL_CLASSES ||--o{ SCHOOL_CLASSES_SUBJECTS : "1:N"
+    SUBJECTS ||--o{ SCHOOL_CLASSES_SUBJECTS : "1:N"
 
     SCHOOL_CLASSES {
         BIGINT id PK
@@ -72,8 +72,8 @@ erDiagram
         DATE date
     }
 
-    STUDENT_SUBJECTS {
-        BIGINT student_id FK
+    SCHOOL_CLASSES_SUBJECTS {
+        BIGINT school_class_id FK
         BIGINT subject_id FK
     }
 ```

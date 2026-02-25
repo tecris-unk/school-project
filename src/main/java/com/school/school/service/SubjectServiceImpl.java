@@ -46,7 +46,9 @@ public class SubjectServiceImpl implements SubjectService {
         if (subjectDto.getTeacherId() != null) {
             Teacher teacher = teacherRepository
                     .findById(subjectDto.getTeacherId())
-                    .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId())
+                    );
             subject.setTeacher(teacher);
         }
         return mapper.toDto(repository.save(subject));
@@ -63,7 +65,9 @@ public class SubjectServiceImpl implements SubjectService {
                     } else {
                         Teacher teacher = teacherRepository
                                 .findById(subjectDto.getTeacherId())
-                                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId()));
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                        TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId())
+                                );
                         existingSubject.setTeacher(teacher);
                     }
                     return repository.save(existingSubject);

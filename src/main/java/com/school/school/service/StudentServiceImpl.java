@@ -102,7 +102,9 @@ public class StudentServiceImpl implements StudentService {
             Grade grade = gradeMapper.toEntity(gradeDto);
             grade.setStudent(student);
             Subject subject = subjectRepository.findById(gradeDto.getSubjectId())
-                    .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId())
+                    );
             grade.setSubject(subject);
             gradeRepository.save(grade);
         }

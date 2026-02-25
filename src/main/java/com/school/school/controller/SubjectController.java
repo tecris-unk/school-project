@@ -31,6 +31,7 @@ public final class SubjectController {
             @ApiResponse(responseCode = "200", description = "Предмет найден"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
+
     @GetMapping("/{id}")
     public ResponseEntity<SubjectDto> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findSubjectById(id));
@@ -41,6 +42,7 @@ public final class SubjectController {
             @ApiResponse(responseCode = "200", description = "Предметы найдены"),
             @ApiResponse(responseCode = "204", description = "Список предметов пуст")
     })
+
     @GetMapping
     public ResponseEntity<List<SubjectDto>> getAllSubjects() {
         List<SubjectDto> subjects = service.findAllSubjects();
@@ -56,6 +58,7 @@ public final class SubjectController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Связанные сущности не найдены")
     })
+
     @PostMapping
     public ResponseEntity<SubjectDto> addSubject(
             @Valid @RequestBody final SubjectDto subjectDto) {
@@ -69,6 +72,7 @@ public final class SubjectController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
+
     @PutMapping("/{id}")
     public ResponseEntity<SubjectDto> updateSubject(
             @PathVariable final Long id,
@@ -81,6 +85,7 @@ public final class SubjectController {
             @ApiResponse(responseCode = "204", description = "Предмет удалён"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubject(@PathVariable final Long id) {
         service.deleteSubject(id);

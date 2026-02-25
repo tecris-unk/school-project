@@ -31,6 +31,7 @@ public final class SchoolClassController {
             @ApiResponse(responseCode = "200", description = "Класс найден"),
             @ApiResponse(responseCode = "404", description = "Класс не найден")
     })
+
     @GetMapping("/{id}")
     public ResponseEntity<SchoolClassDto> findById(
             @PathVariable final Long id) {
@@ -38,17 +39,17 @@ public final class SchoolClassController {
     }
 
     @Operation(summary = "Получить все классы")
-    @ApiResponses(value = {
+    @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Классы получены"),
             @ApiResponse(responseCode = "204", description = "Список классов пуст")
     })
+
     @GetMapping
     public ResponseEntity<List<SchoolClassDto>> getAllClasses() {
         List<SchoolClassDto> classes = service.findAllClasses();
         if (classes.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
         return ResponseEntity.ok(classes);
     }
 
@@ -57,13 +58,13 @@ public final class SchoolClassController {
             @ApiResponse(responseCode = "200", description = "Классы получены"),
             @ApiResponse(responseCode = "204", description = "Список классов пуст")
     })
+
     @GetMapping("/with-subjects")
     public ResponseEntity<List<SchoolClassDto>> getAllSchoolClassesWithSubjects() {
         List<SchoolClassDto> schoolClasses = service.findAllSchoolClassesWithSubjects();
         if (schoolClasses.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
         return new ResponseEntity<>(schoolClasses, HttpStatus.OK);
     }
 
@@ -72,6 +73,7 @@ public final class SchoolClassController {
             @ApiResponse(responseCode = "201", description = "Класс создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
     })
+
     @PostMapping
     public ResponseEntity<SchoolClassDto> addClass(
             @Valid @RequestBody final SchoolClassDto classDto) {
@@ -85,6 +87,7 @@ public final class SchoolClassController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Класс не найден")
     })
+
     @PutMapping("/{id}")
     public ResponseEntity<SchoolClassDto> updateClass(
             @PathVariable final Long id,
@@ -97,6 +100,7 @@ public final class SchoolClassController {
             @ApiResponse(responseCode = "204", description = "Класс успешно удален"),
             @ApiResponse(responseCode = "404", description = "Класс не найден")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClass(@PathVariable final Long id) {
         service.deleteClass(id);

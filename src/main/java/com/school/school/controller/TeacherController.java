@@ -31,6 +31,7 @@ public final class TeacherController {
             @ApiResponse(responseCode = "200", description = "Учитель найден"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
+
     @GetMapping("/{id}")
     public ResponseEntity<TeacherDto> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findTeacherById(id));
@@ -41,6 +42,7 @@ public final class TeacherController {
             @ApiResponse(responseCode = "200", description = "Учителя найдены"),
             @ApiResponse(responseCode = "204", description = "Список учителей пуст")
     })
+
     @GetMapping
     public ResponseEntity<List<TeacherDto>> getAllTeachers() {
         List<TeacherDto> teachers = service.findAllTeachers();
@@ -55,6 +57,7 @@ public final class TeacherController {
             @ApiResponse(responseCode = "201", description = "Учитель создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
+
     @PostMapping
     public ResponseEntity<TeacherDto> addTeacher(
             @Valid @RequestBody final TeacherDto teacherDto) {
@@ -68,6 +71,7 @@ public final class TeacherController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
+
     @PutMapping("/{id}")
     public ResponseEntity<TeacherDto> updateTeacher(
             @PathVariable final Long id,
@@ -80,6 +84,7 @@ public final class TeacherController {
             @ApiResponse(responseCode = "204", description = "Учитель удалён"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeacher(@PathVariable final Long id) {
         service.deleteTeacher(id);

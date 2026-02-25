@@ -47,9 +47,13 @@ public class GradeServiceImpl implements GradeService {
     @Transactional
     public GradeDto createGrade(final GradeDto gradeDto) {
         Student student = studentRepository.findById(gradeDto.getStudentId())
-                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + gradeDto.getStudentId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        STUDENT_NOT_FOUND_MSG + " with id: " + gradeDto.getStudentId())
+                );
         Subject subject = subjectRepository.findById(gradeDto.getSubjectId())
-                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId())
+                );
 
         Grade grade = mapper.toEntity(gradeDto);
         grade.setStudent(student);
@@ -61,9 +65,13 @@ public class GradeServiceImpl implements GradeService {
     @Transactional
     public GradeDto updateGrade(final Long id, final GradeDto gradeDto) {
         Student student = studentRepository.findById(gradeDto.getStudentId())
-                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + gradeDto.getStudentId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        STUDENT_NOT_FOUND_MSG + " with id: " + gradeDto.getStudentId())
+                );
         Subject subject = subjectRepository.findById(gradeDto.getSubjectId())
-                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        SUBJECT_NOT_FOUND_MSG + " with id: " + gradeDto.getSubjectId())
+                );
 
         Grade grade = repository.findById(id)
                 .map(existingGrade -> {

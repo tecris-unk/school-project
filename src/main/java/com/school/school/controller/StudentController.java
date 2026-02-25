@@ -33,6 +33,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "200", description = "Ученик найден"),
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
+
     @GetMapping("/{id}")
     public ResponseEntity<StudentDto> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findStudentById(id));
@@ -43,6 +44,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "200", description = "Ученик найден"),
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
+
     @GetMapping(path = "/", params = "email")
     public ResponseEntity<StudentDto> findByEmail(
             @RequestParam(required = false) final String email) {
@@ -54,6 +56,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "200", description = "Ученики найдены"),
             @ApiResponse(responseCode = "204", description = "Список учеников пуст")
     })
+
     @GetMapping("/")
     public ResponseEntity<List<StudentDto>> getAllStudents() {
         List<StudentDto> students = service.findAllStudents();
@@ -68,6 +71,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
+
     @PostMapping("/")
     public ResponseEntity<StudentDto> addStudent(
             @Valid @RequestBody final StudentDto studentDto) {
@@ -80,6 +84,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
+
     @PostMapping("/with_grades")
     public ResponseEntity<StudentDto> addStudentWithGrades(
             @Valid @RequestBody final StudentDto studentDto, final List<GradeDto> gradesDto) {
@@ -93,6 +98,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
+
     @PutMapping("/{id}")
     public ResponseEntity<StudentDto> updateStudent(
             @PathVariable final Long id,
@@ -105,6 +111,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "204", description = "Ученик удалён"),
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable final Long id) {
         service.deleteStudent(id);

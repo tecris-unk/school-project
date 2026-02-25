@@ -19,7 +19,6 @@ public final class StudentMapper {
                 student.getId(),
                 student.getFirstName(),
                 student.getLastName(),
-                student.getGrade(),
                 student.getGender() != null ? student.getGender().name() : null,
                 student.getEmail()
         );
@@ -33,7 +32,6 @@ public final class StudentMapper {
         Student student = new Student();
         student.setFirstName(dto.getFirstName());
         student.setLastName(dto.getLastName());
-        student.setGrade(dto.getGrade());
         student.setGender(parseGender(dto.getGender()));
         student.setEmail(dto.getEmail());
 
@@ -43,7 +41,6 @@ public final class StudentMapper {
     public void updateEntity(final Student student, final StudentDto dto) {
         student.setFirstName(dto.getFirstName());
         student.setLastName(dto.getLastName());
-        student.setGrade(dto.getGrade());
         student.setGender(parseGender(dto.getGender()));
         student.setEmail(dto.getEmail());
     }

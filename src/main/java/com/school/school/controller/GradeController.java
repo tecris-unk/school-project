@@ -31,6 +31,7 @@ public final class GradeController {
             @ApiResponse(responseCode = "200", description = "Оценка найдена"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
+
     @GetMapping("/{id}")
     public ResponseEntity<GradeDto> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findGradeById(id));
@@ -41,6 +42,7 @@ public final class GradeController {
             @ApiResponse(responseCode = "200", description = "Оценки найдены"),
             @ApiResponse(responseCode = "204", description = "Список оценок пуст")
     })
+
     @GetMapping
     public ResponseEntity<List<GradeDto>> getAllGrades() {
         List<GradeDto> grades = service.findAllGrades();
@@ -55,6 +57,7 @@ public final class GradeController {
             @ApiResponse(responseCode = "201", description = "Оценка добавлена"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
+
     @PostMapping
     public ResponseEntity<GradeDto> addGrade(
             @Valid @RequestBody final GradeDto gradeDto) {
@@ -68,6 +71,7 @@ public final class GradeController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
+
     @PutMapping("/{id}")
     public ResponseEntity<GradeDto> updateGrade(
             @PathVariable final Long id,
@@ -80,6 +84,7 @@ public final class GradeController {
             @ApiResponse(responseCode = "204", description = "Оценка успешно удалена"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGrade(@PathVariable final Long id) {
         service.deleteGrade(id);

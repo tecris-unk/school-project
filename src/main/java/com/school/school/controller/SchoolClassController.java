@@ -80,13 +80,26 @@ public final class SchoolClassController {
         return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 
+    @Operation(summary = "Получить все классы c загруженными предметами")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Классы получены"),
+            @ApiResponse(responseCode = "404", description = "Классы не найдены")
+    })
     @PostMapping
     public ResponseEntity<Void> addClass(
             @Valid @RequestBody final SchoolClassDto classDto) {
         service.createClass(classDto);
+        if(classDto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Обновить класс")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Класс успешно обновлен"),
+            @ApiResponse(responseCode = "404", description = "Класс не найден")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<SchoolClassDto> updateClass(
             @PathVariable final Long id,
@@ -98,6 +111,11 @@ public final class SchoolClassController {
         return ResponseEntity.ok(mapper.toDto(schoolClass));
     }
 
+    @Operation(summary = "Удалить класс")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Класс успешно удален"),
+            @ApiResponse(responseCode = "404", description = "Класс не найден")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClass(@PathVariable final Long id) {
         boolean isDeleted = service.deleteClass(id);

@@ -1,5 +1,6 @@
 package com.school.school.service;
 
+import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.Grade;
 import com.school.school.model.Student;
 import com.school.school.model.Subject;
@@ -8,7 +9,7 @@ import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.StudentDto;
 import com.school.school.service.mapper.StudentMapper;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -19,15 +20,16 @@ import org.springframework.stereotype.Service;
 @Primary
 public class StudentServiceImpl implements StudentService {
 
+    private static final String STUDENT_NOT_FOUND_MSG = "Student not found";
+    private static final String SUBJECT_NOT_FOUND_MSG = "Subject not found";
+
     private final StudentRepository repository;
-
     private final SubjectRepository subjectRepository;
-
     private final GradeRepository gradeRepository;
-
     private final StudentMapper mapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Student> findAllStudents() {
         return repository.findAll();
     }
@@ -38,28 +40,32 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public Student findStudentById(final Long id) {
         return repository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
     }
 
     @Override
+    @Transactional
     public Student findStudentByEmail(final String email) {
         return repository.findByEmail(email)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with email: " + email));
     }
 
     @Override
+    @Transactional
     public boolean deleteStudent(final Long id) {
         return repository.findById(id)
                 .map(user -> {
                     repository.delete(user);
                     return true;
                 })
-                .orElse(false);
+                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
     }
 
     @Override
+    @Transactional
     public Student updateStudent(
             final Long id,
             final StudentDto updatedStudent) {
@@ -69,11 +75,11 @@ public class StudentServiceImpl implements StudentService {
                     repository.save(existingStudent);
                     return existingStudent;
                 })
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void createStudentWithGrades(
             final StudentDto dto,
             final List<Grade> grades) {
@@ -82,7 +88,7 @@ public class StudentServiceImpl implements StudentService {
         for (Grade grade : grades) {
             grade.setStudent(student);
             Subject subject = subjectRepository.findById(grade.getSubject().getId())
-                    .orElseThrow(() -> new RuntimeException("Subject not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + grade.getSubject().getId()));
             grade.setSubject(subject);
             gradeRepository.save(grade);
         }

@@ -9,8 +9,6 @@ public interface StudentService {
 
     List<Student> findAllStudents();
 
-    List<Student> findAllStudentsWithSubjects();
-
     void createStudent(StudentDto student);
 
     Student findStudentById(Long id);

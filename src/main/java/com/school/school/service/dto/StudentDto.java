@@ -14,13 +14,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StudentDto {
-    /**
-     * Минимальная оценка.
-     */
+
     public static final int MIN_GRADE = 1;
-    /**
-     * Максимальная оценка.
-     */
     public static final int MAX_GRADE = 11;
 
     private Long id;

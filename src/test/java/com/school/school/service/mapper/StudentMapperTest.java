@@ -20,7 +20,7 @@ class StudentMapperTest {
 
     @Test
     void toDtoShouldMapAllFields() {
-        Student student = new Student(1L, "Ivan", "Petrov", 10, Student.Gender.MALE, "ivan@mail.com", null, null);
+        Student student = new Student(1L, "Ivan", "Petrov", 10, Student.Gender.MALE, "ivan@mail.com", null);
 
         StudentDto result = mapper.toDto(student);
 
@@ -59,7 +59,7 @@ class StudentMapperTest {
 
     @Test
     void updateEntityShouldOverwriteExistingFields() {
-        Student existing = new Student(3L, "Old", "Name", 5, Student.Gender.MALE, "old@mail.com", null, null);
+        Student existing = new Student(3L, "Old", "Name", 5, Student.Gender.MALE, "old@mail.com", null);
         StudentDto dto = new StudentDto(null, "New", "Student", 11, "FEMALE", "new@mail.com");
 
         mapper.updateEntity(existing, dto);

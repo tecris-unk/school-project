@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Контроллер для учащегося.
- */
 @RestController
 @RequestMapping("/api/students")
 @AllArgsConstructor
@@ -31,12 +28,6 @@ public final class StudentController {
 
     private final StudentMapper mapper;
 
-    /**
-     * {@code GET} : найти учащегося по айди.
-     *
-     * @param id индетификатор учащегося
-     * @return учащийся, если он найден
-     */
     @GetMapping("/{id}")
     public ResponseEntity<StudentDto> findById(@PathVariable final Long id) {
         Student student = service.findStudentById(id);
@@ -46,14 +37,8 @@ public final class StudentController {
         return ResponseEntity.ok(mapper.toDto(student));
     }
 
-    /**
-     * {@code GET} : найти учащегося по электронной почте.
-     *
-     * @param email электронная почта учащегося
-     * @return учащийся, если он найден
-     */
-    @GetMapping("/by-email")
-    public ResponseEntity<StudentDto> findByEmail(
+    @GetMapping(path = "/", params = "email")
+    public ResponseEntity<StudentDto> getStudent(
             @RequestParam final String email) {
         Student student = service.findStudentByEmail(email);
         if (student == null) {
@@ -62,12 +47,7 @@ public final class StudentController {
         return ResponseEntity.ok(mapper.toDto(student));
     }
 
-    /**
-     * {@code GET} : получить всех учащихся.
-     *
-     * @return список всех пользователей, если он не пуст
-     */
-    @GetMapping()
+    @GetMapping("/")
     public ResponseEntity<List<StudentDto>> getAllStudents() {
         List<Student> students = service.findAllStudents();
         if (students.isEmpty()) {
@@ -79,43 +59,13 @@ public final class StudentController {
         return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 
-    /**
-     * {@code GET} : получить всех учащихся с загруженными предметами.
-     *
-     * @return список всех пользователей с предзагруженными предметами
-     */
-    @GetMapping("/with-subjects")
-    public ResponseEntity<List<StudentDto>> getAllStudentsWithSubjects() {
-        List<Student> students = service.findAllStudentsWithSubjects();
-        if (students.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-        List<StudentDto> dtoList = students.stream()
-                .map(mapper::toDto)
-                .toList();
-        return new ResponseEntity<>(dtoList, HttpStatus.OK);
-    }
-
-    /**
-     * {@code POST} : добавить нового учащегося.
-     *
-     * @param studentDto учащийся, которого нужно добавить
-     * @return учащегося, если его получилось добавить
-     */
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<Void> addStudent(
             @Valid @RequestBody final StudentDto studentDto) {
         service.createStudent(studentDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    /**
-     * {@code PUT} : обновить учащегося.
-     *
-     * @param id             индетификатор учащегося
-     * @param updatedStudent обновление учащегося
-     * @return обновленного учащегося, если это получилось сделать
-     */
     @PutMapping("/{id}")
     public ResponseEntity<StudentDto> updateStudent(
             @PathVariable final Long id,
@@ -127,12 +77,6 @@ public final class StudentController {
         return ResponseEntity.ok(mapper.toDto(student));
     }
 
-    /**
-     * {@code DELETE} : удалить учащегося.
-     *
-     * @param id индетификатор учащегося
-     * @return получилось ли удалить учащегося
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable final Long id) {
         boolean isDeleted = service.deleteStudent(id);

@@ -33,11 +33,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> findAllStudentsWithSubjects() {
-        return repository.findAllWithSubjectsBy();
-    }
-
-    @Override
     public void createStudent(final StudentDto dto) {
         repository.save(mapper.toEntity(dto));
     }

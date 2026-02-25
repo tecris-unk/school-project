@@ -1,6 +1,7 @@
 package com.school.school.service;
 
 import com.school.school.model.SchoolClass;
+import com.school.school.model.Student;
 import com.school.school.repository.SchoolClassRepository;
 import com.school.school.service.dto.SchoolClassDto;
 import com.school.school.service.mapper.SchoolClassMapper;
@@ -19,6 +20,11 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     @Override
     public List<SchoolClass> findAllClasses() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<SchoolClass> findAllSchoolClassesWithSubjects() {
+        return repository.findAllWithSubjectsBy();
     }
 
     @Override

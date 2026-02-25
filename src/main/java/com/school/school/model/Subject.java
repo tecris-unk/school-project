@@ -42,5 +42,5 @@ public class Subject {
     private List<Grade> grades = new ArrayList<>();
 
     @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY)
-    private List<Student> students = new ArrayList<>();
+    private List<SchoolClass> schoolClasses = new ArrayList<>();
 }

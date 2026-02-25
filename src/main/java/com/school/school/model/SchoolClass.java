@@ -1,13 +1,19 @@
 package com.school.school.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -25,7 +31,16 @@ public class SchoolClass {
     private Long id;
 
     private Integer grade;
+
     private String letter;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDate creationDate;
+
+    @PrePersist
+    public void onCreate() {
+        creationDate = LocalDate.now();
+    }
 
     @OneToMany(
             mappedBy = "schoolClass",
@@ -33,4 +48,12 @@ public class SchoolClass {
             fetch = FetchType.LAZY
     )
     private List<Student> students = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "school_classes_subjects",
+            joinColumns = @JoinColumn(name = "school_class_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private List<Subject> subjects = new ArrayList<>();
 }

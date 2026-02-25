@@ -4,6 +4,9 @@ import com.school.school.model.Grade;
 import com.school.school.service.GradeService;
 import com.school.school.service.dto.GradeDto;
 import com.school.school.service.mapper.GradeMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,9 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Контроллер для оценок.
- */
 @RestController
 @RequestMapping("/api/grades")
 @AllArgsConstructor
@@ -30,6 +30,11 @@ public final class GradeController {
 
     private final GradeMapper mapper;
 
+    @Operation(summary = "Найти оценку по индетификатору")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Оценка найдена"),
+            @ApiResponse(responseCode = "404", description = "Оценка не найдена")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<GradeDto> findById(@PathVariable final Long id) {
         Grade grade = service.findGradeById(id);
@@ -40,6 +45,11 @@ public final class GradeController {
         return ResponseEntity.ok(mapper.toDto(grade));
     }
 
+    @Operation(summary = "Найти все оценки")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Оценки найдены"),
+            @ApiResponse(responseCode = "404", description = "Оценки не найдены")
+    })
     @GetMapping
     public ResponseEntity<List<GradeDto>> getAllGrades() {
         List<Grade> grades = service.findAllGrades();
@@ -53,6 +63,11 @@ public final class GradeController {
         return ResponseEntity.ok(dtoList);
     }
 
+    @Operation(summary = "Добавление оценки")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Оценка добавлена"),
+            @ApiResponse(responseCode = "404", description = "Оценка не найдена")
+    })
     @PostMapping
     public ResponseEntity<Void> addGrade(
             @Valid @RequestBody final GradeDto gradeDto) {
@@ -63,6 +78,11 @@ public final class GradeController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Обновить оценку по индетификатору")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Оценка успешно обновлена"),
+            @ApiResponse(responseCode = "404", description = "Оценка не найдена")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<GradeDto> updateGrade(
             @PathVariable final Long id,
@@ -74,6 +94,11 @@ public final class GradeController {
         return ResponseEntity.ok(mapper.toDto(grade));
     }
 
+    @Operation(summary = "Удалить оценку по индетификатору")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Оценка успешно удалена"),
+            @ApiResponse(responseCode = "404", description = "Оценка не найдена")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGrade(@PathVariable final Long id) {
         boolean isDeleted = service.deleteGrade(id);

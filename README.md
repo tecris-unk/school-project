@@ -27,12 +27,12 @@
 
 ```mermaid
 erDiagram
-    SCHOOL_CLASSES ||--o{ STUDENTS : "1:N"
-    TEACHERS ||--o{ SUBJECTS : "1:N"
-    STUDENTS ||--o{ GRADES : "1:N"
-    SUBJECTS ||--o{ GRADES : "1:N"
-    SCHOOL_CLASSES ||--o{ SCHOOL_CLASSES_SUBJECTS : "1:N"
-    SUBJECTS ||--o{ SCHOOL_CLASSES_SUBJECTS : "1:N"
+    STUDENTS ||--o{ GRADES : receives
+    SUBJECTS ||--o{ GRADES : includes
+    TEACHERS ||--o{ SUBJECTS : teaches
+    SUBJECTS ||--o{ SCHOOL_CLASSES_SUBJECTS : assigned_to
+    SCHOOL_CLASSES ||--o{ STUDENTS : has
+    SCHOOL_CLASSES ||--o{ SCHOOL_CLASSES_SUBJECTS : contains
 
     SCHOOL_CLASSES {
         BIGINT id PK
@@ -46,15 +46,20 @@ erDiagram
         VARCHAR last_name
         INT grade
         VARCHAR gender
-        VARCHAR email
+        VARCHAR email UK
         BIGINT school_class_id FK
+    }
+
+    SCHOOL_CLASSES_SUBJECTS {
+        BIGINT school_class_id PK, FK
+        BIGINT subject_id PK, FK
     }
 
     TEACHERS {
         BIGINT id PK
         VARCHAR first_name
         VARCHAR last_name
-        VARCHAR email
+        VARCHAR email UK
     }
 
     SUBJECTS {
@@ -72,8 +77,5 @@ erDiagram
         DATE date
     }
 
-    SCHOOL_CLASSES_SUBJECTS {
-        BIGINT school_class_id FK
-        BIGINT subject_id FK
-    }
+    
 ```

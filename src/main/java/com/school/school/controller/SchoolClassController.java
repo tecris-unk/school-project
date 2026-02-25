@@ -80,18 +80,14 @@ public final class SchoolClassController {
         return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 
-    @Operation(summary = "Получить все классы c загруженными предметами")
+    @Operation(summary = "Создать новый класс")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Классы получены"),
-            @ApiResponse(responseCode = "404", description = "Классы не найдены")
+            @ApiResponse(responseCode = "200", description = "Класс создан"),
     })
     @PostMapping
     public ResponseEntity<Void> addClass(
             @Valid @RequestBody final SchoolClassDto classDto) {
         service.createClass(classDto);
-        if(classDto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

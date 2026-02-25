@@ -4,6 +4,9 @@ import com.school.school.model.Teacher;
 import com.school.school.service.TeacherService;
 import com.school.school.service.dto.TeacherDto;
 import com.school.school.service.mapper.TeacherMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,11 @@ public final class TeacherController {
 
     private final TeacherMapper mapper;
 
+    @Operation(summary = "Найти учителя по ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Учитель найден"),
+            @ApiResponse(responseCode = "404", description = "Учитель не найден")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<TeacherDto> findById(@PathVariable final Long id) {
         Teacher teacher = service.findTeacherById(id);
@@ -35,6 +43,11 @@ public final class TeacherController {
         return ResponseEntity.ok(mapper.toDto(teacher));
     }
 
+    @Operation(summary = "Найти всех учителей")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Учителя найдены"),
+            @ApiResponse(responseCode = "404", description = "Учителя не найдены")
+    })
     @GetMapping
     public ResponseEntity<List<TeacherDto>> getAllTeachers() {
         List<Teacher> teachers = service.findAllTeachers();
@@ -48,6 +61,10 @@ public final class TeacherController {
         return ResponseEntity.ok(dtoList);
     }
 
+    @Operation(summary = "Создать учителя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Учитель создан")
+    })
     @PostMapping
     public ResponseEntity<Void> addTeacher(
             @RequestBody final TeacherDto teacherDto) {
@@ -55,6 +72,11 @@ public final class TeacherController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Обновить учителя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Учитель обновлён"),
+            @ApiResponse(responseCode = "404", description = "Учитель не найден")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<TeacherDto> updateTeacher(
             @PathVariable final Long id,
@@ -66,6 +88,11 @@ public final class TeacherController {
         return ResponseEntity.ok(mapper.toDto(teacher));
     }
 
+    @Operation(summary = "Удалить учителя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Учитель удалён"),
+            @ApiResponse(responseCode = "404", description = "Учитель не найден")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeacher(@PathVariable final Long id) {
         boolean isDeleted = service.deleteTeacher(id);

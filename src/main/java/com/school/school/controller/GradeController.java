@@ -39,9 +39,6 @@ public final class GradeController {
     public ResponseEntity<GradeDto> findById(@PathVariable final Long id) {
         Grade grade = service.findGradeById(id);
 
-        if (grade == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(grade));
     }
 
@@ -71,10 +68,7 @@ public final class GradeController {
     @PostMapping
     public ResponseEntity<Void> addGrade(
             @Valid @RequestBody final GradeDto gradeDto) {
-        Grade grade = service.createGrade(gradeDto);
-        if (grade == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        service.createGrade(gradeDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -88,9 +82,6 @@ public final class GradeController {
             @PathVariable final Long id,
             @Valid @RequestBody final GradeDto gradeDto) {
         Grade grade = service.updateGrade(id, gradeDto);
-        if (grade == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(grade));
     }
 
@@ -101,10 +92,7 @@ public final class GradeController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGrade(@PathVariable final Long id) {
-        boolean isDeleted = service.deleteGrade(id);
-        if (!isDeleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        service.deleteGrade(id);
         return ResponseEntity.noContent().build();
     }
 

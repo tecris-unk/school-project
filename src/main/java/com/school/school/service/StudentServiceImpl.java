@@ -40,14 +40,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Student findStudentById(final Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Student findStudentByEmail(final String email) {
         return repository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with email: " + email));
@@ -55,13 +55,10 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
-    public boolean deleteStudent(final Long id) {
-        return repository.findById(id)
-                .map(user -> {
-                    repository.delete(user);
-                    return true;
-                })
+    public void deleteStudent(final Long id) {
+        Student student = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
+        repository.delete(student);
     }
 
     @Override

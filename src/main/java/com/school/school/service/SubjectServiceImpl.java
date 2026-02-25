@@ -1,5 +1,6 @@
 package com.school.school.service;
 
+import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.Subject;
 import com.school.school.model.Teacher;
 import com.school.school.repository.SubjectRepository;
@@ -9,43 +10,46 @@ import com.school.school.service.mapper.SubjectMapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
 public class SubjectServiceImpl implements SubjectService {
 
+    private static final String SUBJECT_NOT_FOUND_MSG = "Subject not found";
+    private static final String TEACHER_NOT_FOUND_MSG = "Teacher not found";
+
     private final SubjectRepository repository;
-
     private final TeacherRepository teacherRepository;
-
     private final SubjectMapper mapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Subject> findAllSubjects() {
         return repository.findAll();
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public Subject findSubjectById(final Long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
     }
 
     @Override
-    public Subject createSubject(final SubjectDto subjectDto) {
+    @Transactional
+    public void createSubject(final SubjectDto subjectDto) {
         Subject subject = mapper.toEntity(subjectDto);
         if (subjectDto.getTeacherId() != null) {
             Teacher teacher = teacherRepository
-                    .findById(subjectDto.getTeacherId()).orElse(null);
-            if (teacher == null) {
-                return null;
-            }
+                    .findById(subjectDto.getTeacherId())
+                    .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId()));
             subject.setTeacher(teacher);
         }
         repository.save(subject);
-        return subject;
     }
 
     @Override
+    @Transactional
     public Subject updateSubject(final Long id, final SubjectDto subjectDto) {
         return repository.findById(id)
                 .map(existingSubject -> {
@@ -54,25 +58,21 @@ public class SubjectServiceImpl implements SubjectService {
                         existingSubject.setTeacher(null);
                     } else {
                         Teacher teacher = teacherRepository
-                                .findById(subjectDto.getTeacherId()).orElse(null);
-                        if (teacher == null) {
-                            return null;
-                        }
+                                .findById(subjectDto.getTeacherId())
+                                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + subjectDto.getTeacherId()));
                         existingSubject.setTeacher(teacher);
                     }
                     repository.save(existingSubject);
                     return existingSubject;
                 })
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
     }
 
     @Override
-    public boolean deleteSubject(final Long id) {
-        return repository.findById(id)
-                .map(subject -> {
-                    repository.delete(subject);
-                    return true;
-                })
-                .orElse(false);
+    @Transactional
+    public void deleteSubject(final Long id) {
+        Subject subject = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
+        repository.delete(subject);
     }
 }

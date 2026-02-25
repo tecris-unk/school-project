@@ -39,9 +39,6 @@ public final class StudentController {
     @GetMapping("/{id}")
     public ResponseEntity<StudentDto> findById(@PathVariable final Long id) {
         Student student = service.findStudentById(id);
-        if (student == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(student));
     }
 
@@ -54,9 +51,6 @@ public final class StudentController {
     public ResponseEntity<StudentDto> findByEmail(
             @RequestParam(required = false) final String email) {
         Student student = service.findStudentByEmail(email);
-        if (student == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(student));
     }
 
@@ -98,9 +92,6 @@ public final class StudentController {
             @PathVariable final Long id,
             @Valid @RequestBody final StudentDto updatedStudent) {
         Student student = service.updateStudent(id, updatedStudent);
-        if (student == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(student));
     }
 
@@ -111,10 +102,7 @@ public final class StudentController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable final Long id) {
-        boolean isDeleted = service.deleteStudent(id);
-        if (!isDeleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        service.deleteStudent(id);
         return ResponseEntity.noContent().build();
     }
 }

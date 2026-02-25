@@ -10,9 +10,9 @@ public interface GradeService {
 
     Grade findGradeById(Long id);
 
-    Grade createGrade(GradeDto gradeDto);
+    void createGrade(GradeDto gradeDto);
 
     Grade updateGrade(Long id, GradeDto gradeDto);
 
-    boolean deleteGrade(Long id);
+    void deleteGrade(Long id);
 }

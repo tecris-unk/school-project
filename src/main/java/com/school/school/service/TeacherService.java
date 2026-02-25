@@ -14,5 +14,5 @@ public interface TeacherService {
 
     Teacher updateTeacher(Long id, TeacherDto teacherDto);
 
-    boolean deleteTeacher(Long id);
+    void deleteTeacher(Long id);
 }

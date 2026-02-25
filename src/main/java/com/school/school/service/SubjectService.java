@@ -10,9 +10,9 @@ public interface SubjectService {
 
     Subject findSubjectById(Long id);
 
-    Subject createSubject(SubjectDto subjectDto);
+    void createSubject(SubjectDto subjectDto);
 
     Subject updateSubject(Long id, SubjectDto subjectDto);
 
-    boolean deleteSubject(Long id);
+    void deleteSubject(Long id);
 }

@@ -38,9 +38,6 @@ public final class SubjectController {
     @GetMapping("/{id}")
     public ResponseEntity<SubjectDto> findById(@PathVariable final Long id) {
         Subject subject = service.findSubjectById(id);
-        if (subject == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(subject));
     }
 
@@ -70,10 +67,7 @@ public final class SubjectController {
     @PostMapping
     public ResponseEntity<Void> addSubject(
             @Valid @RequestBody final SubjectDto subjectDto) {
-        Subject subject = service.createSubject(subjectDto);
-        if (subject == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        service.createSubject(subjectDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -87,9 +81,6 @@ public final class SubjectController {
             @PathVariable final Long id,
             @Valid @RequestBody final SubjectDto subjectDto) {
         Subject subject = service.updateSubject(id, subjectDto);
-        if (subject == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(subject));
     }
 
@@ -100,10 +91,7 @@ public final class SubjectController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubject(@PathVariable final Long id) {
-        boolean isDeleted = service.deleteSubject(id);
-        if (!isDeleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+         service.deleteSubject(id);
         return ResponseEntity.noContent().build();
     }
 }

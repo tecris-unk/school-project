@@ -17,7 +17,7 @@ public interface StudentService {
 
     Student updateStudent(Long id, StudentDto updatedStudent);
 
-    boolean deleteStudent(Long id);
+    void deleteStudent(Long id);
 
     void createStudentWithGrades(StudentDto student, List<Grade> grades);
 }

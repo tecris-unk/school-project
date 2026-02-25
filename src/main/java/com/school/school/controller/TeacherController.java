@@ -37,9 +37,6 @@ public final class TeacherController {
     @GetMapping("/{id}")
     public ResponseEntity<TeacherDto> findById(@PathVariable final Long id) {
         Teacher teacher = service.findTeacherById(id);
-        if (teacher == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(teacher));
     }
 
@@ -82,9 +79,6 @@ public final class TeacherController {
             @PathVariable final Long id,
             @RequestBody final TeacherDto teacherDto) {
         Teacher teacher = service.updateTeacher(id, teacherDto);
-        if (teacher == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(mapper.toDto(teacher));
     }
 
@@ -95,10 +89,7 @@ public final class TeacherController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeacher(@PathVariable final Long id) {
-        boolean isDeleted = service.deleteTeacher(id);
-        if (!isDeleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        service.deleteTeacher(id);
         return ResponseEntity.noContent().build();
     }
 }

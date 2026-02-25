@@ -1,6 +1,8 @@
 package com.school.school.service;
 
+import com.school.school.exceptions.ConflictException;
 import com.school.school.exceptions.ResourceNotFoundException;
+import com.school.school.exceptions.ValidationException;
 import com.school.school.model.Grade;
 import com.school.school.model.Student;
 import com.school.school.model.Subject;
@@ -22,6 +24,8 @@ public class StudentServiceImpl implements StudentService {
 
     private static final String STUDENT_NOT_FOUND_MSG = "Student not found";
     private static final String SUBJECT_NOT_FOUND_MSG = "Subject not found";
+    private static final String EMAIL_ALREADY_EXISTS_MSG = "Student with this email already exists";
+    private static final String EMAIL_REQUIRED_MSG = "Email must not be blank";
 
     private final StudentRepository repository;
     private final SubjectRepository subjectRepository;
@@ -36,6 +40,8 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void createStudent(final StudentDto dto) {
+        validateEmail(dto.getEmail());
+        ensureEmailUnique(dto.getEmail());
         repository.save(mapper.toEntity(dto));
     }
 
@@ -66,8 +72,10 @@ public class StudentServiceImpl implements StudentService {
     public Student updateStudent(
             final Long id,
             final StudentDto updatedStudent) {
+        validateEmail(updatedStudent.getEmail());
         return repository.findById(id)
                 .map(existingStudent -> {
+                    ensureEmailUniqueForUpdate(updatedStudent.getEmail(), existingStudent.getId());
                     mapper.updateEntity(existingStudent, updatedStudent);
                     repository.save(existingStudent);
                     return existingStudent;
@@ -89,5 +97,25 @@ public class StudentServiceImpl implements StudentService {
             grade.setSubject(subject);
             gradeRepository.save(grade);
         }
+    }
+
+    private void validateEmail(final String email) {
+        if (email == null || email.isBlank()) {
+            throw new ValidationException(EMAIL_REQUIRED_MSG);
+        }
+    }
+
+    private void ensureEmailUnique(final String email) {
+        if (repository.findByEmail(email).isPresent()) {
+            throw new ConflictException(EMAIL_ALREADY_EXISTS_MSG + ": " + email);
+        }
+    }
+
+    private void ensureEmailUniqueForUpdate(final String email, final Long currentStudentId) {
+        repository.findByEmail(email)
+                .filter(student -> !student.getId().equals(currentStudentId))
+                .ifPresent(student -> {
+                    throw new ConflictException(EMAIL_ALREADY_EXISTS_MSG + ": " + email);
+                });
     }
 }

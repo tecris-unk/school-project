@@ -73,7 +73,7 @@ public final class GradeController {
     public ResponseEntity<GradeResponse> updateGrade(
             @PathVariable final Long id,
             @Valid @RequestBody final GradeRequest gradeRequest) {
-        return ResponseEntity.ok(service.updateGrade(id,gradeRequest));
+        return ResponseEntity.ok(service.updateGrade(id, gradeRequest));
     }
 
     @Operation(summary = "Удалить оценку по индетификатору")

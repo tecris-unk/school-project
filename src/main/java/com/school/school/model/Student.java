@@ -53,7 +53,7 @@ public class Student {
 
     @OneToMany(
             mappedBy = "student",
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            cascade = {CascadeType.ALL},
             fetch = FetchType.LAZY
     )
     private List<Grade> grades = new ArrayList<>();

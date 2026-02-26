@@ -60,7 +60,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
                     mapper.updateEntity(existingClass, classRequest);
                     return repository.save(existingClass);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG +WITH_ID + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG  + WITH_ID + id));
         return mapper.toResponse(schoolClass);
     }
 

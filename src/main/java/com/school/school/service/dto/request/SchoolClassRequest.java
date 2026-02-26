@@ -17,10 +17,9 @@ public class SchoolClassRequest {
     public static final int MIN_GRADE = 1;
     public static final int MAX_GRADE = 11;
 
-    private Long id;
-
     @Min(MIN_GRADE)
     @Max(MAX_GRADE)
+    @NotBlank
     private Integer grade;
 
     @NotBlank

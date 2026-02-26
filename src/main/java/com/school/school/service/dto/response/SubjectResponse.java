@@ -12,7 +12,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SubjectResponse {
+
     private Long id;
     private Long teacherId;
+    private String name;
+    private String description;
     private List<Long> schoolClassIds = new ArrayList<>();
 }

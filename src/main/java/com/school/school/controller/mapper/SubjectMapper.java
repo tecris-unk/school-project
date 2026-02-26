@@ -17,6 +17,8 @@ public final class SubjectMapper {
         }
 
         SubjectResponse response = new SubjectResponse();
+        response.setName(subject.getName());
+        response.setDescription(subject.getDescription());
         response.setId(subject.getId());
         response.setTeacherId(subject.getTeacher() != null ? subject.getTeacher().getId() : null);
         response.setSchoolClassIds(toSchoolClassIds(subject.getSchoolClasses()));

@@ -93,7 +93,7 @@ public class GradeServiceImpl implements GradeService {
     @Transactional
     public void deleteGrade(final Long id) {
         Grade grade = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + WITH_ID+ id));
+                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + WITH_ID + id));
         repository.delete(grade);
     }
 }

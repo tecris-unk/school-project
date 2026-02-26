@@ -39,7 +39,7 @@ public final class SchoolClassController {
     }
 
     @Operation(summary = "Получить все классы")
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Классы получены"),
             @ApiResponse(responseCode = "204", description = "Список классов пуст")
     })

@@ -17,6 +17,8 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
     private static final String SCHOOL_CLASS_NOT_FOUND_MSG = "School class not found";
 
+    private static final String WITH_ID = " with id: ";
+
     private final SchoolClassRepository repository;
     private final SchoolClassMapper mapper;
 
@@ -40,7 +42,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     @Transactional(readOnly = true)
     public SchoolClassResponse findClassById(final Long id) {
         SchoolClass schoolClass = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(schoolClass);
     }
 
@@ -58,7 +60,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
                     mapper.updateEntity(existingClass, classRequest);
                     return repository.save(existingClass);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG +WITH_ID + id));
         return mapper.toResponse(schoolClass);
     }
 
@@ -66,7 +68,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     @Transactional
     public void deleteClass(final Long id) {
         SchoolClass schoolClass = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + WITH_ID + id));
         repository.delete(schoolClass);
     }
 }

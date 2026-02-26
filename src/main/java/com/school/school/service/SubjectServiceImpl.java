@@ -20,6 +20,8 @@ public class SubjectServiceImpl implements SubjectService {
     private static final String SUBJECT_NOT_FOUND_MSG = "Subject not found";
     private static final String TEACHER_NOT_FOUND_MSG = "Teacher not found";
 
+    private static final String WITH_ID = " with id: ";
+
     private final SubjectRepository repository;
     private final TeacherRepository teacherRepository;
     private final SubjectMapper mapper;
@@ -36,7 +38,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Transactional(readOnly = true)
     public SubjectResponse findSubjectById(final Long id) {
         Subject subject = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(subject);
     }
 
@@ -48,7 +50,7 @@ public class SubjectServiceImpl implements SubjectService {
             Teacher teacher = teacherRepository
                     .findById(subjectRequest.getTeacherId())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            TEACHER_NOT_FOUND_MSG + " with id: " + subjectRequest.getTeacherId())
+                            TEACHER_NOT_FOUND_MSG + WITH_ID + subjectRequest.getTeacherId())
                     );
             subject.setTeacher(teacher);
         }
@@ -67,13 +69,13 @@ public class SubjectServiceImpl implements SubjectService {
                         Teacher teacher = teacherRepository
                                 .findById(subjectRequest.getTeacherId())
                                 .orElseThrow(() -> new ResourceNotFoundException(
-                                        TEACHER_NOT_FOUND_MSG + " with id: " + subjectRequest.getTeacherId())
+                                        TEACHER_NOT_FOUND_MSG + WITH_ID + subjectRequest.getTeacherId())
                                 );
                         existingSubject.setTeacher(teacher);
                     }
                     return repository.save(existingSubject);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(subject);
     }
 
@@ -81,7 +83,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Transactional
     public void deleteSubject(final Long id) {
         Subject subject = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + WITH_ID + id));
         repository.delete(subject);
     }
 }

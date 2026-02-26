@@ -34,6 +34,8 @@ public class StudentServiceImpl implements StudentService {
     private static final String EMAIL_ALREADY_EXISTS_MSG = "Student with this email already exists";
     private static final String EMAIL_REQUIRED_MSG = "Email must not be blank";
 
+    private static final String WITH_ID = " with id: ";
+
     private final StudentRepository repository;
     private final SubjectRepository subjectRepository;
     private final SchoolClassRepository schoolClassRepository;
@@ -71,7 +73,7 @@ public class StudentServiceImpl implements StudentService {
     @Transactional(readOnly = true)
     public StudentResponse findStudentById(final Long id) {
         Student student = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(student);
     }
 
@@ -87,7 +89,7 @@ public class StudentServiceImpl implements StudentService {
     @Transactional
     public void deleteStudent(final Long id) {
         Student student = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + WITH_ID + id));
         repository.delete(student);
     }
 
@@ -102,7 +104,7 @@ public class StudentServiceImpl implements StudentService {
                     applySchoolClass(existingStudent, updatedStudent.getSchoolClassId());
                     return repository.save(existingStudent);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(student);
     }
 
@@ -122,7 +124,7 @@ public class StudentServiceImpl implements StudentService {
             grade.setStudent(student);
             Subject subject = subjectRepository.findById(gradeRequest.getSubjectId())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            SUBJECT_NOT_FOUND_MSG + " with id: " + gradeRequest.getSubjectId())
+                            SUBJECT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getSubjectId())
                     );
             grade.setSubject(subject);
             gradeRepository.save(grade);
@@ -138,7 +140,7 @@ public class StudentServiceImpl implements StudentService {
 
         SchoolClass schoolClass = schoolClassRepository.findById(schoolClassId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        SCHOOL_CLASS_NOT_FOUND_MSG + " with id: " + schoolClassId)
+                        SCHOOL_CLASS_NOT_FOUND_MSG + WITH_ID + schoolClassId)
                 );
         student.setSchoolClass(schoolClass);
     }

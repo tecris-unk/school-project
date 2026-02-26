@@ -17,6 +17,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     private static final String TEACHER_NOT_FOUND_MSG = "Teacher not found";
 
+    private static final String WITH_ID = " with id: ";
+
     private final TeacherRepository repository;
     private final TeacherMapper mapper;
 
@@ -32,7 +34,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Transactional(readOnly = true)
     public TeacherResponse findTeacherById(final Long id) {
         Teacher teacher = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(teacher);
     }
 
@@ -51,7 +53,7 @@ public class TeacherServiceImpl implements TeacherService {
                     mapper.updateEntity(existingTeacher, teacherRequest);
                     return repository.save(existingTeacher);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(teacher);
     }
 
@@ -59,7 +61,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Transactional
     public void deleteTeacher(final Long id) {
         Teacher teacher = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + WITH_ID + id));
         repository.delete(teacher);
     }
 }

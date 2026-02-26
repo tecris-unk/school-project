@@ -23,6 +23,8 @@ public class GradeServiceImpl implements GradeService {
     private static final String STUDENT_NOT_FOUND_MSG = "Student not found";
     private static final String SUBJECT_NOT_FOUND_MSG = "Subject not found";
 
+    private static final String WITH_ID = " with id: ";
+
     private final GradeRepository repository;
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
@@ -40,7 +42,7 @@ public class GradeServiceImpl implements GradeService {
     @Transactional(readOnly = true)
     public GradeResponse findGradeById(final Long id) {
         Grade grade = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(grade);
     }
 
@@ -49,11 +51,11 @@ public class GradeServiceImpl implements GradeService {
     public GradeResponse createGrade(final GradeRequest gradeRequest) {
         Student student = studentRepository.findById(gradeRequest.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        STUDENT_NOT_FOUND_MSG + " with id: " + gradeRequest.getStudentId())
+                        STUDENT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getStudentId())
                 );
         Subject subject = subjectRepository.findById(gradeRequest.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        SUBJECT_NOT_FOUND_MSG + " with id: " + gradeRequest.getSubjectId())
+                        SUBJECT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getSubjectId())
                 );
 
         Grade grade = mapper.toEntity(gradeRequest);
@@ -68,11 +70,11 @@ public class GradeServiceImpl implements GradeService {
         Student student = studentRepository.findById(gradeRequest.getStudentId())
 
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        STUDENT_NOT_FOUND_MSG + " with id: " + gradeRequest.getStudentId())
+                        STUDENT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getStudentId())
                 );
         Subject subject = subjectRepository.findById(gradeRequest.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        SUBJECT_NOT_FOUND_MSG + " with id: " + gradeRequest.getSubjectId())
+                        SUBJECT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getSubjectId())
                 );
 
         Grade grade = repository.findById(id)
@@ -83,7 +85,7 @@ public class GradeServiceImpl implements GradeService {
                     repository.save(existingGrade);
                     return existingGrade;
                 })
-                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + WITH_ID + id));
         return mapper.toResponse(grade);
     }
 
@@ -91,7 +93,7 @@ public class GradeServiceImpl implements GradeService {
     @Transactional
     public void deleteGrade(final Long id) {
         Grade grade = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + " with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + WITH_ID+ id));
         repository.delete(grade);
     }
 }

@@ -1,10 +1,10 @@
 package com.school.school.service;
 
+import com.school.school.controller.mapper.SchoolClassMapper;
 import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.SchoolClass;
 import com.school.school.repository.SchoolClassRepository;
 import com.school.school.service.dto.request.SchoolClassRequest;
-import com.school.school.controller.mapper.SchoolClassMapper;
 import com.school.school.service.dto.response.SchoolClassResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;

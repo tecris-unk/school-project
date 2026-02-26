@@ -1,9 +1,9 @@
 package com.school.school.controller;
 
-import com.school.school.service.dto.request.StudentWithGradesRequest;
-import com.school.school.service.dto.response.StudentResponse;
 import com.school.school.service.StudentService;
 import com.school.school.service.dto.request.StudentRequest;
+import com.school.school.service.dto.request.StudentWithGradesRequest;
+import com.school.school.service.dto.response.StudentResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -1,5 +1,7 @@
 package com.school.school.service;
 
+import com.school.school.controller.mapper.GradeMapper;
+import com.school.school.controller.mapper.StudentMapper;
 import com.school.school.exceptions.ConflictException;
 import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.exceptions.ValidationException;
@@ -13,8 +15,6 @@ import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.request.GradeRequest;
 import com.school.school.service.dto.request.StudentRequest;
-import com.school.school.controller.mapper.GradeMapper;
-import com.school.school.controller.mapper.StudentMapper;
 import com.school.school.service.dto.request.StudentWithGradesRequest;
 import com.school.school.service.dto.response.StudentResponse;
 import java.util.List;

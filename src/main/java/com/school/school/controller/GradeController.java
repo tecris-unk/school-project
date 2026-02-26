@@ -1,8 +1,8 @@
 package com.school.school.controller;
 
-import com.school.school.service.dto.response.GradeResponse;
 import com.school.school.service.GradeService;
 import com.school.school.service.dto.request.GradeRequest;
+import com.school.school.service.dto.response.GradeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -89,10 +89,17 @@ public final class StudentController {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
-    @PostMapping("/with_grades")
-    public ResponseEntity<StudentResponse> addStudentWithGrades(
+    @PostMapping("/with_gradesT")
+    public ResponseEntity<StudentResponse> addStudentWithGradesTransactional(
             @Valid @RequestBody final StudentWithGradesRequest request) {
-        StudentResponse created = service.createStudentWithGrades(request);
+        StudentResponse created = service.createStudentWithGradesTransactional(request);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/with_grades")
+    public ResponseEntity<StudentResponse> addStudentWithGradesNoTransactional(
+            @Valid @RequestBody final StudentWithGradesRequest request) {
+        StudentResponse created = service.createStudentWithGradesNoTransactional(request);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 

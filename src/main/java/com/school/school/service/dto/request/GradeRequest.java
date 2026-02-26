@@ -26,9 +26,7 @@ public class GradeRequest {
     @NotNull
     private LocalDate date;
 
-    @NotNull
     private Long studentId;
 
-    @NotNull
     private Long subjectId;
 }

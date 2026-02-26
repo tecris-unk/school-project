@@ -40,7 +40,6 @@ public final class SubjectMapper {
         subject.setDescription(request.getDescription());
     }
 
-
     private List<Long> toSchoolClassIds(final List<SchoolClass> schoolClasses) {
         if (schoolClasses == null) {
             return new ArrayList<>();

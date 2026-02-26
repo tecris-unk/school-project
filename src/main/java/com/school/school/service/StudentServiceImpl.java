@@ -110,7 +110,30 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
-    public StudentResponse createStudentWithGrades(final StudentWithGradesRequest request) {
+    public StudentResponse createStudentWithGradesTransactional(final StudentWithGradesRequest request) {
+        StudentRequest studentRequest = request.getStudent();
+        validateEmail(studentRequest.getEmail());
+        ensureEmailUnique(studentRequest.getEmail());
+
+        Student student = mapper.toEntity(studentRequest);
+        applySchoolClass(student, studentRequest.getSchoolClassId());
+        student = repository.save(student);
+
+        for (GradeRequest gradeRequest : request.getGrades()) {
+            Grade grade = gradeMapper.toEntity(gradeRequest);
+            grade.setStudent(student);
+            Subject subject = subjectRepository.findById(gradeRequest.getSubjectId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            SUBJECT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getSubjectId())
+                    );
+            grade.setSubject(subject);
+            gradeRepository.save(grade);
+        }
+        return mapper.toResponse(student);
+    }
+
+    @Override
+    public StudentResponse createStudentWithGradesNoTransactional(final StudentWithGradesRequest request) {
         StudentRequest studentRequest = request.getStudent();
         validateEmail(studentRequest.getEmail());
         ensureEmailUnique(studentRequest.getEmail());

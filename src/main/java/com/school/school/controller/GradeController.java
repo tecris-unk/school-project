@@ -1,7 +1,8 @@
 package com.school.school.controller;
 
+import com.school.school.service.dto.response.GradeResponse;
 import com.school.school.service.GradeService;
-import com.school.school.service.dto.GradeDto;
+import com.school.school.service.dto.request.GradeRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -32,7 +33,7 @@ public final class GradeController {
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<GradeDto> findById(@PathVariable final Long id) {
+    public ResponseEntity<GradeResponse> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findGradeById(id));
     }
 
@@ -42,8 +43,8 @@ public final class GradeController {
             @ApiResponse(responseCode = "204", description = "Список оценок пуст")
     })
     @GetMapping
-    public ResponseEntity<List<GradeDto>> getAllGrades() {
-        List<GradeDto> grades = service.findAllGrades();
+    public ResponseEntity<List<GradeResponse>> getAllGrades() {
+        List<GradeResponse> grades = service.findAllGrades();
         if (grades.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -56,9 +57,9 @@ public final class GradeController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
     @PostMapping
-    public ResponseEntity<GradeDto> addGrade(
-            @Valid @RequestBody final GradeDto gradeDto) {
-        GradeDto created = service.createGrade(gradeDto);
+    public ResponseEntity<GradeResponse> addGrade(
+            @Valid @RequestBody final GradeRequest gradeRequest) {
+        GradeResponse created = service.createGrade(gradeRequest);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -68,12 +69,11 @@ public final class GradeController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
-
     @PutMapping("/{id}")
-    public ResponseEntity<GradeDto> updateGrade(
+    public ResponseEntity<GradeResponse> updateGrade(
             @PathVariable final Long id,
-            @Valid @RequestBody final GradeDto gradeDto) {
-        return ResponseEntity.ok(service.updateGrade(id, gradeDto));
+            @Valid @RequestBody final GradeRequest gradeRequest) {
+        return ResponseEntity.ok(service.updateGrade(id,gradeRequest));
     }
 
     @Operation(summary = "Удалить оценку по индетификатору")

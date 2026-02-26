@@ -1,17 +1,18 @@
 package com.school.school.service;
 
-import com.school.school.service.dto.SubjectDto;
+import com.school.school.service.dto.request.SubjectRequest;
+import com.school.school.service.dto.response.SubjectResponse;
 import java.util.List;
 
 public interface SubjectService {
 
-    List<SubjectDto> findAllSubjects();
+    List<SubjectResponse> findAllSubjects();
 
-    SubjectDto findSubjectById(Long id);
+    SubjectResponse findSubjectById(Long id);
 
-    SubjectDto createSubject(SubjectDto subjectDto);
+    SubjectResponse createSubject(SubjectRequest subjectRequest);
 
-    SubjectDto updateSubject(Long id, SubjectDto subjectDto);
+    SubjectResponse updateSubject(Long id, SubjectRequest subjectRequest);
 
     void deleteSubject(Long id);
 }

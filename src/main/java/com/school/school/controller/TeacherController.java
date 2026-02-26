@@ -1,7 +1,8 @@
 package com.school.school.controller;
 
 import com.school.school.service.TeacherService;
-import com.school.school.service.dto.TeacherDto;
+import com.school.school.service.dto.request.TeacherRequest;
+import com.school.school.service.dto.response.TeacherResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,9 +32,8 @@ public final class TeacherController {
             @ApiResponse(responseCode = "200", description = "Учитель найден"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
-
     @GetMapping("/{id}")
-    public ResponseEntity<TeacherDto> findById(@PathVariable final Long id) {
+    public ResponseEntity<TeacherResponse> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findTeacherById(id));
     }
 
@@ -44,8 +44,8 @@ public final class TeacherController {
     })
 
     @GetMapping
-    public ResponseEntity<List<TeacherDto>> getAllTeachers() {
-        List<TeacherDto> teachers = service.findAllTeachers();
+    public ResponseEntity<List<TeacherResponse>> getAllTeachers() {
+        List<TeacherResponse> teachers = service.findAllTeachers();
         if (teachers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -57,11 +57,10 @@ public final class TeacherController {
             @ApiResponse(responseCode = "201", description = "Учитель создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
-
     @PostMapping
-    public ResponseEntity<TeacherDto> addTeacher(
-            @Valid @RequestBody final TeacherDto teacherDto) {
-        TeacherDto created = service.createTeacher(teacherDto);
+    public ResponseEntity<TeacherResponse> addTeacher(
+            @Valid @RequestBody final TeacherRequest teacherRequest) {
+        TeacherResponse created = service.createTeacher(teacherRequest);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -71,12 +70,11 @@ public final class TeacherController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
-
     @PutMapping("/{id}")
-    public ResponseEntity<TeacherDto> updateTeacher(
+    public ResponseEntity<TeacherResponse> updateTeacher(
             @PathVariable final Long id,
-           @Valid @RequestBody final TeacherDto teacherDto) {
-        return ResponseEntity.ok(service.updateTeacher(id, teacherDto));
+            @Valid @RequestBody final TeacherRequest teacherRequest) {
+        return ResponseEntity.ok(service.updateTeacher(id, teacherRequest));
     }
 
     @Operation(summary = "Удалить учителя")

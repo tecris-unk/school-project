@@ -1,7 +1,8 @@
 package com.school.school.controller;
 
 import com.school.school.service.SubjectService;
-import com.school.school.service.dto.SubjectDto;
+import com.school.school.service.dto.request.SubjectRequest;
+import com.school.school.service.dto.response.SubjectResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,9 +32,8 @@ public final class SubjectController {
             @ApiResponse(responseCode = "200", description = "Предмет найден"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
-
     @GetMapping("/{id}")
-    public ResponseEntity<SubjectDto> findById(@PathVariable final Long id) {
+    public ResponseEntity<SubjectResponse> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findSubjectById(id));
     }
 
@@ -42,10 +42,9 @@ public final class SubjectController {
             @ApiResponse(responseCode = "200", description = "Предметы найдены"),
             @ApiResponse(responseCode = "204", description = "Список предметов пуст")
     })
-
     @GetMapping
-    public ResponseEntity<List<SubjectDto>> getAllSubjects() {
-        List<SubjectDto> subjects = service.findAllSubjects();
+    public ResponseEntity<List<SubjectResponse>> getAllSubjects() {
+        List<SubjectResponse> subjects = service.findAllSubjects();
         if (subjects.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -58,11 +57,10 @@ public final class SubjectController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Связанные сущности не найдены")
     })
-
     @PostMapping
-    public ResponseEntity<SubjectDto> addSubject(
-            @Valid @RequestBody final SubjectDto subjectDto) {
-        SubjectDto created = service.createSubject(subjectDto);
+    public ResponseEntity<SubjectResponse> addSubject(
+            @Valid @RequestBody final SubjectRequest subjectRequest) {
+        SubjectResponse created = service.createSubject(subjectRequest);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -72,12 +70,11 @@ public final class SubjectController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
-
     @PutMapping("/{id}")
-    public ResponseEntity<SubjectDto> updateSubject(
+    public ResponseEntity<SubjectResponse> updateSubject(
             @PathVariable final Long id,
-            @Valid @RequestBody final SubjectDto subjectDto) {
-        return ResponseEntity.ok(service.updateSubject(id, subjectDto));
+            @Valid @RequestBody final SubjectRequest subjectRequest) {
+        return ResponseEntity.ok(service.updateSubject(id, subjectRequest));
     }
 
     @Operation(summary = "Удалить предмет")
@@ -85,7 +82,6 @@ public final class SubjectController {
             @ApiResponse(responseCode = "204", description = "Предмет удалён"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubject(@PathVariable final Long id) {
         service.deleteSubject(id);

@@ -1,17 +1,18 @@
 package com.school.school.service;
 
-import com.school.school.service.dto.GradeDto;
+import com.school.school.service.dto.request.GradeRequest;
+import com.school.school.service.dto.response.GradeResponse;
 import java.util.List;
 
 public interface GradeService {
 
-    List<GradeDto> findAllGrades();
+    List<GradeResponse> findAllGrades();
 
-    GradeDto findGradeById(Long id);
+    GradeResponse findGradeById(Long id);
 
-    GradeDto createGrade(GradeDto gradeDto);
+    GradeResponse createGrade(GradeRequest gradeRequest);
 
-    GradeDto updateGrade(Long id, GradeDto gradeDto);
+    GradeResponse updateGrade(Long id, GradeRequest gradeRequest);
 
     void deleteGrade(Long id);
 }

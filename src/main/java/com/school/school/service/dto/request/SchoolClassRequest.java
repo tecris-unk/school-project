@@ -1,10 +1,8 @@
-package com.school.school.service.dto;
+package com.school.school.service.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,14 +12,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SchoolClassDto {
-    /**
-     * Минимальная оценка.
-     */
+
+public class SchoolClassRequest {
     public static final int MIN_GRADE = 1;
-    /**
-     * Максимальная оценка.
-     */
     public static final int MAX_GRADE = 11;
 
     private Long id;
@@ -32,8 +25,4 @@ public class SchoolClassDto {
 
     @NotBlank
     private String letter;
-
-    private List<StudentDto> students = new ArrayList<>();
-
-    private List<SubjectDto> subjects = new ArrayList<>();
 }

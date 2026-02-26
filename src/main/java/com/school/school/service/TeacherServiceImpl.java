@@ -3,8 +3,9 @@ package com.school.school.service;
 import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.Teacher;
 import com.school.school.repository.TeacherRepository;
-import com.school.school.service.dto.TeacherDto;
-import com.school.school.service.mapper.TeacherMapper;
+import com.school.school.service.dto.request.TeacherRequest;
+import com.school.school.controller.mapper.TeacherMapper;
+import com.school.school.service.dto.response.TeacherResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,37 +22,37 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeacherDto> findAllTeachers() {
+    public List<TeacherResponse> findAllTeachers() {
         return repository.findAll().stream()
-                .map(mapper::toDto)
+                .map(mapper::toResponse)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TeacherDto findTeacherById(final Long id) {
+    public TeacherResponse findTeacherById(final Long id) {
         Teacher teacher = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + id));
-        return mapper.toDto(teacher);
+        return mapper.toResponse(teacher);
     }
 
     @Override
     @Transactional
-    public TeacherDto createTeacher(final TeacherDto teacherDto) {
-        Teacher teacher = repository.save(mapper.toEntity(teacherDto));
-        return mapper.toDto(teacher);
+    public TeacherResponse createTeacher(final TeacherRequest teacherRequest) {
+        Teacher teacher = repository.save(mapper.toEntity(teacherRequest));
+        return mapper.toResponse(teacher);
     }
 
     @Override
     @Transactional
-    public TeacherDto updateTeacher(final Long id, final TeacherDto teacherDto) {
+    public TeacherResponse updateTeacher(final Long id, final TeacherRequest teacherRequest) {
         Teacher teacher = repository.findById(id)
                 .map(existingTeacher -> {
-                    mapper.updateEntity(existingTeacher, teacherDto);
+                    mapper.updateEntity(existingTeacher, teacherRequest);
                     return repository.save(existingTeacher);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + " with id: " + id));
-        return mapper.toDto(teacher);
+        return mapper.toResponse(teacher);
     }
 
     @Override

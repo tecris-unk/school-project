@@ -1,7 +1,5 @@
-package com.school.school.service.dto;
+package com.school.school.service.dto.response;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -13,18 +11,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TeacherDto {
+public class TeacherResponse {
+
     private Long id;
-
-    @NotBlank
     private String firstName;
-
-    @NotBlank
     private String lastName;
-
-    @NotBlank
-    @Email
     private String email;
-
-    private List<SubjectDto> subjects = new ArrayList<>();
+    private List<SubjectResponse> subjects = new ArrayList<>();
 }

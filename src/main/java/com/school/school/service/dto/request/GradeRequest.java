@@ -1,4 +1,4 @@
-package com.school.school.service.dto;
+package com.school.school.service.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -13,12 +13,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class GradeDto {
+
+public class GradeRequest {
 
     public static final int MIN_SCORE = 2;
     public static final int MAX_SCORE = 10;
-
-    private Long id;
 
     @Min(MIN_SCORE)
     @Max(MAX_SCORE)
@@ -27,7 +26,9 @@ public class GradeDto {
     @NotNull
     private LocalDate date;
 
-    private StudentDto student;
+    @NotNull
+    private Long studentId;
 
-    private SubjectDto subject;
+    @NotNull
+    private Long subjectId;
 }

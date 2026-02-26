@@ -5,8 +5,9 @@ import com.school.school.model.Subject;
 import com.school.school.model.Teacher;
 import com.school.school.repository.SubjectRepository;
 import com.school.school.repository.TeacherRepository;
-import com.school.school.service.dto.SubjectDto;
-import com.school.school.service.mapper.SubjectMapper;
+import com.school.school.service.dto.request.SubjectRequest;
+import com.school.school.controller.mapper.SubjectMapper;
+import com.school.school.service.dto.response.SubjectResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,57 +26,55 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SubjectDto> findAllSubjects() {
+    public List<SubjectResponse> findAllSubjects() {
         return repository.findAll().stream()
-                .map(mapper::toDto)
+                .map(mapper::toResponse)
                 .toList();
     }
 
 
     @Transactional(readOnly = true)
-    public SubjectDto findSubjectById(final Long id) {
+    public SubjectResponse findSubjectById(final Long id) {
         Subject subject = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
-        return mapper.toDto(subject);
+        return mapper.toResponse(subject);
     }
 
     @Override
     @Transactional
-    public SubjectDto createSubject(final SubjectDto subjectDto) {
-        Subject subject = mapper.toEntity(subjectDto);
-        if (subjectDto.getTeacher() != null && subjectDto.getTeacher().getId() != null) {
-            Long teacherId = subjectDto.getTeacher().getId();
+    public SubjectResponse createSubject(final SubjectRequest subjectRequest) {
+        Subject subject = mapper.toEntity(subjectRequest);
+        if (subjectRequest.getTeacherId() != null) {
             Teacher teacher = teacherRepository
-                    .findById(teacherId)
+                    .findById(subjectRequest.getTeacherId())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            TEACHER_NOT_FOUND_MSG + " with id: " + teacherId)
+                            TEACHER_NOT_FOUND_MSG + " with id: " + subjectRequest.getTeacherId())
                     );
             subject.setTeacher(teacher);
         }
-        return mapper.toDto(repository.save(subject));
+        return mapper.toResponse(repository.save(subject));
     }
 
     @Override
     @Transactional
-    public SubjectDto updateSubject(final Long id, final SubjectDto subjectDto) {
+    public SubjectResponse updateSubject(final Long id, final SubjectRequest subjectRequest) {
         Subject subject = repository.findById(id)
                 .map(existingSubject -> {
-                    mapper.updateEntity(existingSubject, subjectDto);
-                    if (subjectDto.getTeacher() == null || subjectDto.getTeacher().getId() == null) {
+                    mapper.updateEntity(existingSubject, subjectRequest);
+                    if (subjectRequest.getTeacherId() == null) {
                         existingSubject.setTeacher(null);
                     } else {
-                        Long teacherId = subjectDto.getTeacher().getId();
                         Teacher teacher = teacherRepository
-                                .findById(teacherId)
+                                .findById(subjectRequest.getTeacherId())
                                 .orElseThrow(() -> new ResourceNotFoundException(
-                                        TEACHER_NOT_FOUND_MSG + " with id: " + teacherId)
+                                        TEACHER_NOT_FOUND_MSG + " with id: " + subjectRequest.getTeacherId())
                                 );
                         existingSubject.setTeacher(teacher);
                     }
                     return repository.save(existingSubject);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + " with id: " + id));
-        return mapper.toDto(subject);
+        return mapper.toResponse(subject);
     }
 
     @Override

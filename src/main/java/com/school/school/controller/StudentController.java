@@ -1,8 +1,9 @@
 package com.school.school.controller;
 
+import com.school.school.service.dto.request.StudentWithGradesRequest;
+import com.school.school.service.dto.response.StudentResponse;
 import com.school.school.service.StudentService;
-import com.school.school.service.dto.GradeDto;
-import com.school.school.service.dto.StudentDto;
+import com.school.school.service.dto.request.StudentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,7 +35,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<StudentDto> findById(@PathVariable final Long id) {
+    public ResponseEntity<StudentResponse> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(service.findStudentById(id));
     }
 
@@ -44,7 +45,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @GetMapping(path = "/", params = "email")
-    public ResponseEntity<StudentDto> findByEmail(
+    public ResponseEntity<StudentResponse> findByEmail(
             @RequestParam(required = false) final String email) {
         return ResponseEntity.ok(service.findStudentByEmail(email));
     }
@@ -55,10 +56,10 @@ public final class StudentController {
             @ApiResponse(responseCode = "204", description = "Список учеников пуст")
     })
     @GetMapping("/")
-    public ResponseEntity<List<StudentDto>> getAllStudents(
+    public ResponseEntity<List<StudentResponse>> getAllStudents(
             @RequestParam(name = "with-grades", required = false, defaultValue = "false") boolean withGrades) {
 
-        List<StudentDto> students;
+        List<StudentResponse> students;
         if (withGrades) {
             students = service.findAllStudentsWithGrades();
         } else {
@@ -77,9 +78,9 @@ public final class StudentController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
     @PostMapping
-    public ResponseEntity<StudentDto> addStudent(
-            @Valid @RequestBody final StudentDto studentDto) {
-        StudentDto created = service.createStudent(studentDto);
+    public ResponseEntity<StudentResponse> addStudent(
+            @Valid @RequestBody final StudentRequest studentRequest) {
+        StudentResponse created = service.createStudent(studentRequest);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -89,9 +90,9 @@ public final class StudentController {
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
     @PostMapping("/with_grades")
-    public ResponseEntity<StudentDto> addStudentWithGrades(
-            @Valid @RequestBody final StudentDto studentDto, final List<GradeDto> gradesDto) {
-        StudentDto created = service.createStudentWithGrades(studentDto, gradesDto);
+    public ResponseEntity<StudentResponse> addStudentWithGrades(
+            @Valid @RequestBody final StudentWithGradesRequest request) {
+        StudentResponse created = service.createStudentWithGrades(request);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -102,9 +103,9 @@ public final class StudentController {
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<StudentDto> updateStudent(
+    public ResponseEntity<StudentResponse> updateStudent(
             @PathVariable final Long id,
-            @Valid @RequestBody final StudentDto updatedStudent) {
+            @Valid @RequestBody final StudentRequest updatedStudent) {
         return ResponseEntity.ok(service.updateStudent(id, updatedStudent));
     }
 

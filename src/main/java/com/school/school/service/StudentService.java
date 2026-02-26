@@ -1,24 +1,25 @@
 package com.school.school.service;
 
-import com.school.school.service.dto.GradeDto;
-import com.school.school.service.dto.StudentDto;
+import com.school.school.service.dto.request.StudentRequest;
+import com.school.school.service.dto.request.StudentWithGradesRequest;
+import com.school.school.service.dto.response.StudentResponse;
 import java.util.List;
 
 public interface StudentService {
 
-    List<StudentDto> findAllStudents();
+    List<StudentResponse> findAllStudents();
 
-    List<StudentDto> findAllStudentsWithGrades();
+    List<StudentResponse> findAllStudentsWithGrades();
 
-    StudentDto createStudent(StudentDto student);
+    StudentResponse createStudent(StudentRequest student);
 
-    StudentDto findStudentById(Long id);
+    StudentResponse findStudentById(Long id);
 
-    StudentDto findStudentByEmail(String email);
+    StudentResponse findStudentByEmail(String email);
 
-    StudentDto updateStudent(Long id, StudentDto updatedStudent);
+    StudentResponse updateStudent(Long id, StudentRequest updatedStudent);
 
     void deleteStudent(Long id);
 
-    StudentDto createStudentWithGrades(StudentDto student, List<GradeDto> gradesDto);
+    StudentResponse createStudentWithGrades(StudentWithGradesRequest request);
 }

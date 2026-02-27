@@ -3,7 +3,9 @@ package com.school.school.service;
 import com.school.school.controller.mapper.SchoolClassMapper;
 import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.SchoolClass;
+import com.school.school.model.Subject;
 import com.school.school.repository.SchoolClassRepository;
+import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.request.SchoolClassRequest;
 import com.school.school.service.dto.response.SchoolClassResponse;
 import java.util.List;
@@ -21,6 +23,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
     private final SchoolClassRepository repository;
     private final SchoolClassMapper mapper;
+    private final SubjectRepository subjectRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -62,6 +65,23 @@ public class SchoolClassServiceImpl implements SchoolClassService {
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG  + WITH_ID + id));
         return mapper.toResponse(schoolClass);
+    }
+
+    @Override
+    @Transactional
+    public SchoolClassResponse addSubjectToClass(final Long classId, final Long subjectId) {
+        SchoolClass schoolClass = repository.findById(classId)
+                .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + WITH_ID + classId));
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found" + WITH_ID + subjectId));
+
+        boolean alreadyAssigned = schoolClass.getSubjects().stream()
+                .anyMatch(existingSubject -> existingSubject.getId().equals(subjectId));
+        if (!alreadyAssigned) {
+            schoolClass.getSubjects().add(subject);
+        }
+
+        return mapper.toResponse(repository.save(schoolClass));
     }
 
     @Override

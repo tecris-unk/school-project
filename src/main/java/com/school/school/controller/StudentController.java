@@ -72,7 +72,7 @@ public final class StudentController {
         return ResponseEntity.ok(students);
     }
 
-    @Operation(summary = "Создать ученика")
+    @Operation(summary = "Создать ученика (опционально с оценками)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
@@ -96,6 +96,11 @@ public final class StudentController {
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Создать ученика с оценками, без транзакционал")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Ученик создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+    })
     @PostMapping("/with_grades")
     public ResponseEntity<StudentResponse> addStudentWithGradesNoTransactional(
             @Valid @RequestBody final StudentWithGradesRequest request) {

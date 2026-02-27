@@ -91,6 +91,18 @@ public final class SchoolClassController {
         return ResponseEntity.ok(service.updateClass(id, classRequest));
     }
 
+    @Operation(summary = "Добавить предмет в класс")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Предмет добавлен в класс"),
+            @ApiResponse(responseCode = "404", description = "Класс или предмет не найден")
+    })
+    @PutMapping("/{classId}/subjects/{subjectId}")
+    public ResponseEntity<SchoolClassResponse> addSubjectToClass(
+            @PathVariable final Long classId,
+            @PathVariable final Long subjectId) {
+        return ResponseEntity.ok(service.addSubjectToClass(classId, subjectId));
+    }
+
     @Operation(summary = "Удалить класс")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Класс успешно удален"),

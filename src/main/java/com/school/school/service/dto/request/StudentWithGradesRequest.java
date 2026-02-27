@@ -2,7 +2,6 @@ package com.school.school.service.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,8 +16,8 @@ public class StudentWithGradesRequest {
 
     @NotNull
     @Valid
-    private StudentRequest student;
+    StudentRequest student;
 
     @Valid
-    private List<GradeRequest> grades = new ArrayList<>();
+    List<GradeRequest> grades;
 }

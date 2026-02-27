@@ -19,6 +19,7 @@ public class GradeRequest {
     public static final int MIN_SCORE = 2;
     public static final int MAX_SCORE = 10;
 
+    @NotNull
     @Min(MIN_SCORE)
     @Max(MAX_SCORE)
     private Integer score;
@@ -28,5 +29,6 @@ public class GradeRequest {
 
     private Long studentId;
 
+    @NotNull
     private Long subjectId;
 }

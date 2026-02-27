@@ -16,5 +16,7 @@ public interface SchoolClassService {
 
     SchoolClassResponse updateClass(Long id, SchoolClassRequest classRequest);
 
+    SchoolClassResponse addSubjectToClass(Long classId, Long subjectId);
+
     void deleteClass(Long id);
 }

@@ -22,6 +22,29 @@
 6. Реализовать метод, сохраняющий несколько связанных сущностей. Продемонстрировать частичное сохранение данных без @Transactional и полное откатывание операции с @Transactional при возникновении ошибки.
 7. Нарисовать ER-диаграмму с указанием PK/FK и связей.
 
+// Запрос для createStudentsWithGrades ДЛЯ ПРОВЕРКИ @Transactional
+{
+    "student": {
+        "lastName": "Doe",
+        "firstName": "John",
+        "email": "dfasf.doe@example.com",
+        "gender": "MALE"
+    },
+    "grades": [
+        {
+            "score": 7,
+            "date": "2023-04-01",
+            "subjectId": 1
+        },
+        {
+            "score": 9,
+            "date":"2026-02-20",
+            "subjectId": 3
+        }
+    ]
+}
+
+
 [Сонар](https://sonarcloud.io/project/overview?id=tecris-unk_school-project)
 
 

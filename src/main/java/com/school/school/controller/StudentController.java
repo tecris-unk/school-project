@@ -1,5 +1,6 @@
 package com.school.school.controller;
 
+import com.school.school.service.StudentSearchQueryType;
 import com.school.school.service.StudentService;
 import com.school.school.service.dto.request.StudentRequest;
 import com.school.school.service.dto.request.StudentWithGradesRequest;
@@ -9,13 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import java.time.LocalDate;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,23 +43,38 @@ public final class StudentController {
         return ResponseEntity.ok(service.findStudentById(id));
     }
 
-    @Operation(summary = "Получить всех учеников (опционально поиск по почте и дате оценок)")
+    @Operation(summary = "Сложный поиск учеников по вложенным сущностям")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ученики найдены"),
             @ApiResponse(responseCode = "204", description = "Список учеников пуст")
     })
     @GetMapping
-    public ResponseEntity<Page<StudentResponse>> getAllStudents(
-            @RequestParam(required = false) @Email String email,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @PageableDefault(size = 20) Pageable pageable) {
+    public ResponseEntity<Page<StudentResponse>> searchStudents(
+            @RequestParam(required = false) @Email String teacherEmail,
+            @RequestParam(required = false) String subjectName,
+            @RequestParam(required = false) Integer minScore,
+            @RequestParam(defaultValue = "NATIVE") StudentSearchQueryType queryType,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
+        String normalizedTeacherEmail = normalizeTextParam(teacherEmail);
+        String normalizedSubjectName = normalizeTextParam(subjectName);
 
-        Page<StudentResponse> page = service.findStudentsByEmailAndDate(email, date, pageable);
-
-        if (page.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        Page<StudentResponse> page = service.findStudentsByNestedFilters(
+                normalizedTeacherEmail,
+                normalizedSubjectName,
+                minScore,
+                pageable,
+                queryType
+        );
         return ResponseEntity.ok(page);
+    }
+
+    private String normalizeTextParam(final String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
     }
 
     @Operation(summary = "Создать ученика (опционально с оценками)")

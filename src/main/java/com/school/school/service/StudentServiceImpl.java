@@ -17,9 +17,16 @@ import com.school.school.service.dto.request.GradeRequest;
 import com.school.school.service.dto.request.StudentRequest;
 import com.school.school.service.dto.request.StudentWithGradesRequest;
 import com.school.school.service.dto.response.StudentResponse;
+import jakarta.annotation.Nullable;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,14 +49,6 @@ public class StudentServiceImpl implements StudentService {
     private final GradeRepository gradeRepository;
     private final StudentMapper mapper;
     private final GradeMapper gradeMapper;
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<StudentResponse> findAllStudents() {
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -79,10 +78,27 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional(readOnly = true)
-    public StudentResponse findStudentByEmail(final String email) {
-        Student student = repository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(STUDENT_NOT_FOUND_MSG + " with email: " + email));
-        return mapper.toResponse(student);
+    public Page<StudentResponse> findStudentsByEmailAndDate(
+            @Nullable final String email,
+            @Nullable final LocalDate date,
+            final Pageable pageable
+    ) {
+        Page<Student> studentPage = repository.findStudentsByEmail(email, pageable);
+        List<Student> students = studentPage.getContent();
+
+        if (date != null && !students.isEmpty()) {
+            List<Grade> grades = gradeRepository.findGradesByStudentsAndDate(students, date);
+
+            Map<Long, List<Grade>> gradesByStudentId = grades.stream()
+                    .collect(Collectors.groupingBy(g -> g.getStudent().getId()));
+
+            students.forEach(student -> {
+                List<Grade> studentGrades = gradesByStudentId.getOrDefault(student.getId(), Collections.emptyList());
+                student.setGrades(studentGrades);
+            });
+        }
+
+        return studentPage.map(mapper::toResponse);
     }
 
     @Override

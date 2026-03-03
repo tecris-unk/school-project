@@ -12,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SchoolClassResponse {
+
     private Long id;
     private Integer grade;
     private String letter;

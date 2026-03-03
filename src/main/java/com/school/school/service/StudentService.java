@@ -3,11 +3,12 @@ package com.school.school.service;
 import com.school.school.service.dto.request.StudentRequest;
 import com.school.school.service.dto.request.StudentWithGradesRequest;
 import com.school.school.service.dto.response.StudentResponse;
+import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface StudentService {
-
-    List<StudentResponse> findAllStudents();
 
     List<StudentResponse> findAllStudentsWithGrades();
 
@@ -15,7 +16,7 @@ public interface StudentService {
 
     StudentResponse findStudentById(Long id);
 
-    StudentResponse findStudentByEmail(String email);
+    public Page<StudentResponse> findStudentsByEmailAndDate(final String email, final LocalDate date, final Pageable pageable);
 
     StudentResponse updateStudent(Long id, StudentRequest updatedStudent);
 

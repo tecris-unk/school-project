@@ -77,7 +77,7 @@ public final class StudentController {
         return normalized.isEmpty() ? null : normalized;
     }
 
-    @Operation(summary = "Создать ученика (опционально с оценками)")
+    @Operation(summary = "Создать ученика")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")

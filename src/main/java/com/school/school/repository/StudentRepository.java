@@ -13,18 +13,18 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query(value = """
             SELECT DISTINCT st.id FROM Student st
-            JOIN st.grades g
-            JOIN g.subject sb
-            JOIN sb.teacher t
+            LEFT JOIN st.grades g
+            LEFT JOIN g.subject sb
+            LEFT JOIN sb.teacher t
             WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
                AND (:subjectName IS NULL OR LOWER(sb.name) LIKE CONCAT('%', CAST(:subjectName AS string), '%'))
               AND (:minScore IS NULL OR g.score >= :minScore)
             """,
             countQuery = """
                     SELECT COUNT(DISTINCT st.id) FROM Student st
-                    JOIN st.grades g
-                    JOIN g.subject sb
-                    JOIN sb.teacher t
+                    LEFT JOIN st.grades g
+                    LEFT JOIN g.subject sb
+                    LEFT JOIN sb.teacher t
                     WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
                       AND (:subjectName IS NULL OR LOWER(sb.name) LIKE CONCAT('%', CAST(:subjectName AS string), '%'))
                       AND (:minScore IS NULL OR g.score >= :minScore)
@@ -39,9 +39,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query(value = """
             SELECT DISTINCT st.id
             FROM students st
-            JOIN grades g ON g.student_id = st.id
-            JOIN subjects sb ON sb.id = g.subject_id
-            JOIN teachers t ON t.id = sb.teacher_id
+            LEFT JOIN grades g ON g.student_id = st.id
+            LEFT JOIN subjects sb ON sb.id = g.subject_id
+            LEFT JOIN teachers t ON t.id = sb.teacher_id
             WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
                AND (:subjectName IS NULL OR sb.name ILIKE CONCAT('%', CAST(:subjectName AS TEXT), '%'))
               AND (:minScore IS NULL OR g.score >= :minScore)
@@ -49,9 +49,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             countQuery = """
                     SELECT COUNT(DISTINCT st.id)
                     FROM students st
-                    JOIN grades g ON g.student_id = st.id
-                    JOIN subjects sb ON sb.id = g.subject_id
-                    JOIN teachers t ON t.id = sb.teacher_id
+                    LEFT JOIN grades g ON g.student_id = st.id
+                    LEFT JOIN subjects sb ON sb.id = g.subject_id
+                    LEFT JOIN teachers t ON t.id = sb.teacher_id
                     WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
                       AND (:subjectName IS NULL OR sb.name ILIKE CONCAT('%', CAST(:subjectName AS TEXT), '%'))
                       AND (:minScore IS NULL OR g.score >= :minScore)

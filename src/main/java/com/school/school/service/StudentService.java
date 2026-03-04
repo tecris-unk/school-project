@@ -3,7 +3,6 @@ package com.school.school.service;
 import com.school.school.service.dto.request.StudentRequest;
 import com.school.school.service.dto.request.StudentWithGradesRequest;
 import com.school.school.service.dto.response.StudentResponse;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -25,6 +24,6 @@ public interface StudentService {
 
     void deleteStudent(Long id);
 
-    public StudentResponse createStudentWithGradesTransactional(final StudentWithGradesRequest request);
-    public StudentResponse createStudentWithGradesNoTransactional(final StudentWithGradesRequest request);
+    StudentResponse createStudentWithGradesTransactional(final StudentWithGradesRequest request);
+    StudentResponse createStudentWithGradesNoTransactional(final StudentWithGradesRequest request);
 }

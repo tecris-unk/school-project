@@ -5,11 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class SchoolApplication {
-    /**
-     * Запуск REST API программы.
-     *
-     * @param args аргументы консоли
-     */
+
     public static void main(final String[] args) {
         SpringApplication.run(SchoolApplication.class, args);
     }

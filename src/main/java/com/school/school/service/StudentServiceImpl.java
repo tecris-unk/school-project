@@ -97,7 +97,11 @@ public class StudentServiceImpl implements StudentService {
         }
 
         Page<Long> studentIdsPage = queryType == StudentSearchQueryType.NATIVE
-                ? repository.findStudentIdsByNestedFiltersNative(teacherEmail, normalizedSubjectName, minScore, pageable)
+                ? repository.findStudentIdsByNestedFiltersNative(
+                        teacherEmail,
+                        normalizedSubjectName,
+                        minScore,
+                        pageable)
                 : repository.findStudentIdsByNestedFiltersJpql(
                 teacherEmail,
                 normalizedSubjectName,
@@ -115,7 +119,11 @@ public class StudentServiceImpl implements StudentService {
 
         List<Student> students = repository.findAllByIdsWithGradesAndTeacher(ids);
         Map<Long, Student> studentsById = students.stream()
-                .collect(Collectors.toMap(Student::getId, student -> student, (left, right) -> left, LinkedHashMap::new));
+                .collect(Collectors.toMap(
+                        Student::getId,
+                        student -> student,
+                        (left, right) -> left,
+                        LinkedHashMap::new));
 
         List<StudentResponse> orderedResponses = ids.stream()
                 .map(studentsById::get)
@@ -123,7 +131,10 @@ public class StudentServiceImpl implements StudentService {
                 .map(mapper::toResponse)
                 .toList();
 
-        Page<StudentResponse> mappedPage = new PageImpl<>(orderedResponses, pageable, studentIdsPage.getTotalElements());
+        Page<StudentResponse> mappedPage = new PageImpl<>(
+                orderedResponses,
+                pageable,
+                studentIdsPage.getTotalElements());
         searchCache.put(cacheKey, mappedPage);
         return mappedPage;
     }
@@ -155,31 +166,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
-    public StudentResponse createStudentWithGradesTransactional(final StudentWithGradesRequest request) {
-        StudentRequest studentRequest = request.getStudent();
-        validateEmail(studentRequest.getEmail());
-        ensureEmailUnique(studentRequest.getEmail());
-
-        Student student = mapper.toEntity(studentRequest);
-        applySchoolClass(student, studentRequest.getSchoolClassId());
-        student = repository.save(student);
-
-        for (GradeRequest gradeRequest : request.getGrades()) {
-            Grade grade = gradeMapper.toEntity(gradeRequest);
-            grade.setStudent(student);
-            Subject subject = subjectRepository.findById(gradeRequest.getSubjectId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            SUBJECT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getSubjectId())
-                    );
-            grade.setSubject(subject);
-            gradeRepository.save(grade);
-        }
-        invalidateSearchCache();
-        return mapper.toResponse(student);
-    }
-
-    @Override
-    public StudentResponse createStudentWithGradesNoTransactional(final StudentWithGradesRequest request) {
+    public StudentResponse createStudentWithGrades(final StudentWithGradesRequest request) {
         StudentRequest studentRequest = request.getStudent();
         validateEmail(studentRequest.getEmail());
         ensureEmailUnique(studentRequest.getEmail());
@@ -206,57 +193,45 @@ public class StudentServiceImpl implements StudentService {
         searchCache.clear();
     }
 
-    @AllArgsConstructor
-    private static final class StudentSearchCacheKey {
-        private final String teacherEmail;
-        private final String subjectName;
-        private final Integer minScore;
-        private final int pageNumber;
-        private final int pageSize;
-        private final String sort;
-        private final StudentSearchQueryType queryType;
+        private record StudentSearchCacheKey(String teacherEmail, String subjectName, Integer minScore, int pageNumber,
+                                             int pageSize, String sort, StudentSearchQueryType queryType) {
 
-        private static StudentSearchCacheKey of(
-                final String teacherEmail,
-                final String subjectName,
-                final Integer minScore,
-                final Pageable pageable,
-                final StudentSearchQueryType queryType
-        ) {
-            return new StudentSearchCacheKey(
-                    teacherEmail,
-                    subjectName,
-                    minScore,
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    pageable.getSort().toString(),
-                    queryType
-            );
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
+            private static StudentSearchCacheKey of(
+                    final String teacherEmail,
+                    final String subjectName,
+                    final Integer minScore,
+                    final Pageable pageable,
+                    final StudentSearchQueryType queryType
+            ) {
+                return new StudentSearchCacheKey(
+                        teacherEmail,
+                        subjectName,
+                        minScore,
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        pageable.getSort().toString(),
+                        queryType
+                );
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            StudentSearchCacheKey that = (StudentSearchCacheKey) o;
-            return pageNumber == that.pageNumber
-                    && pageSize == that.pageSize
-                    && Objects.equals(teacherEmail, that.teacherEmail)
-                    && Objects.equals(subjectName, that.subjectName)
-                    && Objects.equals(minScore, that.minScore)
-                    && Objects.equals(sort, that.sort)
-                    && queryType == that.queryType;
-        }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(teacherEmail, subjectName, minScore, pageNumber, pageSize, sort, queryType);
+            @Override
+            public boolean equals(final Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
+                StudentSearchCacheKey that = (StudentSearchCacheKey) o;
+                return pageNumber == that.pageNumber
+                        && pageSize == that.pageSize
+                        && Objects.equals(teacherEmail, that.teacherEmail)
+                        && Objects.equals(subjectName, that.subjectName)
+                        && Objects.equals(minScore, that.minScore)
+                        && Objects.equals(sort, that.sort)
+                        && queryType == that.queryType;
+            }
         }
-    }
 
     private void applySchoolClass(final Student student, final Long schoolClassId) {
         if (schoolClassId == null) {

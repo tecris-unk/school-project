@@ -17,8 +17,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             LEFT JOIN g.subject sb
             LEFT JOIN sb.teacher t
             WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
-               AND (:subjectName IS NULL OR LOWER(sb.name) LIKE CONCAT('%', CAST(:subjectName AS string), '%'))
-              AND (:minScore IS NULL OR g.score >= :minScore)
+            AND (:subjectName IS NULL OR LOWER(sb.name) LIKE CONCAT('%', CAST(:subjectName AS string), '%'))
+            AND (:minScore IS NULL OR g.score >= :minScore)
             """,
             countQuery = """
                     SELECT COUNT(DISTINCT st.id) FROM Student st
@@ -26,8 +26,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
                     LEFT JOIN g.subject sb
                     LEFT JOIN sb.teacher t
                     WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
-                      AND (:subjectName IS NULL OR LOWER(sb.name) LIKE CONCAT('%', CAST(:subjectName AS string), '%'))
-                      AND (:minScore IS NULL OR g.score >= :minScore)
+                    AND (:subjectName IS NULL OR LOWER(sb.name) LIKE CONCAT('%', CAST(:subjectName AS string), '%'))
+                    AND (:minScore IS NULL OR g.score >= :minScore)
                     """)
     Page<Long> findStudentIdsByNestedFiltersJpql(
             @Param("teacherEmail") String teacherEmail,
@@ -43,8 +43,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             LEFT JOIN subjects sb ON sb.id = g.subject_id
             LEFT JOIN teachers t ON t.id = sb.teacher_id
             WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
-               AND (:subjectName IS NULL OR sb.name ILIKE CONCAT('%', CAST(:subjectName AS TEXT), '%'))
-              AND (:minScore IS NULL OR g.score >= :minScore)
+            AND (:subjectName IS NULL OR sb.name ILIKE CONCAT('%', CAST(:subjectName AS TEXT), '%'))
+            AND (:minScore IS NULL OR g.score >= :minScore)
             """,
             countQuery = """
                     SELECT COUNT(DISTINCT st.id)
@@ -53,8 +53,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
                     LEFT JOIN subjects sb ON sb.id = g.subject_id
                     LEFT JOIN teachers t ON t.id = sb.teacher_id
                     WHERE (:teacherEmail IS NULL OR t.email = :teacherEmail)
-                      AND (:subjectName IS NULL OR sb.name ILIKE CONCAT('%', CAST(:subjectName AS TEXT), '%'))
-                      AND (:minScore IS NULL OR g.score >= :minScore)
+                    AND (:subjectName IS NULL OR sb.name ILIKE CONCAT('%', CAST(:subjectName AS TEXT), '%'))
+                    AND (:minScore IS NULL OR g.score >= :minScore)
                     """,
             nativeQuery = true)
     Page<Long> findStudentIdsByNestedFiltersNative(

@@ -20,6 +20,35 @@
 
 [Сонар](https://sonarcloud.io/project/overview?id=tecris-unk_school-project)
 
+## Проверка требований 1-5 (сложный поиск, pageable, индекс, инвалидация)
+
+### Сложный GET с JPQL
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=5&sort=id,asc
+
+
+### Аналогичный GET с Native SQL
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=NATIVE&page=0&size=5&sort=id,asc
+
+### Проверка pageable (вторая страница)
+
+http://localhost:8080/api/students?queryType=JPQL&page=1&size=2&sort=id,asc
+
+### Проверка инвалидации in-memory индекса
+1. Сначала выполнить поиск (результат закешируется):
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=20
+
+3. Изменить данные, влияющие на фильтр (оценка/предмет/учитель/ученик). Пример — изменить оценку:
+
+PUT "http://localhost:8080/api/grades/1" \
+
+{"studentId":1,"subjectId":1,"score":2,"date":"2025-01-01"}
+
+3. Повторить исходный поиск и убедиться, что ответ изменился (кэш был инвалидирован):
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=20
 
 ```mermaid
 erDiagram

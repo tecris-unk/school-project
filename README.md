@@ -3,50 +3,52 @@
 ### REST API проект на Java, фреймворк Spring, Maven. 
  
  	
-1. Создать Spring Boot приложение.
-2. Реализовать REST API для одной ключевой сущности своей предметной области (domain).
-3. Реализовать:
-- GET endpoint с @RequestParam
-- GET endpoint с @PathVariable
-4. Реализовать слои: Controller → Service → Repository.
-5. Реализовать DTO и mapper между Entity и API-ответом.
-6. Настроить Checkstyle и привести код к стилю.
+1. Реализовать сложный GET-запрос с фильтрацией по вложенной сущности с использованием @Query (JPQL).
+2. Реализовать аналогичный запрос через native query.
+3. Добавить пагинацию (Pageable).
+4. Реализовать in-memory индекс на основе HashMap<K, V> для ранее запрошенных данных. Ключ должен формироваться из параметров запроса (составной ключ). Обеспечить корректную работу индекса за счёт правильной реализации equals() и hashCode().
+5. Реализовать инвалидацию индекса при изменении данных.
 
-1. Подключить реляционную БД к проекту.
-2. В модели данных реализовать минимум 5 сущностей:
-- минимум одну связь OneToMany
-- минимум одну связь ManyToMany
-3. Реализовать CRUD операции.
-4. Настроить и обосновать использование CascadeType и FetchType.
-5. Продемонстрировать проблему N+1 и решить её через @EntityGraph или fetch join.
-6. Реализовать метод, сохраняющий несколько связанных сущностей. Продемонстрировать частичное сохранение данных без @Transactional и полное откатывание операции с @Transactional при возникновении ошибки.
-7. Нарисовать ER-диаграмму с указанием PK/FK и связей.
-
-// Запрос для createStudentsWithGrades ДЛЯ ПРОВЕРКИ @Transactional
-{
-    "student": {
-        "lastName": "Doe",
-        "firstName": "John",
-        "email": "dfasf.doe@example.com",
-        "gender": "MALE"
-    },
-    "grades": [
-        {
-            "score": 7,
-            "date": "2023-04-01",
-            "subjectId": 1
-        },
-        {
-            "score": 9,
-            "date":"2026-02-20",
-            "subjectId": 3
-        }
-    ]
-}
-
+1. Реализовать глобальную обработку ошибок через @ControllerAdvice.
+2. Добавить валидацию входных данных через @Valid.
+3. Реализовать единый формат ошибки для всех endpoint.
+4. Настроить логирование через logback:
+- уровни логирования
+- ротация логов
+5. Реализовать аспект (AOP) для логирования времени выполнения сервисных методов.
+6. Подключить Swagger/OpenAPI с описанием endpoint и DTO.
 
 [Сонар](https://sonarcloud.io/project/overview?id=tecris-unk_school-project)
 
+## Проверка требований 1-5 (сложный поиск, pageable, индекс, инвалидация)
+
+### Сложный GET с JPQL
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=5&sort=id,asc
+
+
+### Аналогичный GET с Native SQL
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=NATIVE&page=0&size=5&sort=id,asc
+
+### Проверка pageable (вторая страница)
+
+http://localhost:8080/api/students?queryType=JPQL&page=1&size=2&sort=id,asc
+
+### Проверка инвалидации in-memory индекса
+1. Сначала выполнить поиск (результат закешируется):
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=20
+
+3. Изменить данные, влияющие на фильтр (оценка/предмет/учитель/ученик). Пример — изменить оценку:
+
+PUT "http://localhost:8080/api/grades/1" \
+
+{"studentId":1,"subjectId":1,"score":2,"date":"2025-01-01"}
+
+3. Повторить исходный поиск и убедиться, что ответ изменился (кэш был инвалидирован):
+
+http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=20
 
 ```mermaid
 erDiagram

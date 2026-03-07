@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    final String VALIDATION_FAILED = "Validation failed";
+    private static final String VALIDATION_FAILED = "Validation failed";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(

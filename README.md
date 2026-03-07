@@ -50,6 +50,11 @@ PUT "http://localhost:8080/api/grades/1" \
 
 http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=20
 
+###Swagger UI:
+
+http://localhost:8080/swagger-ui.html
+http://localhost:8080/v3/api-docs
+
 ```mermaid
 erDiagram
     SCHOOL_CLASSES ||--o{ STUDENTS : has

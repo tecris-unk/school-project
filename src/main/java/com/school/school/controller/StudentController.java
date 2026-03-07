@@ -10,12 +10,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,10 +29,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("/api/students")
 @AllArgsConstructor
-public final class StudentController {
+public class StudentController {
 
     private final StudentService service;
 
@@ -39,7 +43,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<StudentResponse> findById(@PathVariable final Long id) {
+    public ResponseEntity<StudentResponse> findById(@PathVariable @Positive final Long id) {
         return ResponseEntity.ok(service.findStudentById(id));
     }
 
@@ -52,7 +56,7 @@ public final class StudentController {
     public ResponseEntity<Page<StudentResponse>> searchStudents(
             @RequestParam(required = false) @Email String teacherEmail,
             @RequestParam(required = false) String subjectName,
-            @RequestParam(required = false) Integer minScore,
+            @RequestParam(required = false) @Min(0) Integer minScore,
             @RequestParam(defaultValue = "NATIVE") StudentSearchQueryType queryType,
             @PageableDefault(size = 20) Pageable pageable
     ) {
@@ -94,7 +98,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
     })
-    @PostMapping("/with_gradesT")
+    @PostMapping("/with_grades")
     public ResponseEntity<StudentResponse> addStudentWithGrades(
             @Valid @RequestBody final StudentWithGradesRequest request) {
         StudentResponse created = service.createStudentWithGrades(request);
@@ -109,7 +113,7 @@ public final class StudentController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<StudentResponse> updateStudent(
-            @PathVariable final Long id,
+            @PathVariable @Positive final Long id,
             @Valid @RequestBody final StudentRequest updatedStudent) {
         return ResponseEntity.ok(service.updateStudent(id, updatedStudent));
     }
@@ -120,7 +124,7 @@ public final class StudentController {
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable final Long id) {
+    public ResponseEntity<Void> deleteStudent(@PathVariable @Positive final Long id) {
         service.deleteStudent(id);
         return ResponseEntity.noContent().build();
     }

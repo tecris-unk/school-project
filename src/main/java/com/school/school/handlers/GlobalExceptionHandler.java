@@ -6,9 +6,12 @@ import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.exceptions.ValidationException;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,94 +19,129 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+@Slf4j
 @Hidden
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+        final MethodArgumentNotValidException ex,
+        final HttpServletRequest request) {
 
-        Map<String, List<String>> fieldErrors = ex.getBindingResult()
-                .getFieldErrors()
+            Map<String, List<String>> fieldErrors = ex.getBindingResult()
+                    .getFieldErrors()
+                    .stream()
+                    .collect(Collectors.groupingBy(
+                            FieldError::getField,
+                            Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                    ));
+
+            return buildResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Validation failed",
+                    "Request validation error",
+                    request,
+                    fieldErrors,
+                    ex
+            );
+        }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+            final ConstraintViolationException ex,
+            final HttpServletRequest request) {
+
+        Map<String, List<String>> violations = ex.getConstraintViolations()
                 .stream()
                 .collect(Collectors.groupingBy(
-                        FieldError::getField,
-                        Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                        violation -> violation.getPropertyPath().toString(),
+                        Collectors.mapping(ConstraintViolation::getMessage, Collectors.toList())
                 ));
 
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed",
-                "Request validation error",
+                "Request parameter validation error",
                 request,
-                fieldErrors
+                violations,
+                ex
         );
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
-            ValidationException ex,
-            HttpServletRequest request) {
+            final ValidationException ex,
+            final HttpServletRequest request) {
 
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed",
                 ex.getMessage(),
                 request,
-                null
+                null,
+                ex
         );
     }
 
     @ExceptionHandler({NotFoundException.class, ResourceNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFoundException(
-            RuntimeException ex,
-            HttpServletRequest request) {
+            final RuntimeException ex,
+            final HttpServletRequest request) {
 
         return buildResponse(
                 HttpStatus.NOT_FOUND,
                 "Resource not found",
                 ex.getMessage(),
                 request,
-                null
+                null,
+                ex
         );
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflictException(
-            ConflictException ex,
-            HttpServletRequest request) {
+            final ConflictException ex,
+            final HttpServletRequest request) {
 
         return buildResponse(
                 HttpStatus.CONFLICT,
                 "Conflict",
                 ex.getMessage(),
                 request,
-                null
+                null,
+                ex
         );
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(
-            Exception ex,
-            HttpServletRequest request) {
+            final Exception ex,
+            final HttpServletRequest request) {
 
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Internal Server Error",
                 "Unexpected error occurred",
                 request,
-                null
+                null,
+                ex
         );
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(
-            HttpStatus status,
-            String error,
-            String message,
-            HttpServletRequest request,
-            Map<String, ?> details) {
+            final HttpStatus status,
+            final String error,
+            final String message,
+            final HttpServletRequest request,
+            final Map<String, ?> details,
+            final Exception exception) {
+
+        if (status.is5xxServerError()) {
+            log.error("Request '{}' failed with {}", request.getRequestURI(), status.value(), exception);
+        } else {
+            log.warn("Request '{}' failed with {}: {}", request.getRequestURI(), status.value(), exception.getMessage());
+        }
 
         ErrorResponse response = new ErrorResponse(
                 status.value(),

@@ -1,5 +1,7 @@
 package com.school.school.service.dto.request;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -8,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Schema(description = "Запрос на создание ученика вместе с оценками")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -16,8 +19,11 @@ public class StudentWithGradesRequest {
 
     @NotNull
     @Valid
-    StudentRequest student;
+    @Schema(description = "Данные ученика")
+    private StudentRequest student;
 
     @Valid
-    List<GradeRequest> grades;
+    @ArraySchema(schema = @Schema(implementation = GradeRequest.class),
+            arraySchema = @Schema(description = "Список оценок ученика"))
+    private List<GradeRequest> grades;
 }

@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,10 +22,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("/api/classes")
 @AllArgsConstructor
-public final class SchoolClassController {
+public class SchoolClassController {
 
     private final SchoolClassService service;
 
@@ -34,7 +37,7 @@ public final class SchoolClassController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<SchoolClassResponse> findById(
-            @PathVariable final Long id) {
+            @PathVariable @Positive final Long id) {
         return ResponseEntity.ok(service.findClassById(id));
     }
 
@@ -86,7 +89,7 @@ public final class SchoolClassController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<SchoolClassResponse> updateClass(
-            @PathVariable final Long id,
+            @PathVariable @Positive final Long id,
             @Valid @RequestBody final SchoolClassRequest classRequest) {
         return ResponseEntity.ok(service.updateClass(id, classRequest));
     }
@@ -98,8 +101,8 @@ public final class SchoolClassController {
     })
     @PutMapping("/{classId}/subjects/{subjectId}")
     public ResponseEntity<SchoolClassResponse> addSubjectToClass(
-            @PathVariable final Long classId,
-            @PathVariable final Long subjectId) {
+            @PathVariable @Positive final Long classId,
+            @PathVariable @Positive final Long subjectId) {
         return ResponseEntity.ok(service.addSubjectToClass(classId, subjectId));
     }
 
@@ -110,7 +113,7 @@ public final class SchoolClassController {
     })
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClass(@PathVariable final Long id) {
+    public ResponseEntity<Void> deleteClass(@PathVariable @Positive final Long id) {
         service.deleteClass(id);
         return ResponseEntity.noContent().build();
     }

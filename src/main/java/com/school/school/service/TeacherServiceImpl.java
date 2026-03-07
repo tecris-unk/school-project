@@ -21,6 +21,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository repository;
     private final TeacherMapper mapper;
+    private final StudentSearchCacheIndex searchCacheIndex;
 
     @Override
     @Transactional(readOnly = true)
@@ -42,6 +43,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Transactional
     public TeacherResponse createTeacher(final TeacherRequest teacherRequest) {
         Teacher teacher = repository.save(mapper.toEntity(teacherRequest));
+        searchCacheIndex.clear();
         return mapper.toResponse(teacher);
     }
 
@@ -54,6 +56,7 @@ public class TeacherServiceImpl implements TeacherService {
                     return repository.save(existingTeacher);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + WITH_ID + id));
+        searchCacheIndex.clear();
         return mapper.toResponse(teacher);
     }
 
@@ -62,6 +65,7 @@ public class TeacherServiceImpl implements TeacherService {
     public void deleteTeacher(final Long id) {
         Teacher teacher = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(TEACHER_NOT_FOUND_MSG + WITH_ID + id));
+        searchCacheIndex.clear();
         repository.delete(teacher);
     }
 }

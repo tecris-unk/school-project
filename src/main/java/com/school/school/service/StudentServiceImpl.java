@@ -15,9 +15,9 @@ import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.request.GradeRequest;
 import com.school.school.service.dto.request.StudentRequest;
+import com.school.school.service.StudentSearchCacheIndex.StudentSearchCacheKey;
 import com.school.school.service.dto.request.StudentWithGradesRequest;
 import com.school.school.service.dto.response.StudentResponse;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class StudentServiceImpl implements StudentService {
     private final GradeRepository gradeRepository;
     private final StudentMapper mapper;
     private final GradeMapper gradeMapper;
-    private final Map<StudentSearchCacheKey, Page<StudentResponse>> searchCache = new HashMap<>();
+    private final StudentSearchCacheIndex searchCacheIndex;
 
     @Override
     public StudentResponse createStudent(final StudentRequest request) {
@@ -91,7 +91,7 @@ public class StudentServiceImpl implements StudentService {
                 pageable,
                 queryType
         );
-        Page<StudentResponse> cachedResult = searchCache.get(cacheKey);
+        Page<StudentResponse> cachedResult = searchCacheIndex.get(cacheKey);
         if (cachedResult != null) {
             return cachedResult;
         }
@@ -113,7 +113,7 @@ public class StudentServiceImpl implements StudentService {
         List<Long> ids = studentIdsPage.getContent();
         if (ids.isEmpty()) {
             Page<StudentResponse> emptyPage = new PageImpl<>(List.of(), pageable, studentIdsPage.getTotalElements());
-            searchCache.put(cacheKey, emptyPage);
+            searchCacheIndex.put(cacheKey, emptyPage);
             return emptyPage;
         }
 
@@ -135,7 +135,7 @@ public class StudentServiceImpl implements StudentService {
                 orderedResponses,
                 pageable,
                 studentIdsPage.getTotalElements());
-        searchCache.put(cacheKey, mappedPage);
+        searchCacheIndex.put(cacheKey, mappedPage);
         return mappedPage;
     }
 
@@ -190,48 +190,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     private void invalidateSearchCache() {
-        searchCache.clear();
+        searchCacheIndex.clear();
     }
-
-        private record StudentSearchCacheKey(String teacherEmail, String subjectName, Integer minScore, int pageNumber,
-                                             int pageSize, String sort, StudentSearchQueryType queryType) {
-
-            private static StudentSearchCacheKey of(
-                    final String teacherEmail,
-                    final String subjectName,
-                    final Integer minScore,
-                    final Pageable pageable,
-                    final StudentSearchQueryType queryType
-            ) {
-                return new StudentSearchCacheKey(
-                        teacherEmail,
-                        subjectName,
-                        minScore,
-                        pageable.getPageNumber(),
-                        pageable.getPageSize(),
-                        pageable.getSort().toString(),
-                        queryType
-                );
-            }
-
-            @Override
-            public boolean equals(final Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (o == null || getClass() != o.getClass()) {
-                    return false;
-                }
-                StudentSearchCacheKey that = (StudentSearchCacheKey) o;
-                return pageNumber == that.pageNumber
-                        && pageSize == that.pageSize
-                        && Objects.equals(teacherEmail, that.teacherEmail)
-                        && Objects.equals(subjectName, that.subjectName)
-                        && Objects.equals(minScore, that.minScore)
-                        && Objects.equals(sort, that.sort)
-                        && queryType == that.queryType;
-            }
-        }
 
     private void applySchoolClass(final Student student, final Long schoolClassId) {
         if (schoolClassId == null) {

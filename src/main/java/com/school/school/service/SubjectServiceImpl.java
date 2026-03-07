@@ -25,6 +25,7 @@ public class SubjectServiceImpl implements SubjectService {
     private final SubjectRepository repository;
     private final TeacherRepository teacherRepository;
     private final SubjectMapper mapper;
+    private final StudentSearchCacheIndex searchCacheIndex;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,7 +55,9 @@ public class SubjectServiceImpl implements SubjectService {
                     );
             subject.setTeacher(teacher);
         }
-        return mapper.toResponse(repository.save(subject));
+        SubjectResponse savedSubject = mapper.toResponse(repository.save(subject));
+        searchCacheIndex.clear();
+        return savedSubject;
     }
 
     @Override
@@ -76,6 +79,7 @@ public class SubjectServiceImpl implements SubjectService {
                     return repository.save(existingSubject);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + WITH_ID + id));
+        searchCacheIndex.clear();
         return mapper.toResponse(subject);
     }
 
@@ -84,6 +88,7 @@ public class SubjectServiceImpl implements SubjectService {
     public void deleteSubject(final Long id) {
         Subject subject = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(SUBJECT_NOT_FOUND_MSG + WITH_ID + id));
+        searchCacheIndex.clear();
         repository.delete(subject);
     }
 }

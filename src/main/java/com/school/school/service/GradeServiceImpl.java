@@ -29,6 +29,7 @@ public class GradeServiceImpl implements GradeService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final GradeMapper mapper;
+    private final StudentSearchCacheIndex searchCacheIndex;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,7 +62,9 @@ public class GradeServiceImpl implements GradeService {
         Grade grade = mapper.toEntity(gradeRequest);
         grade.setStudent(student);
         grade.setSubject(subject);
-        return mapper.toResponse(repository.save(grade));
+        GradeResponse savedGrade = mapper.toResponse(repository.save(grade));
+        searchCacheIndex.clear();
+        return savedGrade;
     }
 
     @Override
@@ -86,6 +89,7 @@ public class GradeServiceImpl implements GradeService {
                     return existingGrade;
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + WITH_ID + id));
+        searchCacheIndex.clear();
         return mapper.toResponse(grade);
     }
 
@@ -94,6 +98,7 @@ public class GradeServiceImpl implements GradeService {
     public void deleteGrade(final Long id) {
         Grade grade = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(GRADE_NOT_FOUND_MSG + WITH_ID + id));
+        searchCacheIndex.clear();
         repository.delete(grade);
     }
 }

@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    final String VALIDATION_FAILED = "Validation failed";
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
         final MethodArgumentNotValidException ex,
@@ -39,7 +41,7 @@ public class GlobalExceptionHandler {
 
             return buildResponse(
                     HttpStatus.BAD_REQUEST,
-                    "Validation failed",
+                    VALIDATION_FAILED,
                     "Request validation error",
                     request,
                     fieldErrors,
@@ -61,7 +63,7 @@ public class GlobalExceptionHandler {
 
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
-                "Validation failed",
+                VALIDATION_FAILED,
                 "Request parameter validation error",
                 request,
                 violations,
@@ -76,7 +78,7 @@ public class GlobalExceptionHandler {
 
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
-                "Validation failed",
+                VALIDATION_FAILED,
                 ex.getMessage(),
                 request,
                 null,

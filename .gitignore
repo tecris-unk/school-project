@@ -16,6 +16,7 @@ docker-compose.yml
 db
 .env
 utils/EnvConfig.java
+logs
 
 ### STS ###
 .apt_generated

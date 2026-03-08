@@ -24,5 +24,5 @@ public interface StudentService {
 
     void deleteStudent(Long id);
 
-    StudentResponse createStudentWithGrades(final StudentWithGradesRequest request);
+    StudentResponse createStudentWithGrades(StudentWithGradesRequest request);
 }

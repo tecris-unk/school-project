@@ -109,7 +109,6 @@ public class StudentServiceImpl implements StudentService {
                 pageable
         );
 
-
         List<Long> ids = studentIdsPage.getContent();
         if (ids.isEmpty()) {
             Page<StudentResponse> emptyPage = new PageImpl<>(List.of(), pageable, studentIdsPage.getTotalElements());

@@ -14,7 +14,8 @@ public class ErrorResponse {
     private final String path;
     private final Map<String, ?> details;
 
-    public ErrorResponse(int status,
+    public ErrorResponse(
+                         int status,
                          String error,
                          String message,
                          String path,

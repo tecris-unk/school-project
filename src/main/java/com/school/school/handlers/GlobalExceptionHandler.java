@@ -28,26 +28,42 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
-        final MethodArgumentNotValidException ex,
-        final HttpServletRequest request) {
 
-            Map<String, List<String>> fieldErrors = ex.getBindingResult()
-                    .getFieldErrors()
-                    .stream()
-                    .collect(Collectors.groupingBy(
-                            FieldError::getField,
-                            Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+            final MethodArgumentNotValidException ex,
+            final HttpServletRequest request) {
+
+        Map<String, List<String>> fieldErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        FieldError::getField,
+                        Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
                     ));
 
-            return buildResponse(
-                    HttpStatus.BAD_REQUEST,
-                    VALIDATION_FAILED,
-                    "Request validation error",
-                    request,
-                    fieldErrors,
-                    ex
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                VALIDATION_FAILED,
+                "Request validation error",
+                request,
+                fieldErrors,
+                ex
             );
-        }
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            final ValidationException ex,
+            final HttpServletRequest request) {
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                VALIDATION_FAILED,
+                ex.getMessage(),
+                request,
+                null,
+                ex
+        );
+    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(
@@ -67,21 +83,6 @@ public class GlobalExceptionHandler {
                 "Request parameter validation error",
                 request,
                 violations,
-                ex
-        );
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
-            final ValidationException ex,
-            final HttpServletRequest request) {
-
-        return buildResponse(
-                HttpStatus.BAD_REQUEST,
-                VALIDATION_FAILED,
-                ex.getMessage(),
-                request,
-                null,
                 ex
         );
     }
@@ -140,9 +141,19 @@ public class GlobalExceptionHandler {
             final Exception exception) {
 
         if (status.is5xxServerError()) {
-            log.error("Request '{}' failed with {}", request.getRequestURI(), status.value(), exception);
+            log.error(
+                    "Request '{}' failed with {}",
+                    request.getRequestURI(),
+                    status.value(),
+                    exception
+            );
         } else {
-            log.warn("Request '{}' failed with {}: {}", request.getRequestURI(), status.value(), exception.getMessage());
+            log.warn(
+                    "Request '{}' failed with {}: {}",
+                    request.getRequestURI(),
+                    status.value(),
+                    exception.getMessage()
+            );
         }
 
         ErrorResponse response = new ErrorResponse(

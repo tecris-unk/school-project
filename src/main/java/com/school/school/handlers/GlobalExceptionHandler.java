@@ -16,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Slf4j
 @Hidden
@@ -83,6 +85,37 @@ public class GlobalExceptionHandler {
                 "Request parameter validation error",
                 request,
                 violations,
+                ex
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+            final MethodArgumentTypeMismatchException ex,
+            final HttpServletRequest request) {
+
+        String expectedType = ex.getRequiredType() == null ? "unknown" : ex.getRequiredType().getSimpleName();
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                VALIDATION_FAILED,
+                "Request parameter '%s' must be of type '%s'".formatted(ex.getName(), expectedType),
+                request,
+                null,
+                ex
+        );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
+            final MissingServletRequestParameterException ex,
+            final HttpServletRequest request) {
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                VALIDATION_FAILED,
+                "Missing required request parameter '%s'".formatted(ex.getParameterName()),
+                request,
+                null,
                 ex
         );
     }

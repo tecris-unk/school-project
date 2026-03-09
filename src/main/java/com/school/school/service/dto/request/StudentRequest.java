@@ -25,7 +25,7 @@ public class StudentRequest {
     private String lastName;
 
     @NotBlank
-    @Schema(description = "Пол ученика", example = "male")
+    @Schema(description = "Пол ученика", example = "MALE")
     private String gender;
 
     @NotBlank

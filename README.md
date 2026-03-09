@@ -19,7 +19,16 @@
 
 [Сонар](https://sonarcloud.io/project/overview?id=tecris-unk_school-project)
 
+Пример запроса:
 
+```http
+POST /api/grades/bulk?transactional=true
+
+[
+  {"studentId": 1, "subjectId": 1, "score": 9, "date": "2026-01-10"},
+  {"studentId": 999999, "subjectId": 1, "score": 7, "date": "2026-01-11"}
+]
+```
 
 
 ```mermaid

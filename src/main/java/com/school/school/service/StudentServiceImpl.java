@@ -80,6 +80,7 @@ public class StudentServiceImpl implements StudentService {
             final Pageable pageable,
             final StudentSearchQueryType queryType
     ) {
+
         String normalizedSubjectName = subjectName == null || subjectName.isBlank()
                 ? null
                 : subjectName.trim().toLowerCase();

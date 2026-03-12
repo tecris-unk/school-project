@@ -1,8 +1,5 @@
 package com.school.school.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.Student;
 import com.school.school.model.Subject;
@@ -12,6 +9,8 @@ import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.request.GradeRequest;
 import java.time.LocalDate;
 import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

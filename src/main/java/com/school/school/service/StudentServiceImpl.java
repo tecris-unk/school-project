@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 @Primary
@@ -94,8 +96,10 @@ public class StudentServiceImpl implements StudentService {
         );
         Page<StudentResponse> cachedResult = searchCacheIndex.get(cacheKey);
         if (cachedResult != null) {
+            log.info("Cache HIT for key: {}", cacheKey);
             return cachedResult;
         }
+        log.info("Cache MISS for key: {}", cacheKey);
 
         Page<Long> studentIdsPage = queryType == StudentSearchQueryType.NATIVE
                 ? repository.findStudentIdsByNestedFiltersNative(

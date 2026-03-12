@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -64,6 +65,21 @@ public class GradeController {
     public ResponseEntity<GradeResponse> addGrade(
             @Valid @RequestBody final GradeRequest gradeRequest) {
         GradeResponse created = service.createGrade(gradeRequest);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Массовое добавление оценок с выбором режима транзакционности")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Оценки добавлены"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+    })
+    @PostMapping("/bulk")
+    public ResponseEntity<List<GradeResponse>> addGradesBulk(
+            @RequestParam(defaultValue = "true") final boolean transactional,
+            @Valid @RequestBody final List<@Valid GradeRequest> gradeRequests) {
+        List<GradeResponse> created = transactional
+                ? service.createGradesBulkTransactional(gradeRequests)
+                : service.createGradesBulkNonTransactional(gradeRequests);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 

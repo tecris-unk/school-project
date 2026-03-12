@@ -14,5 +14,9 @@ public interface GradeService {
 
     GradeResponse updateGrade(Long id, GradeRequest gradeRequest);
 
+    List<GradeResponse> createGradesBulkTransactional(List<GradeRequest> gradeRequests);
+
+    List<GradeResponse> createGradesBulkNonTransactional(List<GradeRequest> gradeRequests);
+
     void deleteGrade(Long id);
 }

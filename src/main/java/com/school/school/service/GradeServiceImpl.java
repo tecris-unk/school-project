@@ -50,6 +50,12 @@ public class GradeServiceImpl implements GradeService {
     @Override
     @Transactional
     public GradeResponse createGrade(final GradeRequest gradeRequest) {
+        GradeResponse savedGrade = saveSingleGrade(gradeRequest);
+        searchCacheIndex.clear();
+        return savedGrade;
+    }
+
+    private Grade buildGradeEntity(final GradeRequest gradeRequest) {
         Student student = studentRepository.findById(gradeRequest.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         STUDENT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getStudentId())
@@ -62,16 +68,41 @@ public class GradeServiceImpl implements GradeService {
         Grade grade = mapper.toEntity(gradeRequest);
         grade.setStudent(student);
         grade.setSubject(subject);
-        GradeResponse savedGrade = mapper.toResponse(repository.save(grade));
+
+        return grade;
+    }
+
+    @Override
+    @Transactional
+    public List<GradeResponse> createGradesBulkTransactional(final List<GradeRequest> gradeRequests) {
+        List<GradeResponse> createdGrades = gradeRequests.stream()
+                .map(this::saveSingleGrade)
+                .toList();
+        searchCacheIndex.clear();
+        return createdGrades;
+    }
+
+    @Override
+    public List<GradeResponse> createGradesBulkNonTransactional(final List<GradeRequest> gradeRequests) {
+        return gradeRequests.stream()
+                .map(this::saveSingleGradeWithCacheInvalidation)
+                .toList();
+    }
+
+    private GradeResponse saveSingleGradeWithCacheInvalidation(final GradeRequest gradeRequest) {
+        GradeResponse savedGrade = saveSingleGrade(gradeRequest);
         searchCacheIndex.clear();
         return savedGrade;
+    }
+
+    private GradeResponse saveSingleGrade(final GradeRequest gradeRequest) {
+        return mapper.toResponse(repository.save(buildGradeEntity(gradeRequest)));
     }
 
     @Override
     @Transactional
     public GradeResponse updateGrade(final Long id, final GradeRequest gradeRequest) {
         Student student = studentRepository.findById(gradeRequest.getStudentId())
-
                 .orElseThrow(() -> new ResourceNotFoundException(
                         STUDENT_NOT_FOUND_MSG + WITH_ID + gradeRequest.getStudentId())
                 );

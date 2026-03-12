@@ -85,14 +85,8 @@ public class GradeServiceImpl implements GradeService {
     @Override
     public List<GradeResponse> createGradesBulkNonTransactional(final List<GradeRequest> gradeRequests) {
         return gradeRequests.stream()
-                .map(this::saveSingleGradeWithCacheInvalidation)
+                .map(this::saveSingleGrade)
                 .toList();
-    }
-
-    private GradeResponse saveSingleGradeWithCacheInvalidation(final GradeRequest gradeRequest) {
-        GradeResponse savedGrade = saveSingleGrade(gradeRequest);
-        searchCacheIndex.clear();
-        return savedGrade;
     }
 
     private GradeResponse saveSingleGrade(final GradeRequest gradeRequest) {

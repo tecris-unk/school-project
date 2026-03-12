@@ -1,13 +1,6 @@
 # ШКОЛА 
 
 ### REST API проект на Java, фреймворк Spring, Maven. 
- 
- 	
-1. Реализовать сложный GET-запрос с фильтрацией по вложенной сущности с использованием @Query (JPQL).
-2. Реализовать аналогичный запрос через native query.
-3. Добавить пагинацию (Pageable).
-4. Реализовать in-memory индекс на основе HashMap<K, V> для ранее запрошенных данных. Ключ должен формироваться из параметров запроса (составной ключ). Обеспечить корректную работу индекса за счёт правильной реализации equals() и hashCode().
-5. Реализовать инвалидацию индекса при изменении данных.
 
 1. Реализовать глобальную обработку ошибок через @ControllerAdvice.
 2. Добавить валидацию входных данных через @Valid.
@@ -18,42 +11,25 @@
 5. Реализовать аспект (AOP) для логирования времени выполнения сервисных методов.
 6. Подключить Swagger/OpenAPI с описанием endpoint и DTO.
 
+1. Реализовать bulk-операцию (POST со списком объектов), имеющую бизнес-смысл в рамках проекта.
+2. Использовать Stream API и Optional в сервисном слое.
+3. Обеспечить транзакционность bulk-операции. Продемонстрировать работу с/без @Transactional и показать разницу в состоянии БД.
+4. Написать:
+- unit-тесты для сервисов (Mockito)
+
 [Сонар](https://sonarcloud.io/project/overview?id=tecris-unk_school-project)
 
-## Проверка требований 1-5 (сложный поиск, pageable, индекс, инвалидация)
+Пример запроса:
 
-### Сложный GET с JPQL
+```http
+POST /api/grades/bulk?transactional=true
 
-http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=5&sort=id,asc
+[
+  {"studentId": 1, "subjectId": 1, "score": 9, "date": "2026-01-10"},
+  {"studentId": 999999, "subjectId": 1, "score": 7, "date": "2026-01-11"}
+]
+```
 
-
-### Аналогичный GET с Native SQL
-
-http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=NATIVE&page=0&size=5&sort=id,asc
-
-### Проверка pageable (вторая страница)
-
-http://localhost:8080/api/students?queryType=JPQL&page=1&size=2&sort=id,asc
-
-### Проверка инвалидации in-memory индекса
-1. Сначала выполнить поиск (результат закешируется):
-
-http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=20
-
-3. Изменить данные, влияющие на фильтр (оценка/предмет/учитель/ученик). Пример — изменить оценку:
-
-PUT "http://localhost:8080/api/grades/1" \
-
-{"studentId":1,"subjectId":1,"score":2,"date":"2025-01-01"}
-
-3. Повторить исходный поиск и убедиться, что ответ изменился (кэш был инвалидирован):
-
-http://localhost:8080/api/students?teacherEmail=teacher1@mail.com&subjectName=math&minScore=4&queryType=JPQL&page=0&size=20
-
-###Swagger UI:
-
-http://localhost:8080/swagger-ui.html
-http://localhost:8080/v3/api-docs
 
 ```mermaid
 erDiagram

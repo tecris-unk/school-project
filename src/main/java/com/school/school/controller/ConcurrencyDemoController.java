@@ -24,7 +24,8 @@ public class ConcurrencyDemoController {
 
     @Operation(summary = "Демонстрация race condition и потокобезопасных решений")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Демонстрация выполнена")
+            @ApiResponse(responseCode = "200", description = "Демонстрация выполнена"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса")
     })
     @GetMapping("/race-demo")
     public ResponseEntity<RaceConditionDemoResponse> runRaceDemo(

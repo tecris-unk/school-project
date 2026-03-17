@@ -33,6 +33,7 @@ public class SubjectController {
     @Operation(summary = "Получить предмет по id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Предмет найден"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
     @GetMapping("/{id}")
@@ -83,6 +84,7 @@ public class SubjectController {
     @Operation(summary = "Удалить предмет")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Предмет удалён"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Предмет не найден")
     })
     @DeleteMapping("/{id}")

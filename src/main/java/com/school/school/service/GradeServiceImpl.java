@@ -11,6 +11,7 @@ import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.request.GradeRequest;
 import com.school.school.service.dto.response.GradeResponse;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,11 +85,26 @@ public class GradeServiceImpl implements GradeService {
 
     @Override
     public List<GradeResponse> createGradesBulkNonTransactional(final List<GradeRequest> gradeRequests) {
-        return gradeRequests.stream()
-                .map(this::saveSingleGrade)
-                .toList();
-    }
-
+        AtomicBoolean createdAny = new AtomicBoolean(false);
+        try {
+            List<GradeResponse> createdGrades = gradeRequests.stream()
+                    .map(gradeRequest -> {
+                        GradeResponse createdGrade = saveSingleGrade(gradeRequest);
+                        createdAny.set(true);
+                        return createdGrade;
+                    })
+                    .toList();
+                if (createdAny.get()) {
+                    searchCacheIndex.clear();
+                }
+                return createdGrades;
+            } catch (RuntimeException ex) {
+                    if (createdAny.get()) {
+                        searchCacheIndex.clear();
+                    }
+                    throw ex;
+                }
+            }
     private GradeResponse saveSingleGrade(final GradeRequest gradeRequest) {
         return mapper.toResponse(repository.save(buildGradeEntity(gradeRequest)));
     }

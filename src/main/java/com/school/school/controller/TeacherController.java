@@ -33,6 +33,7 @@ public class TeacherController {
     @Operation(summary = "Найти учителя по ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Учитель найден"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
     @GetMapping("/{id}")
@@ -58,7 +59,8 @@ public class TeacherController {
     @Operation(summary = "Создать учителя")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Учитель создан"),
-            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
+            @ApiResponse(responseCode = "409", description = "Дубликат")
     })
     @PostMapping
     public ResponseEntity<TeacherResponse> addTeacher(
@@ -83,6 +85,7 @@ public class TeacherController {
     @Operation(summary = "Удалить учителя")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Учитель удалён"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Учитель не найден")
     })
     @DeleteMapping("/{id}")

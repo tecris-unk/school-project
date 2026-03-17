@@ -40,6 +40,7 @@ public class StudentController {
     @Operation(summary = "Получить ученика по id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ученик найден"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @GetMapping("/{id}")
@@ -50,7 +51,8 @@ public class StudentController {
     @Operation(summary = "Сложный поиск учеников по вложенным сущностям")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ученики найдены"),
-            @ApiResponse(responseCode = "204", description = "Список учеников пуст")
+            @ApiResponse(responseCode = "204", description = "Список учеников пуст"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса")
     })
     @GetMapping
     public ResponseEntity<Page<StudentResponse>> searchStudents(
@@ -84,7 +86,8 @@ public class StudentController {
     @Operation(summary = "Создать ученика")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
-            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
+            @ApiResponse(responseCode = "409", description = "Ученик с таким email уже существует")
     })
     @PostMapping
     public ResponseEntity<StudentResponse> addStudent(
@@ -96,7 +99,9 @@ public class StudentController {
     @Operation(summary = "Создать ученика с оценками")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Ученик создан"),
-            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
+            @ApiResponse(responseCode = "404", description = "Связанные сущности не найдены"),
+            @ApiResponse(responseCode = "409", description = "Ученик с таким email уже существует")
     })
     @PostMapping("/with_grades")
     public ResponseEntity<StudentResponse> addStudentWithGrades(
@@ -121,6 +126,7 @@ public class StudentController {
     @Operation(summary = "Удалить ученика")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Ученик удалён"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Ученик не найден")
     })
     @DeleteMapping("/{id}")

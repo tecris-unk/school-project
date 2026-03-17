@@ -35,6 +35,7 @@ public class GradeController {
     @Operation(summary = "Найти оценку по индетификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Оценка найдена"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
     @GetMapping("/{id}")
@@ -59,7 +60,8 @@ public class GradeController {
     @Operation(summary = "Добавление оценки")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Оценка добавлена"),
-            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
+            @ApiResponse(responseCode = "404", description = "Связанные сущности не найдены")
     })
     @PostMapping
     public ResponseEntity<GradeResponse> addGrade(
@@ -71,7 +73,8 @@ public class GradeController {
     @Operation(summary = "Массовое добавление оценок с выбором режима транзакционности")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Оценки добавлены"),
-            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса"),
+            @ApiResponse(responseCode = "404", description = "Связанные сущности не найдены")
     })
     @PostMapping("/bulk")
     public ResponseEntity<List<GradeResponse>> addGradesBulk(
@@ -99,6 +102,7 @@ public class GradeController {
     @Operation(summary = "Удалить оценку по индетификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Оценка успешно удалена"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Оценка не найдена")
     })
     @DeleteMapping("/{id}")

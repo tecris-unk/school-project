@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -144,6 +146,36 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT,
                 "Conflict",
                 ex.getMessage(),
+                request,
+                null,
+                ex
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+            final DataIntegrityViolationException ex,
+            final HttpServletRequest request) {
+
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                "Conflict",
+                "Resource already exists or violates data integrity constraints",
+                request,
+                null,
+                ex
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+            final HttpMessageNotReadableException ex,
+            final HttpServletRequest request) {
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                VALIDATION_FAILED,
+                "Malformed JSON request body",
                 request,
                 null,
                 ex

@@ -33,6 +33,7 @@ public class SchoolClassController {
     @Operation(summary = "Найти класс по индетификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Класс найден"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Класс не найден")
     })
     @GetMapping("/{id}")
@@ -97,6 +98,7 @@ public class SchoolClassController {
     @Operation(summary = "Добавить предмет в класс")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Предмет добавлен в класс"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Класс или предмет не найден")
     })
     @PutMapping("/{classId}/subjects/{subjectId}")
@@ -109,6 +111,7 @@ public class SchoolClassController {
     @Operation(summary = "Удалить класс")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Класс успешно удален"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Класс не найден")
     })
 

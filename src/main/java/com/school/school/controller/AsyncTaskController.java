@@ -37,6 +37,7 @@ public class AsyncTaskController {
     @Operation(summary = "Проверить статус асинхронной задачи")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Статус получен"),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса"),
             @ApiResponse(responseCode = "404", description = "Задача не найдена")
     })
     @GetMapping("/{taskId}")

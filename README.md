@@ -38,11 +38,7 @@ POST /api/grades/bulk?transactional=true
 - **URL:** `{{baseUrl}}/api/students/999999`
 - **Body:** нет
 
-Ожидается унифицированная ошибка от `GlobalExceptionHandler`.
-
 ### 1.2 Conflict (409) — дублирующийся email
-
-Сначала создайте ученика:
 
 - **Method:** `POST`
 - **URL:** `{{baseUrl}}/api/students`
@@ -59,7 +55,6 @@ POST /api/grades/bulk?transactional=true
 }
 ```
 
-Потом отправьте этот же запрос ещё раз с тем же email.
 Ожидается `409 Conflict`.
 
 ### 1.3 Некорректный тип параметра (400)

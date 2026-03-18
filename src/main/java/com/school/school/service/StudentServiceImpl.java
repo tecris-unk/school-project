@@ -99,7 +99,7 @@ public class StudentServiceImpl implements StudentService {
             log.info("Cache HIT for key: {}", cacheKey);
             return cachedResult;
         }
-        log.info("Cache MISS for key: {}", cacheKey);
+        log.debug("Cache MISS for key: {}", cacheKey);
 
         Page<Long> studentIdsPage = queryType == StudentSearchQueryType.NATIVE
                 ? repository.findStudentIdsByNestedFiltersNative(

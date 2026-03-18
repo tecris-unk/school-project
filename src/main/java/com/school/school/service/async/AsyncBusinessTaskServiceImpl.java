@@ -1,6 +1,7 @@
 package com.school.school.service.async;
 
 import com.school.school.exceptions.NotFoundException;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,19 +23,19 @@ public class AsyncBusinessTaskServiceImpl implements AsyncBusinessTaskService {
     @Override
     public String startTask() {
         String taskId = UUID.randomUUID().toString();
-        tasks.put(taskId, TaskStatus.builder()
+
+        TaskStatus pendingStatus = TaskStatus.builder()
                 .taskId(taskId)
                 .state(TaskState.PENDING)
                 .message("Задача поставлена в очередь")
-                .build());
+                .build();
+        tasks.put(taskId, pendingStatus);
 
-        tasks.put(taskId, TaskStatus.builder()
+        CompletableFuture.runAsync(() -> tasks.put(taskId, TaskStatus.builder()
                 .taskId(taskId)
                 .state(TaskState.RUNNING)
                 .message("Бизнес-операция выполняется")
-                .build());
-
-        worker.runBusinessOperation()
+                .build())).thenCompose(ignored -> worker.runBusinessOperation())
                 .thenRun(() -> {
                     int done = completedTaskCounter.incrementAndGet();
                     tasks.put(taskId, TaskStatus.builder()
@@ -52,6 +53,7 @@ public class AsyncBusinessTaskServiceImpl implements AsyncBusinessTaskService {
                     log.error("Ошибка выполнения асинхронной задачи {}", taskId, exception);
                     return null;
                 });
+
         return taskId;
     }
 

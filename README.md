@@ -30,6 +30,128 @@ POST /api/grades/bulk?transactional=true
 ]
 ```
 
+## 1) Глобальная обработка ошибок через `@ControllerAdvice`
+
+### 1.1 Not Found (404)
+
+- **Method:** `GET`
+- **URL:** `{{baseUrl}}/api/students/999999`
+- **Body:** нет
+
+### 1.2 Conflict (409) — дублирующийся email
+
+- **Method:** `POST`
+- **URL:** `{{baseUrl}}/api/students`
+- **Headers:** `Content-Type: application/json`
+- **Body:**
+
+```json
+{
+  "firstName": "Ivan",
+  "lastName": "Ivanov",
+  "gender": "MALE",
+  "email": "duplicate.demo@example.com",
+  "schoolClassId": null
+}
+```
+
+Ожидается `409 Conflict`.
+
+### 1.3 Некорректный тип параметра (400)
+
+- **Method:** `GET`
+- **URL:** `{{baseUrl}}/api/students/not-a-number`
+
+Ожидается `400` с сообщением о неверном типе параметра.
+
+### 1.4 Некорректный JSON (400)
+
+- **Method:** `POST`
+- **URL:** `{{baseUrl}}/api/students`
+- **Headers:** `Content-Type: application/json`
+- **Body:**
+
+```json
+{
+  "firstName": "Ivan",
+  "lastName": "Ivanov",
+  "gender": "MALE",
+  "email": "broken-json@example.com",
+```
+
+(специально незакрытый JSON)
+
+---
+
+## 2) Валидация входных данных через `@Valid`
+
+### 2.1 Валидация тела запроса (`@Valid @RequestBody`) (400)
+
+- **Method:** `POST`
+- **URL:** `{{baseUrl}}/api/students`
+- **Headers:** `Content-Type: application/json`
+- **Body:**
+
+```json
+{
+  "firstName": "",
+  "lastName": "",
+  "gender": "",
+  "email": "invalid-email",
+  "schoolClassId": null
+}
+```
+
+Ожидается `400` и `details` с ошибками по полям.
+
+### 2.2 Валидация query/path параметров (400)
+
+- **Method:** `GET`
+- **URL:** `{{baseUrl}}/api/students?teacherEmail=wrongEmail&minScore=-1`
+- **Body:** нет
+
+Ожидается `400` из-за `@Email` и `@Min(0)`.
+
+---
+
+## 3) Логирование через logback (уровни + ротация)
+
+Это проверяется запросами + просмотром логов.
+
+### 3.1 Сгенерировать INFO/WARN логи
+
+1. Успешный запрос (INFO):
+   - `GET {{baseUrl}}/api/students/1`
+2. Ошибочный запрос (WARN):
+   - `GET {{baseUrl}}/api/students/-1`
+
+### 3.2 Проверить файл логов и ротацию
+
+- основной файл: `logs/school-app.log`
+- архивы: `logs/archive/school-app.YYYY-MM-DD.N.log.gz`
+
+---
+
+## 4) AOP-аспект на время выполнения сервисных методов
+
+В логах должно быть время работы каждого метода в сервисе
+
+---
+
+## 5) Swagger/OpenAPI с описанием endpoint и DTO
+
+### 5.1 Swagger UI
+
+- **Method:** `GET`
+- **URL:** `{{baseUrl}}/swagger-ui/index.html`
+
+### 6.2 OpenAPI JSON
+
+- **Method:** `GET`
+- **URL:** `{{baseUrl}}/v3/api-docs`
+- 
+---
+
 
 ```mermaid
 erDiagram

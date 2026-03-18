@@ -94,17 +94,17 @@ public class GradeServiceImpl implements GradeService {
                         return createdGrade;
                     })
                     .toList();
-                if (createdAny.get()) {
-                    searchCacheIndex.clear();
-                }
-                return createdGrades;
-            } catch (RuntimeException ex) {
-                    if (createdAny.get()) {
-                        searchCacheIndex.clear();
-                    }
-                    throw ex;
-                }
+            if (createdAny.get()) {
+                searchCacheIndex.clear();
             }
+            return createdGrades;
+        } catch (RuntimeException ex) {
+            if (createdAny.get()) {
+                searchCacheIndex.clear();
+            }
+            throw ex;
+        }
+    }
     private GradeResponse saveSingleGrade(final GradeRequest gradeRequest) {
         return mapper.toResponse(repository.save(buildGradeEntity(gradeRequest)));
     }

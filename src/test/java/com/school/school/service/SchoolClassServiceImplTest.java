@@ -6,8 +6,10 @@ import com.school.school.model.SchoolClass;
 import com.school.school.model.Subject;
 import com.school.school.repository.SchoolClassRepository;
 import com.school.school.repository.SubjectRepository;
+import com.school.school.service.dto.request.SchoolClassRequest;
 import com.school.school.service.dto.response.SchoolClassResponse;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -70,5 +72,44 @@ class SchoolClassServiceImplTest {
         when(repository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> schoolClassService.deleteClass(999L));
+    }
+    @Test
+    void findAllSchoolClassesWithSubjects_shouldMapRepositoryResult() {
+        SchoolClass first = new SchoolClass();
+        first.setId(1L);
+        SchoolClass second = new SchoolClass();
+        second.setId(2L);
+
+        SchoolClassResponse firstResponse = new SchoolClassResponse();
+        firstResponse.setId(1L);
+        SchoolClassResponse secondResponse = new SchoolClassResponse();
+        secondResponse.setId(2L);
+
+        when(repository.findAllWithSubjectsBy()).thenReturn(List.of(first, second));
+        when(mapper.toResponse(first)).thenReturn(firstResponse);
+        when(mapper.toResponse(second)).thenReturn(secondResponse);
+
+        List<SchoolClassResponse> actual = schoolClassService.findAllSchoolClassesWithSubjects();
+
+        assertEquals(List.of(1L, 2L), actual.stream().map(SchoolClassResponse::getId).toList());
+    }
+
+    @Test
+    void updateClass_shouldSaveMappedEntity() {
+        SchoolClassRequest request = new SchoolClassRequest(10, "A");
+        SchoolClass existing = new SchoolClass();
+        existing.setId(8L);
+        SchoolClassResponse response = new SchoolClassResponse();
+        response.setId(8L);
+
+        when(repository.findById(8L)).thenReturn(Optional.of(existing));
+        when(repository.save(existing)).thenReturn(existing);
+        when(mapper.toResponse(existing)).thenReturn(response);
+
+        SchoolClassResponse actual = schoolClassService.updateClass(8L, request);
+
+        assertEquals(8L, actual.getId());
+        verify(mapper).updateEntity(existing, request);
+        verify(repository).save(existing);
     }
 }

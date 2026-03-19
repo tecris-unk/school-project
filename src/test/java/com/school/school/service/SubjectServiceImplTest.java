@@ -94,4 +94,41 @@ class SubjectServiceImplTest {
         assertNull(existing.getTeacher());
         verify(searchCacheIndex, times(1)).clear();
     }
+
+    @Test
+    void findSubjectById_shouldMapFoundEntity() {
+        Subject subject = new Subject();
+        subject.setId(2L);
+        SubjectResponse response = new SubjectResponse();
+        response.setId(2L);
+
+        when(repository.findById(2L)).thenReturn(Optional.of(subject));
+        when(mapper.toResponse(subject)).thenReturn(response);
+
+        SubjectResponse actual = subjectService.findSubjectById(2L);
+
+        assertEquals(2L, actual.getId());
+    }
+
+    @Test
+    void updateSubject_shouldAssignTeacherAndClearCache() {
+        SubjectRequest request = new SubjectRequest("Math", "Advanced algebra", 11L);
+        Subject existing = new Subject();
+        existing.setId(4L);
+        Teacher teacher = new Teacher();
+        teacher.setId(11L);
+        SubjectResponse response = new SubjectResponse();
+        response.setId(4L);
+
+        when(repository.findById(4L)).thenReturn(Optional.of(existing));
+        when(teacherRepository.findById(11L)).thenReturn(Optional.of(teacher));
+        when(repository.save(existing)).thenReturn(existing);
+        when(mapper.toResponse(existing)).thenReturn(response);
+
+        SubjectResponse actual = subjectService.updateSubject(4L, request);
+
+        assertEquals(4L, actual.getId());
+        assertEquals(11L, existing.getTeacher().getId());
+        verify(searchCacheIndex, times(1)).clear();
+    }
 }

@@ -2,6 +2,7 @@ package com.school.school.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,5 +84,32 @@ class TeacherServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> teacherService.updateTeacher(999L, request));
 
         verify(searchCacheIndex, never()).clear();
+    }
+    @Test
+    void findTeacherById_shouldMapFoundEntity() {
+        Teacher teacher = new Teacher();
+        teacher.setId(5L);
+        TeacherResponse response = new TeacherResponse();
+        response.setId(5L);
+
+        when(repository.findById(5L)).thenReturn(Optional.of(teacher));
+        when(mapper.toResponse(teacher)).thenReturn(response);
+
+        TeacherResponse actual = teacherService.findTeacherById(5L);
+
+        assertEquals(5L, actual.getId());
+    }
+
+    @Test
+    void deleteTeacher_shouldDeleteEntityAndClearCache() {
+        Teacher teacher = new Teacher();
+        teacher.setId(3L);
+        when(repository.findById(3L)).thenReturn(Optional.of(teacher));
+        doNothing().when(repository).delete(teacher);
+
+        teacherService.deleteTeacher(3L);
+
+        verify(repository, times(1)).delete(teacher);
+        verify(searchCacheIndex, times(1)).clear();
     }
 }

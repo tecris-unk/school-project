@@ -122,4 +122,46 @@ class GradeServiceImplTest {
         assertEquals(2, responses.size());
         assertEquals(List.of(1L, 2L), responses.stream().map(GradeResponse::getId).toList());
     }
+
+    @Test
+    void createGrade_shouldAssignStudentAndSubjectAndClearCache() {
+        GradeRequest request = new GradeRequest(12, LocalDate.now(), 3L, 9L);
+        Student student = new Student();
+        student.setId(3L);
+        Subject subject = new Subject();
+        subject.setId(9L);
+        Grade grade = new Grade();
+        GradeResponse response = new GradeResponse();
+        response.setId(22L);
+
+        when(studentRepository.findById(3L)).thenReturn(Optional.of(student));
+        when(subjectRepository.findById(9L)).thenReturn(Optional.of(subject));
+        when(gradeMapper.toEntity(request)).thenReturn(grade);
+        when(gradeRepository.save(grade)).thenReturn(grade);
+        when(gradeMapper.toResponse(grade)).thenReturn(response);
+
+        GradeResponse actual = gradeService.createGrade(request);
+
+        assertEquals(22L, actual.getId());
+        assertEquals(student, grade.getStudent());
+        assertEquals(subject, grade.getSubject());
+        verify(searchCacheIndex, times(1)).clear();
+    }
+
+    @Test
+    void updateGrade_shouldThrowWhenGradeNotFoundAndNotClearCache() {
+        GradeRequest request = new GradeRequest(11, LocalDate.now(), 4L, 8L);
+        Student student = new Student();
+        student.setId(4L);
+        Subject subject = new Subject();
+        subject.setId(8L);
+
+        when(studentRepository.findById(4L)).thenReturn(Optional.of(student));
+        when(subjectRepository.findById(8L)).thenReturn(Optional.of(subject));
+        when(gradeRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.updateGrade(99L, request));
+
+        verify(searchCacheIndex, never()).clear();
+    }
 }

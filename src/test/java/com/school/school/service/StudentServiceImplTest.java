@@ -8,6 +8,7 @@ import com.school.school.exceptions.ValidationException;
 import com.school.school.model.Grade;
 import com.school.school.model.SchoolClass;
 import com.school.school.model.Student;
+import com.school.school.model.Subject;
 import com.school.school.repository.GradeRepository;
 import com.school.school.repository.SchoolClassRepository;
 import com.school.school.repository.StudentRepository;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
@@ -120,5 +122,78 @@ class StudentServiceImplTest {
 
         verify(gradeRepository, never()).save(any(Grade.class));
         verify(searchCacheIndex, never()).clear();
+    }
+    @Test
+    void updateStudent_shouldUpdateEntityAndClearCache() {
+        StudentRequest request = new StudentRequest("Ivan", "Sidorov", "MALE", "ivan@example.com", 4L);
+        Student existing = new Student();
+        existing.setId(15L);
+        existing.setEmail("ivan@example.com");
+        SchoolClass schoolClass = new SchoolClass();
+        schoolClass.setId(4L);
+        StudentResponse response = new StudentResponse();
+        response.setId(15L);
+
+        when(repository.findById(15L)).thenReturn(Optional.of(existing));
+        when(repository.findByEmail("ivan@example.com")).thenReturn(Optional.of(existing));
+        when(schoolClassRepository.findById(4L)).thenReturn(Optional.of(schoolClass));
+        when(repository.save(existing)).thenReturn(existing);
+        when(mapper.toResponse(existing)).thenReturn(response);
+
+        StudentResponse actual = studentService.updateStudent(15L, request);
+
+        assertEquals(15L, actual.getId());
+        assertEquals(4L, existing.getSchoolClass().getId());
+        verify(mapper).updateEntity(existing, request);
+        verify(searchCacheIndex, times(1)).clear();
+    }
+
+    @Test
+    void findStudentById_shouldMapFoundEntity() {
+        Student student = new Student();
+        student.setId(6L);
+        StudentResponse response = new StudentResponse();
+        response.setId(6L);
+
+        when(repository.findById(6L)).thenReturn(Optional.of(student));
+        when(mapper.toResponse(student)).thenReturn(response);
+
+        StudentResponse actual = studentService.findStudentById(6L);
+
+        assertEquals(6L, actual.getId());
+    }
+
+    @Test
+    void createStudentWithGrades_shouldPersistGradeAndClearCache() {
+        StudentRequest studentRequest = new StudentRequest("Ivan", "Ivanov", "MALE", "ivan@example.com", 3L);
+        GradeRequest gradeRequest = new GradeRequest(10, LocalDate.now(), null, 20L);
+        StudentWithGradesRequest request = new StudentWithGradesRequest(studentRequest, List.of(gradeRequest));
+
+        Student studentEntity = new Student();
+        Student savedStudent = new Student();
+        savedStudent.setId(7L);
+        SchoolClass schoolClass = new SchoolClass();
+        schoolClass.setId(3L);
+        Grade gradeEntity = new Grade();
+        Subject subject = new Subject();
+        subject.setId(20L);
+        StudentResponse response = new StudentResponse();
+        response.setId(7L);
+
+        when(repository.findByEmail("ivan@example.com")).thenReturn(Optional.empty());
+        when(mapper.toEntity(studentRequest)).thenReturn(studentEntity);
+        when(schoolClassRepository.findById(3L)).thenReturn(Optional.of(schoolClass));
+        when(repository.save(studentEntity)).thenReturn(savedStudent);
+        when(gradeMapper.toEntity(gradeRequest)).thenReturn(gradeEntity);
+        when(subjectRepository.findById(20L)).thenReturn(Optional.of(subject));
+        when(mapper.toResponse(savedStudent)).thenReturn(response);
+
+        StudentResponse actual = studentService.createStudentWithGrades(request);
+
+        assertEquals(7L, actual.getId());
+        verify(gradeRepository).save(eq(gradeEntity));
+        assertEquals(savedStudent, gradeEntity.getStudent());
+        assertEquals(subject, gradeEntity.getSubject());
+        verify(searchCacheIndex, times(1)).clear();
     }
 }

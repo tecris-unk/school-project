@@ -112,4 +112,34 @@ class SchoolClassServiceImplTest {
         verify(mapper).updateEntity(existing, request);
         verify(repository).save(existing);
     }
+
+    @Test
+    void createClass_shouldMapSavedEntity() {
+        SchoolClassRequest request = new SchoolClassRequest(7, "B");
+        SchoolClass entity = new SchoolClass();
+        SchoolClass saved = new SchoolClass();
+        saved.setId(12L);
+        SchoolClassResponse response = new SchoolClassResponse();
+        response.setId(12L);
+
+        when(mapper.toEntity(request)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(saved);
+        when(mapper.toResponse(saved)).thenReturn(response);
+
+        SchoolClassResponse actual = schoolClassService.createClass(request);
+
+        assertEquals(12L, actual.getId());
+    }
+
+    @Test
+    void deleteClass_shouldDeleteFoundEntity() {
+        SchoolClass schoolClass = new SchoolClass();
+        schoolClass.setId(4L);
+
+        when(repository.findById(4L)).thenReturn(Optional.of(schoolClass));
+
+        schoolClassService.deleteClass(4L);
+
+        verify(repository).delete(schoolClass);
+    }
 }

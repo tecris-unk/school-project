@@ -131,4 +131,17 @@ class SubjectServiceImplTest {
         assertEquals(11L, existing.getTeacher().getId());
         verify(searchCacheIndex, times(1)).clear();
     }
+
+    @Test
+    void deleteSubject_shouldDeleteEntityAndClearCache() {
+        Subject subject = new Subject();
+        subject.setId(9L);
+
+        when(repository.findById(9L)).thenReturn(Optional.of(subject));
+
+        subjectService.deleteSubject(9L);
+
+        verify(repository).delete(subject);
+        verify(searchCacheIndex, times(1)).clear();
+    }
 }

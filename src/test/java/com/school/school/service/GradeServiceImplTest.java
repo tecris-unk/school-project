@@ -164,4 +164,32 @@ class GradeServiceImplTest {
 
         verify(searchCacheIndex, never()).clear();
     }
+
+    @Test
+    void findGradeById_shouldMapFoundEntity() {
+        Grade grade = new Grade();
+        grade.setId(14L);
+        GradeResponse response = new GradeResponse();
+        response.setId(14L);
+
+        when(gradeRepository.findById(14L)).thenReturn(Optional.of(grade));
+        when(gradeMapper.toResponse(grade)).thenReturn(response);
+
+        GradeResponse actual = gradeService.findGradeById(14L);
+
+        assertEquals(14L, actual.getId());
+    }
+
+    @Test
+    void deleteGrade_shouldDeleteEntityAndClearCache() {
+        Grade grade = new Grade();
+        grade.setId(18L);
+
+        when(gradeRepository.findById(18L)).thenReturn(Optional.of(grade));
+
+        gradeService.deleteGrade(18L);
+
+        verify(gradeRepository, times(1)).delete(grade);
+        verify(searchCacheIndex, times(1)).clear();
+    }
 }

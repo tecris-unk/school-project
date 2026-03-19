@@ -112,4 +112,23 @@ class TeacherServiceImplTest {
         verify(repository, times(1)).delete(teacher);
         verify(searchCacheIndex, times(1)).clear();
     }
+
+    @Test
+    void updateTeacher_shouldSaveUpdatedEntityAndClearCache() {
+        TeacherRequest request = new TeacherRequest("Maria", "Petrova", "maria@example.com");
+        Teacher existing = new Teacher();
+        existing.setId(11L);
+        TeacherResponse response = new TeacherResponse();
+        response.setId(11L);
+
+        when(repository.findById(11L)).thenReturn(Optional.of(existing));
+        when(repository.save(existing)).thenReturn(existing);
+        when(mapper.toResponse(existing)).thenReturn(response);
+
+        TeacherResponse actual = teacherService.updateTeacher(11L, request);
+
+        assertEquals(11L, actual.getId());
+        verify(mapper).updateEntity(existing, request);
+        verify(searchCacheIndex, times(1)).clear();
+    }
 }

@@ -33,6 +33,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceImplTest {
@@ -123,6 +127,7 @@ class StudentServiceImplTest {
         verify(gradeRepository, never()).save(any(Grade.class));
         verify(searchCacheIndex, never()).clear();
     }
+
     @Test
     void updateStudent_shouldUpdateEntityAndClearCache() {
         StudentRequest request = new StudentRequest("Ivan", "Sidorov", "MALE", "ivan@example.com", 4L);
@@ -195,5 +200,80 @@ class StudentServiceImplTest {
         assertEquals(savedStudent, gradeEntity.getStudent());
         assertEquals(subject, gradeEntity.getSubject());
         verify(searchCacheIndex, times(1)).clear();
+    }
+    @Test
+    void findStudentsByNestedFilters_shouldReturnCachedPageWhenPresent() {
+        Pageable pageable = PageRequest.of(0, 10);
+        StudentResponse response = new StudentResponse();
+        response.setId(1L);
+        Page<StudentResponse> cachedPage = new PageImpl<>(List.of(response), pageable, 1);
+
+        when(searchCacheIndex.get(any())).thenReturn(cachedPage);
+
+        Page<StudentResponse> actual = studentService.findStudentsByNestedFilters(
+                "teacher@example.com",
+                " Math ",
+                7,
+                pageable,
+                StudentSearchQueryType.JPQL
+        );
+
+        assertEquals(1, actual.getTotalElements());
+        verify(repository, never()).findStudentIdsByNestedFiltersJpql(any(), any(), any(), any());
+        verify(searchCacheIndex, never()).put(any(), any());
+    }
+
+    @Test
+    void findStudentsByNestedFilters_shouldQueryRepositoryAndCacheOrderedNativeResult() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Long> idsPage = new PageImpl<>(List.of(2L, 1L), pageable, 2);
+        Student firstStudent = new Student();
+        firstStudent.setId(1L);
+        Student secondStudent = new Student();
+        secondStudent.setId(2L);
+        StudentResponse firstResponse = new StudentResponse();
+        firstResponse.setId(1L);
+        StudentResponse secondResponse = new StudentResponse();
+        secondResponse.setId(2L);
+
+        when(searchCacheIndex.get(any())).thenReturn(null);
+        when(repository.findStudentIdsByNestedFiltersNative("teacher@example.com", "math", 8, pageable))
+                .thenReturn(idsPage);
+        when(repository.findAllByIdsWithGradesAndTeacher(List.of(2L, 1L)))
+                .thenReturn(List.of(firstStudent, secondStudent));
+        when(mapper.toResponse(firstStudent)).thenReturn(firstResponse);
+        when(mapper.toResponse(secondStudent)).thenReturn(secondResponse);
+
+        Page<StudentResponse> actual = studentService.findStudentsByNestedFilters(
+                "teacher@example.com",
+                " Math ",
+                8,
+                pageable,
+                StudentSearchQueryType.NATIVE
+        );
+
+        assertEquals(List.of(2L, 1L), actual.getContent().stream().map(StudentResponse::getId).toList());
+        verify(searchCacheIndex, times(1)).put(any(), any());
+    }
+
+    @Test
+    void findStudentsByNestedFilters_shouldCacheEmptyPageWhenNoIdsFound() {
+        Pageable pageable = PageRequest.of(1, 5);
+        Page<Long> idsPage = new PageImpl<>(List.of(), pageable, 0);
+
+        when(searchCacheIndex.get(any())).thenReturn(null);
+        when(repository.findStudentIdsByNestedFiltersJpql(null, null, null, pageable)).thenReturn(idsPage);
+
+        Page<StudentResponse> actual = studentService.findStudentsByNestedFilters(
+                null,
+                " ",
+                null,
+                pageable,
+                StudentSearchQueryType.JPQL
+        );
+
+        assertEquals(0, actual.getTotalElements());
+        verify(repository, never()).findAllByIdsWithGradesAndTeacher(any());
+        verify(searchCacheIndex, times(1)).put(any(), any());
     }
 }

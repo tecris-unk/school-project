@@ -69,7 +69,7 @@ class GradeBulkTransactionIntegrationTest {
 
         List<GradeRequest> requests = List.of(first, secondBroken);
         assertThrows(ResourceNotFoundException.class,
-                () -> gradeService.createGradesBulkTransactional(requests));
+                () -> gradeService.createGradesBulkNonTransactional(requests));
 
         assertEquals(1, gradeRepository.count());
     }

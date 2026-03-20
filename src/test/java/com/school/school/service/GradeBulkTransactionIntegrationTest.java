@@ -55,8 +55,9 @@ class GradeBulkTransactionIntegrationTest {
         GradeRequest first = new GradeRequest(9, LocalDate.now(), existingStudentId, existingSubjectId);
         GradeRequest secondBroken = new GradeRequest(7, LocalDate.now(), 999999L, existingSubjectId);
 
+        List<GradeRequest> requests = List.of(first, secondBroken);
         assertThrows(ResourceNotFoundException.class,
-                () -> gradeService.createGradesBulkTransactional(List.of(first, secondBroken)));
+                () -> gradeService.createGradesBulkTransactional(requests));
 
         assertEquals(0, gradeRepository.count());
     }
@@ -66,8 +67,9 @@ class GradeBulkTransactionIntegrationTest {
         GradeRequest first = new GradeRequest(9, LocalDate.now(), existingStudentId, existingSubjectId);
         GradeRequest secondBroken = new GradeRequest(7, LocalDate.now(), 999999L, existingSubjectId);
 
+        List<GradeRequest> requests = List.of(first, secondBroken);
         assertThrows(ResourceNotFoundException.class,
-                () -> gradeService.createGradesBulkNonTransactional(List.of(first, secondBroken)));
+                () -> gradeService.createGradesBulkTransactional(requests));
 
         assertEquals(1, gradeRepository.count());
     }

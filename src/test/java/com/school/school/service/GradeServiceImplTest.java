@@ -47,6 +47,7 @@ class GradeServiceImplTest {
     void createGradesBulkTransactional_shouldRollbackOnErrorAndStopSavingNextEntries() {
         GradeRequest ok = new GradeRequest(8, LocalDate.now(), 1L, 10L);
         GradeRequest broken = new GradeRequest(7, LocalDate.now(), 999L, 10L);
+        List<GradeRequest> requests = List.of(ok, broken);
 
         Student student = new Student();
         student.setId(1L);
@@ -65,8 +66,7 @@ class GradeServiceImplTest {
         when(gradeRepository.save(any(Grade.class))).thenReturn(grade);
         when(gradeMapper.toResponse(grade)).thenReturn(response);
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> gradeService.createGradesBulkTransactional(List.of(ok, broken)));
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.createGradesBulkTransactional(requests));
 
         verify(gradeRepository, times(1)).save(any(Grade.class));
         verify(searchCacheIndex, never()).clear();
@@ -77,6 +77,8 @@ class GradeServiceImplTest {
         GradeRequest ok = new GradeRequest(8, LocalDate.now(), 1L, 10L);
         GradeRequest broken = new GradeRequest(7, LocalDate.now(), 999L, 10L);
 
+        List<GradeRequest> requests = List.of(ok, broken);
+
         Student student = new Student();
         student.setId(1L);
         Subject subject = new Subject();
@@ -95,7 +97,7 @@ class GradeServiceImplTest {
         when(gradeMapper.toResponse(grade)).thenReturn(response);
 
         assertThrows(ResourceNotFoundException.class,
-                () -> gradeService.createGradesBulkNonTransactional(List.of(ok, broken)));
+                () -> gradeService.createGradesBulkNonTransactional(requests));
 
         verify(gradeRepository, times(1)).save(any(Grade.class));
         verify(searchCacheIndex, times(1)).clear();

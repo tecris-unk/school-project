@@ -1,8 +1,10 @@
 package com.school.school.service.async;
 
+import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import com.school.school.exceptions.NotFoundException;
@@ -23,7 +25,7 @@ class AsyncBusinessTaskServiceImplTest {
     private AsyncBusinessTaskServiceImpl service;
 
     @Test
-    void startTask_shouldEventuallyCompleteAndIncrementCounter() throws Exception {
+    void startTask_shouldEventuallyCompleteAndIncrementCounter(){
         when(worker.runBusinessOperation()).thenReturn(CompletableFuture.completedFuture(null));
 
         String taskId = service.startTask();
@@ -37,7 +39,7 @@ class AsyncBusinessTaskServiceImplTest {
     }
 
     @Test
-    void startTask_shouldMarkTaskAsFailedWhenWorkerFails() throws Exception {
+    void startTask_shouldMarkTaskAsFailedWhenWorkerFails(){
         CompletableFuture<Void> failedFuture = new CompletableFuture<>();
         failedFuture.completeExceptionally(new IllegalStateException("boom"));
         when(worker.runBusinessOperation()).thenReturn(failedFuture);
@@ -55,14 +57,16 @@ class AsyncBusinessTaskServiceImplTest {
         assertThrows(NotFoundException.class, () -> service.getTaskStatus("missing-id"));
     }
 
-    private TaskStatus awaitTerminalState(final String taskId) throws InterruptedException {
-        for (int attempt = 0; attempt < 50; attempt++) {
+    private TaskStatus awaitTerminalState(final String taskId) {
+        long deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(1);
+        while (System.nanoTime() < deadlineNanos) {
             TaskStatus status = service.getTaskStatus(taskId);
             if (status.getState() == TaskState.COMPLETED || status.getState() == TaskState.FAILED) {
                 return status;
             }
-            Thread.sleep(20);
+            Thread.onSpinWait();
         }
+        fail("Timed out waiting for terminal task state");
         return service.getTaskStatus(taskId);
     }
 }

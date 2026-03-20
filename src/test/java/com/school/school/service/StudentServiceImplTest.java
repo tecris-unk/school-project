@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
@@ -196,7 +195,7 @@ class StudentServiceImplTest {
         StudentResponse actual = studentService.createStudentWithGrades(request);
 
         assertEquals(7L, actual.getId());
-        verify(gradeRepository).save(eq(gradeEntity));
+        verify(gradeRepository).save(gradeEntity);
         assertEquals(savedStudent, gradeEntity.getStudent());
         assertEquals(subject, gradeEntity.getSubject());
         verify(searchCacheIndex, times(1)).clear();

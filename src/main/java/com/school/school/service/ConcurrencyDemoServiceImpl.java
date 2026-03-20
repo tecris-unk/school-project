@@ -90,7 +90,7 @@ public class ConcurrencyDemoServiceImpl implements ConcurrencyDemoService {
         }
     }
 
-    private static class SynchronizedCounter {
+    private static final class SynchronizedCounter {
         private int value;
 
         public synchronized void increment() {

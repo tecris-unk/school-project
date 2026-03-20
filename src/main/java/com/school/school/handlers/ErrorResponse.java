@@ -15,11 +15,11 @@ public class ErrorResponse {
     private final Map<String, ?> details;
 
     public ErrorResponse(
-                         int status,
-                         String error,
-                         String message,
-                         String path,
-                         Map<String, ?> details) {
+                         final int status,
+                         final String error,
+                         final String message,
+                         final String path,
+                         final Map<String, ?> details) {
         this.timestamp = LocalDateTime.now();
         this.status = status;
         this.error = error;

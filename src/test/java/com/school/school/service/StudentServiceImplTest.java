@@ -255,6 +255,36 @@ class StudentServiceImplTest {
     }
 
     @Test
+    void createStudent_shouldThrowValidationExceptionWhenEmailNull() {
+        StudentRequest request = new StudentRequest("Ivan", "Ivanov", "MALE", null, 1L);
+
+        assertThrows(ValidationException.class, () -> studentService.createStudent(request));
+
+        verify(repository, never()).findByEmail(any());
+        verify(repository, never()).save(any(Student.class));
+    }
+
+    @Test
+    void findStudentsByNestedFilters_shouldUseNullSubjectNameAsIs() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Long> idsPage = new PageImpl<>(List.of(), pageable, 0);
+        when(searchCacheIndex.get(any())).thenReturn(null);
+        when(repository.findStudentIdsByNestedFiltersNative("teacher@example.com", null, 5, pageable))
+                .thenReturn(idsPage);
+
+        Page<StudentResponse> actual = studentService.findStudentsByNestedFilters(
+                "teacher@example.com",
+                null,
+                5,
+                pageable,
+                StudentSearchQueryType.NATIVE
+        );
+
+        assertEquals(0, actual.getTotalElements());
+        verify(repository).findStudentIdsByNestedFiltersNative("teacher@example.com", null, 5, pageable);
+    }
+
+    @Test
     void findStudentsByNestedFilters_shouldReturnCachedPageWhenPresent() {
         Pageable pageable = PageRequest.of(0, 10);
         StudentResponse response = new StudentResponse();

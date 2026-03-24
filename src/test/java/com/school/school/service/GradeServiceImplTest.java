@@ -125,6 +125,48 @@ class GradeServiceImplTest {
     }
 
     @Test
+    void createGradesBulkTransactional_shouldClearCacheOnSuccess() {
+        GradeRequest firstRequest = new GradeRequest(8, LocalDate.now(), 1L, 10L);
+        GradeRequest secondRequest = new GradeRequest(9, LocalDate.now(), 2L, 11L);
+
+        Student firstStudent = new Student();
+        firstStudent.setId(1L);
+        Student secondStudent = new Student();
+        secondStudent.setId(2L);
+        Subject firstSubject = new Subject();
+        firstSubject.setId(10L);
+        Subject secondSubject = new Subject();
+        secondSubject.setId(11L);
+
+        Grade firstGrade = new Grade();
+        firstGrade.setScore(8);
+        Grade secondGrade = new Grade();
+        secondGrade.setScore(9);
+
+        GradeResponse firstResponse = new GradeResponse();
+        firstResponse.setScore(8);
+        GradeResponse secondResponse = new GradeResponse();
+        secondResponse.setScore(9);
+
+        when(studentRepository.findById(1L)).thenReturn(Optional.of(firstStudent));
+        when(studentRepository.findById(2L)).thenReturn(Optional.of(secondStudent));
+        when(subjectRepository.findById(10L)).thenReturn(Optional.of(firstSubject));
+        when(subjectRepository.findById(11L)).thenReturn(Optional.of(secondSubject));
+        when(gradeMapper.toEntity(firstRequest)).thenReturn(firstGrade);
+        when(gradeMapper.toEntity(secondRequest)).thenReturn(secondGrade);
+        when(gradeRepository.save(firstGrade)).thenReturn(firstGrade);
+        when(gradeRepository.save(secondGrade)).thenReturn(secondGrade);
+        when(gradeMapper.toResponse(firstGrade)).thenReturn(firstResponse);
+        when(gradeMapper.toResponse(secondGrade)).thenReturn(secondResponse);
+
+        List<GradeResponse> actual = gradeService.createGradesBulkTransactional(List.of(firstRequest, secondRequest));
+
+        assertEquals(2, actual.size());
+        assertEquals(List.of(8, 9), actual.stream().map(GradeResponse::getScore).toList());
+        verify(searchCacheIndex, times(1)).clear();
+    }
+
+    @Test
     void createGradesBulkNonTransactional_shouldNotClearWhenFirstItemFails() {
         GradeRequest broken = new GradeRequest(7, LocalDate.now(), 999L, 10L);
         when(studentRepository.findById(999L)).thenReturn(Optional.empty());

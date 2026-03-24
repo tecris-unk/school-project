@@ -220,6 +220,40 @@ class StudentServiceImplTest {
         assertEquals(subject, gradeEntity.getSubject());
         verify(searchCacheIndex, times(1)).clear();
     }
+
+    @Test
+    void findStudentsByNestedFilters_shouldKeepFirstStudentWhenDuplicateIdsLoaded() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Long> idsPage = new PageImpl<>(List.of(2L), pageable, 1);
+
+        Student firstLoaded = new Student();
+        firstLoaded.setId(2L);
+        firstLoaded.setFirstName("first");
+        Student duplicateLoaded = new Student();
+        duplicateLoaded.setId(2L);
+        duplicateLoaded.setFirstName("duplicate");
+
+        StudentResponse firstResponse = new StudentResponse();
+        firstResponse.setId(2L);
+
+        when(searchCacheIndex.get(any())).thenReturn(null);
+        when(repository.findStudentIdsByNestedFiltersJpql("t@example.com", "math", 7, pageable)).thenReturn(idsPage);
+        when(repository.findAllByIdsWithGradesAndTeacher(List.of(2L))).thenReturn(List.of(firstLoaded, duplicateLoaded));
+        when(mapper.toResponse(firstLoaded)).thenReturn(firstResponse);
+
+        Page<StudentResponse> actual = studentService.findStudentsByNestedFilters(
+                "t@example.com",
+                "math",
+                7,
+                pageable,
+                StudentSearchQueryType.JPQL
+        );
+
+        assertEquals(List.of(2L), actual.getContent().stream().map(StudentResponse::getId).toList());
+        verify(mapper, never()).toResponse(duplicateLoaded);
+        verify(searchCacheIndex).put(any(), any());
+    }
+
     @Test
     void findStudentsByNestedFilters_shouldReturnCachedPageWhenPresent() {
         Pageable pageable = PageRequest.of(0, 10);

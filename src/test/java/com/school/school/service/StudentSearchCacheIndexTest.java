@@ -33,6 +33,7 @@ class StudentSearchCacheIndexTest {
                 StudentSearchQueryType.JPQL
         );
 
+        assertEquals(first, first);
         assertEquals(first, second);
         assertEquals(first.hashCode(), second.hashCode());
     }

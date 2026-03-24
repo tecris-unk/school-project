@@ -125,6 +125,20 @@ class GradeServiceImplTest {
     }
 
     @Test
+    void createGradesBulkNonTransactional_shouldNotClearWhenFirstItemFails() {
+        GradeRequest broken = new GradeRequest(7, LocalDate.now(), 999L, 10L);
+        when(studentRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> gradeService.createGradesBulkNonTransactional(List.of(broken))
+        );
+
+        verify(searchCacheIndex, never()).clear();
+        verify(gradeRepository, never()).save(any(Grade.class));
+    }
+
+    @Test
     void deleteGrade_shouldThrowWhenMissing() {
         when(gradeRepository.findById(18L)).thenReturn(Optional.empty());
 

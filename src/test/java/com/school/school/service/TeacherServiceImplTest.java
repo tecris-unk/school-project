@@ -85,6 +85,14 @@ class TeacherServiceImplTest {
 
         verify(searchCacheIndex, never()).clear();
     }
+
+    @Test
+    void findTeacherById_shouldThrowWhenNotFound() {
+        when(repository.findById(500L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> teacherService.findTeacherById(500L));
+    }
+
     @Test
     void findTeacherById_shouldMapFoundEntity() {
         Teacher teacher = new Teacher();
@@ -131,4 +139,13 @@ class TeacherServiceImplTest {
         verify(mapper).updateEntity(existing, request);
         verify(searchCacheIndex, times(1)).clear();
     }
+
+    @Test
+    void deleteTeacher_shouldThrowWhenNotFoundAndNotClearCache() {
+        when(repository.findById(3L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> teacherService.deleteTeacher(3L));
+        verify(searchCacheIndex, never()).clear();
+    }
+
 }

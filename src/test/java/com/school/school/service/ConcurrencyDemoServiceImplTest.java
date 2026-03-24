@@ -1,9 +1,14 @@
 package com.school.school.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.school.school.service.dto.response.RaceConditionDemoResponse;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class ConcurrencyDemoServiceImplTest {
@@ -30,5 +35,36 @@ class ConcurrencyDemoServiceImplTest {
         assertEquals(300, response.getExpected());
         assertEquals(300, response.getSynchronizedResult());
         assertEquals(300, response.getAtomicResult());
+    }
+
+    @Test
+    void runRaceConditionDemo_shouldWrapInterruptedException() {
+        ConcurrencyDemoServiceImpl interruptedService = new ConcurrencyDemoServiceImpl() {
+            @Override
+            void waitForTasks(final ExecutorService executorService, final List<Callable<Void>> tasks)
+                    throws InterruptedException {
+                throw new InterruptedException("boom");
+            }
+        };
+
+        assertThrows(IllegalStateException.class, () -> interruptedService.runRaceConditionDemo(50, 1));
+    }
+
+    @Test
+    void runRaceConditionDemo_shouldWrapExecutionException() {
+        ConcurrencyDemoServiceImpl interruptedService = new ConcurrencyDemoServiceImpl() {
+            @Override
+            ExecutorService createExecutorService(final int actualThreads) {
+                return Executors.newSingleThreadExecutor();
+            }
+
+            @Override
+            void waitForTasks(final ExecutorService executorService, final List<Callable<Void>> tasks)
+                    throws ExecutionException {
+                throw new ExecutionException(new RuntimeException("boom"));
+            }
+        };
+
+        assertThrows(IllegalStateException.class, () -> interruptedService.runRaceConditionDemo(50, 1));
     }
 }

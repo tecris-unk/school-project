@@ -28,7 +28,7 @@ public class ConcurrencyDemoServiceImpl implements ConcurrencyDemoService {
         SynchronizedCounter synchronizedCounter = new SynchronizedCounter();
         AtomicInteger atomicCounter = new AtomicInteger();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(actualThreads);
+        ExecutorService executorService = createExecutorService(actualThreads);
         List<Callable<Void>> tasks = new ArrayList<>();
 
         for (int i = 0; i < actualThreads; i++) {
@@ -43,10 +43,7 @@ public class ConcurrencyDemoServiceImpl implements ConcurrencyDemoService {
         }
 
         try {
-            List<Future<Void>> futures = executorService.invokeAll(tasks);
-            for (Future<Void> future : futures) {
-                future.get();
-            }
+            waitForTasks(executorService, tasks);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Поток выполнения был прерван", exception);
@@ -67,6 +64,18 @@ public class ConcurrencyDemoServiceImpl implements ConcurrencyDemoService {
                 .synchronizedResult(synchronizedCounter.getValue())
                 .atomicResult(atomicCounter.get())
                 .build();
+    }
+
+    ExecutorService createExecutorService(final int actualThreads) {
+        return Executors.newFixedThreadPool(actualThreads);
+    }
+
+    void waitForTasks(final ExecutorService executorService, final List<Callable<Void>> tasks)
+            throws InterruptedException, ExecutionException {
+        List<Future<Void>> futures = executorService.invokeAll(tasks);
+        for (Future<Void> future : futures) {
+            future.get();
+        }
     }
 
     private void shutdownExecutor(final ExecutorService executorService) {

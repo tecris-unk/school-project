@@ -8,12 +8,14 @@ import com.school.school.repository.SubjectRepository;
 import com.school.school.repository.TeacherRepository;
 import com.school.school.service.dto.request.SubjectRequest;
 import com.school.school.service.dto.response.SubjectResponse;
+import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.anyLong;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
@@ -57,6 +59,41 @@ class SubjectServiceImplTest {
 
         assertEquals(1L, actual.getId());
         assertEquals(5L, subject.getTeacher().getId());
+        verify(searchCacheIndex, times(1)).clear();
+    }
+
+    @Test
+    void findAllSubjects_shouldMapAll() {
+        Subject first = new Subject();
+        first.setId(1L);
+        SubjectResponse firstResponse = new SubjectResponse();
+        firstResponse.setId(1L);
+        when(repository.findAll()).thenReturn(List.of(first));
+        when(mapper.toResponse(first)).thenReturn(firstResponse);
+
+        List<SubjectResponse> actual = subjectService.findAllSubjects();
+
+        assertEquals(List.of(1L), actual.stream().map(SubjectResponse::getId).toList());
+    }
+
+    @Test
+    void createSubject_shouldSaveWithoutTeacherWhenTeacherIdMissing() {
+        SubjectRequest request = new SubjectRequest("Math", "Algebra", null);
+        Subject subject = new Subject();
+        Subject saved = new Subject();
+        saved.setId(1L);
+        SubjectResponse response = new SubjectResponse();
+        response.setId(1L);
+
+        when(mapper.toEntity(request)).thenReturn(subject);
+        when(repository.save(subject)).thenReturn(saved);
+        when(mapper.toResponse(saved)).thenReturn(response);
+
+        SubjectResponse actual = subjectService.createSubject(request);
+
+        assertEquals(1L, actual.getId());
+        assertNull(subject.getTeacher());
+        verify(teacherRepository, never()).findById(anyLong());
         verify(searchCacheIndex, times(1)).clear();
     }
 
@@ -111,6 +148,13 @@ class SubjectServiceImplTest {
     }
 
     @Test
+    void findSubjectById_shouldThrowWhenNotFound() {
+        when(repository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> subjectService.findSubjectById(2L));
+    }
+
+    @Test
     void updateSubject_shouldAssignTeacherAndClearCache() {
         SubjectRequest request = new SubjectRequest("Math", "Advanced algebra", 11L);
         Subject existing = new Subject();
@@ -133,6 +177,28 @@ class SubjectServiceImplTest {
     }
 
     @Test
+    void updateSubject_shouldThrowWhenTeacherNotFound() {
+        SubjectRequest request = new SubjectRequest("Math", "Advanced algebra", 11L);
+        Subject existing = new Subject();
+        existing.setId(4L);
+
+        when(repository.findById(4L)).thenReturn(Optional.of(existing));
+        when(teacherRepository.findById(11L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> subjectService.updateSubject(4L, request));
+        verify(searchCacheIndex, never()).clear();
+    }
+
+    @Test
+    void updateSubject_shouldThrowWhenSubjectNotFound() {
+        SubjectRequest request = new SubjectRequest("Math", "Advanced algebra", 11L);
+        when(repository.findById(4L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> subjectService.updateSubject(4L, request));
+        verify(searchCacheIndex, never()).clear();
+    }
+
+    @Test
     void deleteSubject_shouldDeleteEntityAndClearCache() {
         Subject subject = new Subject();
         subject.setId(9L);
@@ -143,5 +209,13 @@ class SubjectServiceImplTest {
 
         verify(repository).delete(subject);
         verify(searchCacheIndex, times(1)).clear();
+    }
+
+    @Test
+    void deleteSubject_shouldThrowWhenNotFound() {
+        when(repository.findById(9L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> subjectService.deleteSubject(9L));
+        verify(searchCacheIndex, never()).clear();
     }
 }

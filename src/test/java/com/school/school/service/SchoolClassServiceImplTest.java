@@ -114,6 +114,17 @@ class SchoolClassServiceImplTest {
     }
 
     @Test
+    void addSubjectToClass_shouldThrowWhenSubjectNotFound() {
+        SchoolClass schoolClass = new SchoolClass();
+        schoolClass.setId(1L);
+        schoolClass.setSubjects(new ArrayList<>());
+        when(repository.findById(1L)).thenReturn(Optional.of(schoolClass));
+        when(subjectRepository.findById(44L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> schoolClassService.addSubjectToClass(1L, 44L));
+    }
+
+    @Test
     void createClass_shouldMapSavedEntity() {
         SchoolClassRequest request = new SchoolClassRequest(7, "B");
         SchoolClass entity = new SchoolClass();
@@ -129,6 +140,71 @@ class SchoolClassServiceImplTest {
         SchoolClassResponse actual = schoolClassService.createClass(request);
 
         assertEquals(12L, actual.getId());
+    }
+
+    @Test
+    void addSubjectToClass_shouldAddSubjectWhenMissing() {
+        SchoolClass schoolClass = new SchoolClass();
+        schoolClass.setId(1L);
+        schoolClass.setSubjects(new ArrayList<>());
+        Subject subject = new Subject();
+        subject.setId(20L);
+        SchoolClassResponse response = new SchoolClassResponse();
+        response.setId(1L);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(schoolClass));
+        when(subjectRepository.findById(20L)).thenReturn(Optional.of(subject));
+        when(repository.save(schoolClass)).thenReturn(schoolClass);
+        when(mapper.toResponse(schoolClass)).thenReturn(response);
+
+        SchoolClassResponse actual = schoolClassService.addSubjectToClass(1L, 20L);
+
+        assertEquals(1L, actual.getId());
+        assertEquals(1, schoolClass.getSubjects().size());
+    }
+
+    @Test
+    void findAllClasses_shouldMapRepositoryResult() {
+        SchoolClass first = new SchoolClass();
+        first.setId(1L);
+        SchoolClassResponse firstResponse = new SchoolClassResponse();
+        firstResponse.setId(1L);
+
+        when(repository.findAll()).thenReturn(List.of(first));
+        when(mapper.toResponse(first)).thenReturn(firstResponse);
+
+        List<SchoolClassResponse> actual = schoolClassService.findAllClasses();
+
+        assertEquals(List.of(1L), actual.stream().map(SchoolClassResponse::getId).toList());
+    }
+
+    @Test
+    void findClassById_shouldMapFoundEntity() {
+        SchoolClass entity = new SchoolClass();
+        entity.setId(3L);
+        SchoolClassResponse response = new SchoolClassResponse();
+        response.setId(3L);
+        when(repository.findById(3L)).thenReturn(Optional.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(response);
+
+        SchoolClassResponse actual = schoolClassService.findClassById(3L);
+
+        assertEquals(3L, actual.getId());
+    }
+
+    @Test
+    void findClassById_shouldThrowWhenNotFound() {
+        when(repository.findById(3L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> schoolClassService.findClassById(3L));
+    }
+
+    @Test
+    void updateClass_shouldThrowWhenMissing() {
+        SchoolClassRequest request = new SchoolClassRequest(10, "A");
+        when(repository.findById(8L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> schoolClassService.updateClass(8L, request));
     }
 
     @Test

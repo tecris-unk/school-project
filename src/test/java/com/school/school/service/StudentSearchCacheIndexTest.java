@@ -1,6 +1,7 @@
 package com.school.school.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.school.school.service.StudentSearchCacheIndex.StudentSearchCacheKey;
@@ -56,5 +57,27 @@ class StudentSearchCacheIndexTest {
         cacheIndex.clear();
 
         assertNull(cacheIndex.get(key));
+    }
+
+    @Test
+    void cacheKeyEquals_shouldHandleDifferentTypesAndValues() {
+        StudentSearchCacheKey first = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.JPQL
+        );
+        StudentSearchCacheKey second = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                9,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.JPQL
+        );
+
+        assertNotEquals(first, second);
+        assertNotEquals(null, first);
+        assertNotEquals("wrong-type", first);
     }
 }

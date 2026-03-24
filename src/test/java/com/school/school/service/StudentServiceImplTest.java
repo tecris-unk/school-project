@@ -168,6 +168,26 @@ class StudentServiceImplTest {
     }
 
     @Test
+    void createStudent_shouldAllowNullSchoolClass() {
+        StudentRequest request = new StudentRequest("Ivan", "Ivanov", "MALE", "ivan@example.com", null);
+        Student entity = new Student();
+        Student saved = new Student();
+        saved.setId(10L);
+        StudentResponse response = new StudentResponse();
+        response.setId(10L);
+
+        when(repository.findByEmail("ivan@example.com")).thenReturn(Optional.empty());
+        when(mapper.toEntity(request)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(saved);
+        when(mapper.toResponse(saved)).thenReturn(response);
+
+        StudentResponse actual = studentService.createStudent(request);
+
+        assertEquals(10L, actual.getId());
+        verify(schoolClassRepository, never()).findById(any());
+    }
+
+    @Test
     void createStudentWithGrades_shouldPersistGradeAndClearCache() {
         StudentRequest studentRequest = new StudentRequest("Ivan", "Ivanov", "MALE", "ivan@example.com", 3L);
         GradeRequest gradeRequest = new GradeRequest(10, LocalDate.now(), null, 20L);
@@ -256,6 +276,13 @@ class StudentServiceImplTest {
     }
 
     @Test
+    void findStudentById_shouldThrowWhenMissing() {
+        when(repository.findById(6L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> studentService.findStudentById(6L));
+    }
+
+    @Test
     void findStudentsByNestedFilters_shouldCacheEmptyPageWhenNoIdsFound() {
         Pageable pageable = PageRequest.of(1, 5);
         Page<Long> idsPage = new PageImpl<>(List.of(), pageable, 0);
@@ -274,5 +301,39 @@ class StudentServiceImplTest {
         assertEquals(0, actual.getTotalElements());
         verify(repository, never()).findAllByIdsWithGradesAndTeacher(any());
         verify(searchCacheIndex, times(1)).put(any(), any());
+    }
+
+    @Test
+    void updateStudent_shouldThrowWhenEmailOwnedByAnotherStudent() {
+        StudentRequest request = new StudentRequest("Ivan", "Sidorov", "MALE", "ivan@example.com", null);
+        Student existing = new Student();
+        existing.setId(15L);
+        Student another = new Student();
+        another.setId(16L);
+        when(repository.findById(15L)).thenReturn(Optional.of(existing));
+        when(repository.findByEmail("ivan@example.com")).thenReturn(Optional.of(another));
+
+        assertThrows(ConflictException.class, () -> studentService.updateStudent(15L, request));
+        verify(searchCacheIndex, never()).clear();
+    }
+
+    @Test
+    void deleteStudent_shouldDeleteAndClearCache() {
+        Student student = new Student();
+        student.setId(5L);
+        when(repository.findById(5L)).thenReturn(Optional.of(student));
+
+        studentService.deleteStudent(5L);
+
+        verify(repository).delete(student);
+        verify(searchCacheIndex).clear();
+    }
+
+    @Test
+    void deleteStudent_shouldThrowWhenNotFound() {
+        when(repository.findById(5L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> studentService.deleteStudent(5L));
+        verify(searchCacheIndex, never()).clear();
     }
 }

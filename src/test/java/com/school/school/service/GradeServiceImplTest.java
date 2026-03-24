@@ -44,6 +44,95 @@ class GradeServiceImplTest {
     private GradeServiceImpl gradeService;
 
     @Test
+    void findGradeById_shouldThrowWhenMissing() {
+        when(gradeRepository.findById(101L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.findGradeById(101L));
+    }
+
+    @Test
+    void createGrade_shouldThrowWhenStudentNotFound() {
+        GradeRequest request = new GradeRequest(12, LocalDate.now(), 3L, 9L);
+        when(studentRepository.findById(3L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.createGrade(request));
+        verify(searchCacheIndex, never()).clear();
+    }
+
+    @Test
+    void createGrade_shouldThrowWhenSubjectNotFound() {
+        GradeRequest request = new GradeRequest(12, LocalDate.now(), 3L, 9L);
+        Student student = new Student();
+        student.setId(3L);
+        when(studentRepository.findById(3L)).thenReturn(Optional.of(student));
+        when(subjectRepository.findById(9L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.createGrade(request));
+        verify(searchCacheIndex, never()).clear();
+    }
+
+    @Test
+    void createGradesBulkNonTransactional_shouldNotClearWhenListIsEmpty() {
+        List<GradeResponse> actual = gradeService.createGradesBulkNonTransactional(List.of());
+
+        assertEquals(List.of(), actual);
+        verify(searchCacheIndex, never()).clear();
+    }
+
+    @Test
+    void updateGrade_shouldUpdateAndClearCache() {
+        GradeRequest request = new GradeRequest(11, LocalDate.now(), 4L, 8L);
+        Student student = new Student();
+        student.setId(4L);
+        Subject subject = new Subject();
+        subject.setId(8L);
+        Grade existing = new Grade();
+        existing.setId(44L);
+        GradeResponse response = new GradeResponse();
+        response.setId(44L);
+
+        when(studentRepository.findById(4L)).thenReturn(Optional.of(student));
+        when(subjectRepository.findById(8L)).thenReturn(Optional.of(subject));
+        when(gradeRepository.findById(44L)).thenReturn(Optional.of(existing));
+        when(gradeRepository.save(existing)).thenReturn(existing);
+        when(gradeMapper.toResponse(existing)).thenReturn(response);
+
+        GradeResponse actual = gradeService.updateGrade(44L, request);
+
+        assertEquals(44L, actual.getId());
+        assertEquals(student, existing.getStudent());
+        assertEquals(subject, existing.getSubject());
+        verify(searchCacheIndex, times(1)).clear();
+    }
+
+    @Test
+    void updateGrade_shouldThrowWhenStudentNotFound() {
+        GradeRequest request = new GradeRequest(11, LocalDate.now(), 4L, 8L);
+        when(studentRepository.findById(4L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.updateGrade(44L, request));
+    }
+
+    @Test
+    void updateGrade_shouldThrowWhenSubjectNotFound() {
+        GradeRequest request = new GradeRequest(11, LocalDate.now(), 4L, 8L);
+        Student student = new Student();
+        student.setId(4L);
+        when(studentRepository.findById(4L)).thenReturn(Optional.of(student));
+        when(subjectRepository.findById(8L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.updateGrade(44L, request));
+    }
+
+    @Test
+    void deleteGrade_shouldThrowWhenMissing() {
+        when(gradeRepository.findById(18L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> gradeService.deleteGrade(18L));
+        verify(searchCacheIndex, never()).clear();
+    }
+
+    @Test
     void createGradesBulkTransactional_shouldRollbackOnErrorAndStopSavingNextEntries() {
         GradeRequest ok = new GradeRequest(8, LocalDate.now(), 1L, 10L);
         GradeRequest broken = new GradeRequest(7, LocalDate.now(), 999L, 10L);

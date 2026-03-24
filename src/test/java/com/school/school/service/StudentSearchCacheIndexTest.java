@@ -62,23 +62,73 @@ class StudentSearchCacheIndexTest {
 
     @Test
     void cacheKeyEquals_shouldHandleDifferentTypesAndValues() {
-        StudentSearchCacheKey first = StudentSearchCacheKey.of(
+
+        StudentSearchCacheKey base = StudentSearchCacheKey.of(
                 "teacher@example.com",
                 "math",
                 8,
                 PageRequest.of(0, 10),
                 StudentSearchQueryType.JPQL
         );
-        StudentSearchCacheKey second = StudentSearchCacheKey.of(
+
+        StudentSearchCacheKey differentTeacher = StudentSearchCacheKey.of(
+                "other@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.JPQL
+        );
+        StudentSearchCacheKey differentSubject = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "physics",
+                8,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.JPQL
+        );
+        StudentSearchCacheKey differentMinScore = StudentSearchCacheKey.of(
                 "teacher@example.com",
                 "math",
                 9,
                 PageRequest.of(0, 10),
                 StudentSearchQueryType.JPQL
         );
+        StudentSearchCacheKey differentPage = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                8,
+                PageRequest.of(1, 10),
+                StudentSearchQueryType.JPQL
+        );
+        StudentSearchCacheKey differentPageSize = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 20),
+                StudentSearchQueryType.JPQL
+        );
+        StudentSearchCacheKey differentSort = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 10).withSort(org.springframework.data.domain.Sort.by("id")),
+                StudentSearchQueryType.JPQL
+        );
+        StudentSearchCacheKey differentType = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.NATIVE
+        );
 
-        assertNotEquals(first, second);
-        assertNotEquals(null, first);
-        assertNotEquals("wrong-type", first);
+        assertNotEquals(base, differentTeacher);
+        assertNotEquals(base, differentSubject);
+        assertNotEquals(base, differentMinScore);
+        assertNotEquals(base, differentPage);
+        assertNotEquals(base, differentPageSize);
+        assertNotEquals(base, differentSort);
+        assertNotEquals(base, differentType);
+        assertNotEquals(null, base);
+        assertNotEquals("wrong-type", base);
     }
 }

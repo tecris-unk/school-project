@@ -70,6 +70,8 @@ class StudentSearchCacheIndexTest {
                 StudentSearchQueryType.JPQL
         );
 
+        assertEquals(base, base);
+
         StudentSearchCacheKey differentTeacher = StudentSearchCacheKey.of(
                 "other@example.com",
                 "math",
@@ -129,7 +131,5 @@ class StudentSearchCacheIndexTest {
         assertNotEquals(base, differentType);
         assertNotEquals(null, base);
         assertNotEquals("wrong-type", base);
-        assertNotEquals(new Object(), base);
-        assertNotEquals("some string", base);
     }
 }

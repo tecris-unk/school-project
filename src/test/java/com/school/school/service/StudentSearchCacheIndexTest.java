@@ -129,5 +129,7 @@ class StudentSearchCacheIndexTest {
         assertNotEquals(base, differentType);
         assertNotEquals(null, base);
         assertNotEquals("wrong-type", base);
+        assertNotEquals(new Object(), base);
+        assertNotEquals("some string", base);
     }
 }

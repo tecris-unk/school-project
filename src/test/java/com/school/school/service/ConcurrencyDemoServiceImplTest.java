@@ -10,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ConcurrencyDemoServiceImplTest {
 
@@ -67,4 +70,52 @@ class ConcurrencyDemoServiceImplTest {
 
         assertThrows(IllegalStateException.class, () -> interruptedService.runRaceConditionDemo(50, 1));
     }
+
+    @Test
+    void runRaceConditionDemo_shouldForceShutdownNowWhenPoolDoesNotTerminate() throws InterruptedException {
+        ExecutorService executorService = mock(ExecutorService.class);
+        when(executorService.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)).thenReturn(false);
+
+        ConcurrencyDemoServiceImpl demoService = new ConcurrencyDemoServiceImpl() {
+            @Override
+            ExecutorService createExecutorService(final int actualThreads) {
+                return executorService;
+            }
+
+            @Override
+            void waitForTasks(final ExecutorService providedExecutor, final List<Callable<Void>> tasks) {
+
+            }
+        };
+
+        demoService.runRaceConditionDemo(50, 0);
+
+        verify(executorService).shutdown();
+        verify(executorService).shutdownNow();
+    }
+
+    @Test
+    void runRaceConditionDemo_shouldForceShutdownNowWhenAwaitIsInterrupted() throws InterruptedException {
+        ExecutorService executorService = mock(ExecutorService.class);
+        when(executorService.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS))
+                .thenThrow(new InterruptedException("interrupted"));
+
+        ConcurrencyDemoServiceImpl demoService = new ConcurrencyDemoServiceImpl() {
+            @Override
+            ExecutorService createExecutorService(final int actualThreads) {
+                return executorService;
+            }
+
+            @Override
+            void waitForTasks(final ExecutorService providedExecutor, final List<Callable<Void>> tasks) {
+
+            }
+        };
+
+        demoService.runRaceConditionDemo(50, 0);
+
+        verify(executorService).shutdown();
+        verify(executorService).shutdownNow();
+    }
+
 }

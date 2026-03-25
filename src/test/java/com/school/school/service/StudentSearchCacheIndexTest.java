@@ -127,7 +127,7 @@ class StudentSearchCacheIndexTest {
         assertNotEquals(base, differentPageSize);
         assertNotEquals(base, differentSort);
         assertNotEquals(base, differentType);
-        assertNotEquals(base, null);
-        assertNotEquals(base, "wrong-type");
+        assertNotEquals(null, base);
+        assertNotEquals("wrong-type", base);
     }
 }

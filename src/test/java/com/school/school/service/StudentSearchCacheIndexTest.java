@@ -6,7 +6,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -71,7 +70,10 @@ class StudentSearchCacheIndexTest {
                 StudentSearchQueryType.JPQL
         );
 
-        assertTrue(base.equals(base));
+        Object wrongType = new Object();
+        assertEquals(base, base);
+        assertNotEquals(null, base);
+        assertNotEquals(base, wrongType);
 
         StudentSearchCacheKey differentTeacher = StudentSearchCacheKey.of(
                 "other@example.com",

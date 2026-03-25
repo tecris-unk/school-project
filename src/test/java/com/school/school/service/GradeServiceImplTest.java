@@ -210,11 +210,12 @@ class GradeServiceImplTest {
     @Test
     void createGradesBulkNonTransactional_shouldNotClearWhenFirstItemFails() {
         GradeRequest broken = new GradeRequest(7, LocalDate.now(), 999L, 10L);
+        List<GradeRequest> requests = List.of(broken);
         when(studentRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(
                 ResourceNotFoundException.class,
-                () -> gradeService.createGradesBulkNonTransactional(List.of(broken))
+                () -> gradeService.createGradesBulkNonTransactional(requests)
         );
 
         verify(searchCacheIndex, never()).clear();

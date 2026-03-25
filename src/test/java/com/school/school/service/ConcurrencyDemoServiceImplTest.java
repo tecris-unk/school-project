@@ -84,7 +84,7 @@ class ConcurrencyDemoServiceImplTest {
 
             @Override
             void waitForTasks(final ExecutorService providedExecutor, final List<Callable<Void>> tasks) {
-
+                //no-op
             }
         };
 
@@ -108,7 +108,7 @@ class ConcurrencyDemoServiceImplTest {
 
             @Override
             void waitForTasks(final ExecutorService providedExecutor, final List<Callable<Void>> tasks) {
-
+                //no-op
             }
         };
 

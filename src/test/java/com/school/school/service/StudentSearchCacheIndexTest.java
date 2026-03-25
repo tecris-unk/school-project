@@ -1,6 +1,7 @@
 package com.school.school.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -128,7 +129,7 @@ class StudentSearchCacheIndexTest {
         assertNotEquals(base, differentPageSize);
         assertNotEquals(base, differentSort);
         assertNotEquals(base, differentType);
-        assertNotEquals(null, base);
-        assertNotEquals("wrong-type", base);
+        assertFalse(base.equals(null));
+        assertFalse(base.equals("wrong-type"));
     }
 }

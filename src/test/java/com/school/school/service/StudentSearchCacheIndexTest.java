@@ -60,6 +60,40 @@ class StudentSearchCacheIndexTest {
     }
 
     @Test
+    void cacheKeyEquals_shouldReturnFalseForNullAndDifferentClass() {
+        StudentSearchCacheKey base = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.JPQL
+        );
+
+        assertNotEquals(null, base);
+        assertNotEquals(new Object(), base);
+    }
+
+    @Test
+    void cacheKeyEquals_shouldReachComparisonPartWhenClassMatches() {
+        StudentSearchCacheKey base = StudentSearchCacheKey.of(
+                "teacher@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.JPQL
+        );
+        StudentSearchCacheKey sameClassDifferentValue = StudentSearchCacheKey.of(
+                "other@example.com",
+                "math",
+                8,
+                PageRequest.of(0, 10),
+                StudentSearchQueryType.JPQL
+        );
+
+        assertNotEquals(base, sameClassDifferentValue);
+    }
+
+    @Test
     void cacheKeyEquals_shouldHandleDifferentTypesAndValues() {
 
         StudentSearchCacheKey base = StudentSearchCacheKey.of(

@@ -4,7 +4,6 @@ import com.school.school.service.StudentSearchCacheIndex.StudentSearchCacheKey;
 import com.school.school.service.dto.response.StudentResponse;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
@@ -162,7 +161,7 @@ class StudentSearchCacheIndexTest {
         assertNotEquals(base, differentPageSize);
         assertNotEquals(base, differentSort);
         assertNotEquals(base, differentType);
-        assertFalse(base.equals(null));
-        assertFalse(base.equals("wrong-type"));
+        assertNotEquals(base, null);
+        assertNotEquals(base, "wrong-type");
     }
 }

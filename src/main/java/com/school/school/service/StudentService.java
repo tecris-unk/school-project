@@ -1,5 +1,6 @@
 package com.school.school.service;
 
+import com.school.school.service.cache.StudentSearchQueryType;
 import com.school.school.service.dto.request.StudentRequest;
 import com.school.school.service.dto.request.StudentWithGradesRequest;
 import com.school.school.service.dto.response.StudentResponse;

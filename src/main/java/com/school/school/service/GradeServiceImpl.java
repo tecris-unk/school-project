@@ -8,6 +8,7 @@ import com.school.school.model.Subject;
 import com.school.school.repository.GradeRepository;
 import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
+import com.school.school.service.cache.StudentSearchCacheIndex;
 import com.school.school.service.dto.request.GradeRequest;
 import com.school.school.service.dto.response.GradeResponse;
 import java.util.List;

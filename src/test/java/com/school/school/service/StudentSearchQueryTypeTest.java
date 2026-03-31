@@ -1,5 +1,6 @@
 package com.school.school.service;
 
+import com.school.school.service.cache.StudentSearchQueryType;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

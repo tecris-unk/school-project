@@ -1,4 +1,4 @@
-package com.school.school.service;
+package com.school.school.service.cache;
 
 import com.school.school.service.dto.response.StudentResponse;
 import java.util.HashMap;

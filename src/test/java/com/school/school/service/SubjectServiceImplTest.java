@@ -6,6 +6,7 @@ import com.school.school.model.Subject;
 import com.school.school.model.Teacher;
 import com.school.school.repository.SubjectRepository;
 import com.school.school.repository.TeacherRepository;
+import com.school.school.service.cache.StudentSearchCacheIndex;
 import com.school.school.service.dto.request.SubjectRequest;
 import com.school.school.service.dto.response.SubjectResponse;
 import java.util.List;

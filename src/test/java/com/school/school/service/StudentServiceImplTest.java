@@ -13,6 +13,8 @@ import com.school.school.repository.GradeRepository;
 import com.school.school.repository.SchoolClassRepository;
 import com.school.school.repository.StudentRepository;
 import com.school.school.repository.SubjectRepository;
+import com.school.school.service.cache.StudentSearchCacheIndex;
+import com.school.school.service.cache.StudentSearchQueryType;
 import com.school.school.service.dto.request.GradeRequest;
 import com.school.school.service.dto.request.StudentRequest;
 import com.school.school.service.dto.request.StudentWithGradesRequest;

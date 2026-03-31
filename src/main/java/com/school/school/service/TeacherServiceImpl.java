@@ -3,6 +3,7 @@ package com.school.school.service;
 import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.Teacher;
 import com.school.school.repository.TeacherRepository;
+import com.school.school.service.cache.StudentSearchCacheIndex;
 import com.school.school.service.dto.request.TeacherRequest;
 import com.school.school.controller.mapper.TeacherMapper;
 import com.school.school.service.dto.response.TeacherResponse;

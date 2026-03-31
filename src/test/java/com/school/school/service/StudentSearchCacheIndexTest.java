@@ -1,6 +1,8 @@
 package com.school.school.service;
 
-import com.school.school.service.StudentSearchCacheIndex.StudentSearchCacheKey;
+import com.school.school.service.cache.StudentSearchCacheIndex;
+import com.school.school.service.cache.StudentSearchCacheIndex.StudentSearchCacheKey;
+import com.school.school.service.cache.StudentSearchQueryType;
 import com.school.school.service.dto.response.StudentResponse;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;

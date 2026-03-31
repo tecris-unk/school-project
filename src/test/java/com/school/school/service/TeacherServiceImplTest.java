@@ -1,5 +1,6 @@
 package com.school.school.service;
 
+import com.school.school.service.cache.StudentSearchCacheIndex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;

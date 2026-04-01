@@ -53,7 +53,7 @@ public class ConcurrencyDemoServiceImpl implements ConcurrencyDemoService {
             shutdownExecutor(executorService);
         }
 
-        log.info("Race demo finished. expected={}, unsafe={}, synchronized={}, atomic={}",
+        log.info("Race demo окончен. ожидаемое={}, unsafe={}, synchronized={}, atomic={}",
                 expected, unsafeCounter.getValue(), synchronizedCounter.getValue(), atomicCounter.get());
 
         return RaceConditionDemoResponse.builder()

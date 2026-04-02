@@ -11,7 +11,7 @@ public class AsyncBusinessOperationWorker {
     @Async("businessTaskExecutor")
     public CompletableFuture<Void> runBusinessOperation() {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(10000);
             return CompletableFuture.completedFuture(null);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();

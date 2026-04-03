@@ -12,7 +12,6 @@ mvnw.cmd
 mvnw
 startjava_checks.xml
 checkstyle.xml
-docker-compose.yml
 db
 .env
 utils/EnvConfig.java

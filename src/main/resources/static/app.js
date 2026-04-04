@@ -45,6 +45,9 @@ function App() {
     const [editing, setEditing] = useState({ entity: null, id: null });
     const [studentFilters, setStudentFilters] = useState({ teacherEmail: '', subjectName: '', minScore: '' });
     const [gradeFilter, setGradeFilter] = useState('');
+    const [teacherFilter, setTeacherFilter] = useState('');
+    const [subjectFilter, setSubjectFilter] = useState('');
+    const [classFilter, setClassFilter] = useState('');
     const [message, setMessage] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(false);
 
@@ -189,6 +192,33 @@ function App() {
     const filteredGrades = useMemo(() => (
         data.grades.filter((grade) => !gradeFilter || String(grade.studentId) === gradeFilter || String(grade.subjectId) === gradeFilter)
     ), [data.grades, gradeFilter]);
+    const filteredTeachers = useMemo(() => {
+        const query = teacherFilter.trim().toLowerCase();
+        if (!query) return data.teachers;
+        return data.teachers.filter((teacher) => (
+            `${teacher.firstName} ${teacher.lastName}`.toLowerCase().includes(query)
+            || teacher.email.toLowerCase().includes(query)
+            || teacher.subjects?.some((subject) => subject.name.toLowerCase().includes(query))
+        ));
+    }, [data.teachers, teacherFilter]);
+    const filteredSubjects = useMemo(() => {
+        const query = subjectFilter.trim().toLowerCase();
+        if (!query) return data.subjects;
+        return data.subjects.filter((subject) => (
+            subject.name.toLowerCase().includes(query)
+            || (subject.description || '').toLowerCase().includes(query)
+            || teacherLabel(subject.teacherId).toLowerCase().includes(query)
+        ));
+    }, [data.subjects, subjectFilter]);
+    const filteredClasses = useMemo(() => {
+        const query = classFilter.trim().toLowerCase();
+        if (!query) return data.classes;
+        return data.classes.filter((schoolClass) => (
+            `${schoolClass.grade}${schoolClass.letter}`.toLowerCase().includes(query)
+            || schoolClass.subjectIds?.some((id) => subjectLabel(id).toLowerCase().includes(query))
+            || schoolClass.studentIds?.some((id) => studentLabel(id).toLowerCase().includes(query))
+        ));
+    }, [classFilter, data.classes]);
 
     return (
         <div className="container">
@@ -281,6 +311,14 @@ function App() {
                 </section>
 
                 <section className="panel section-stack">
+                    <div className="panel relation-overview">
+                        <h3>Отображение связей</h3>
+                        <div className="badges">
+                            <span className="badge">One-to-Many: Учитель → Предметы</span>
+                            <span className="badge">One-to-Many: Ученик → Оценки</span>
+                            <span className="badge">Many-to-Many: Класс ↔ Предметы</span>
+                        </div>
+                    </div>
                     {activeTab === 'students' && (
                         <>
                             <h2>Ученики и связь One-to-Many с оценками</h2>
@@ -297,9 +335,27 @@ function App() {
                         </>
                     )}
 
-                    {activeTab === 'classes' && <ClassTable classes={data.classes} subjectLabel={subjectLabel} studentLabel={studentLabel} onEdit={(item) => startEdit('class', item)} onDelete={(id) => handleDelete(`/api/classes/${id}`)} />}
-                    {activeTab === 'teachers' && <TeacherTable teachers={data.teachers} onEdit={(item) => startEdit('teacher', item)} onDelete={(id) => handleDelete(`/api/teachers/${id}`)} />}
-                    {activeTab === 'subjects' && <SubjectTable subjects={data.subjects} teacherLabel={teacherLabel} classLabel={classLabel} onEdit={(item) => startEdit('subject', item)} onDelete={(id) => handleDelete(`/api/subjects/${id}`)} />}
+                    {activeTab === 'classes' && (
+                        <>
+                            <h2>Классы и связь Many-to-Many с предметами</h2>
+                            <label>Фильтр классов (класс, предмет или ученик)<input value={classFilter} onChange={(e) => setClassFilter(e.target.value)} placeholder="Например, 10Б или Математика" /></label>
+                            <ClassTable classes={filteredClasses} subjectLabel={subjectLabel} studentLabel={studentLabel} onEdit={(item) => startEdit('class', item)} onDelete={(id) => handleDelete(`/api/classes/${id}`)} />
+                        </>
+                    )}
+                    {activeTab === 'teachers' && (
+                        <>
+                            <h2>Учителя и предметы (One-to-Many)</h2>
+                            <label>Фильтр учителей (ФИО, email, предмет)<input value={teacherFilter} onChange={(e) => setTeacherFilter(e.target.value)} placeholder="Например, ivanov@school.ru" /></label>
+                            <TeacherTable teachers={filteredTeachers} onEdit={(item) => startEdit('teacher', item)} onDelete={(id) => handleDelete(`/api/teachers/${id}`)} />
+                        </>
+                    )}
+                    {activeTab === 'subjects' && (
+                        <>
+                            <h2>Предметы</h2>
+                            <label>Фильтр предметов (название, описание, учитель)<input value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)} placeholder="Например, алгебра" /></label>
+                            <SubjectTable subjects={filteredSubjects} teacherLabel={teacherLabel} classLabel={classLabel} onEdit={(item) => startEdit('subject', item)} onDelete={(id) => handleDelete(`/api/subjects/${id}`)} />
+                        </>
+                    )}
                     {activeTab === 'grades' && (
                         <>
                             <h2>Оценки</h2>
@@ -341,7 +397,7 @@ function StudentTable({ students, classLabel, subjectLabel, onEdit, onDelete }) 
 function ClassTable({ classes, subjectLabel, studentLabel, onEdit, onDelete }) {
     if (!classes.length) return <div className="empty">Классы не найдены.</div>;
     return (
-        <><h2>Классы и связь Many-to-Many с предметами</h2><div className="table-wrap"><table><thead><tr><th>ID</th><th>Класс</th><th>Ученики</th><th>Предметы</th><th></th></tr></thead><tbody>
+        <><div className="table-wrap"><table><thead><tr><th>ID</th><th>Класс</th><th>Ученики</th><th>Предметы</th><th></th></tr></thead><tbody>
         {classes.map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.grade}{item.letter}</strong></td><td>{item.studentIds?.length ? <div className="badges">{item.studentIds.map((id) => <span key={id} className="badge">{studentLabel(id)}</span>)}</div> : <span className="muted">Нет учеников</span>}</td><td>{item.subjectIds?.length ? <div className="badges">{item.subjectIds.map((id) => <span key={id} className="badge">{subjectLabel(id)}</span>)}</div> : <span className="muted">Нет предметов</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
         </tbody></table></div></>
     );
@@ -350,7 +406,7 @@ function ClassTable({ classes, subjectLabel, studentLabel, onEdit, onDelete }) {
 function TeacherTable({ teachers, onEdit, onDelete }) {
     if (!teachers.length) return <div className="empty">Учителя не найдены.</div>;
     return (
-        <><h2>Учителя и предметы</h2><div className="table-wrap"><table><thead><tr><th>ID</th><th>Учитель</th><th>Email</th><th>Предметы</th><th></th></tr></thead><tbody>
+        <><div className="table-wrap"><table><thead><tr><th>ID</th><th>Учитель</th><th>Email</th><th>Предметы</th><th></th></tr></thead><tbody>
         {teachers.map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.firstName} {item.lastName}</strong></td><td>{item.email}</td><td>{item.subjects?.length ? <div className="badges">{item.subjects.map((subject) => <span key={subject.id} className="badge">{subject.name}</span>)}</div> : <span className="muted">Нет предметов</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
         </tbody></table></div></>
     );
@@ -359,7 +415,7 @@ function TeacherTable({ teachers, onEdit, onDelete }) {
 function SubjectTable({ subjects, teacherLabel, classLabel, onEdit, onDelete }) {
     if (!subjects.length) return <div className="empty">Предметы не найдены.</div>;
     return (
-        <><h2>Предметы</h2><div className="table-wrap"><table><thead><tr><th>ID</th><th>Название</th><th>Учитель</th><th>Классы</th><th>Описание</th><th></th></tr></thead><tbody>
+        <><div className="table-wrap"><table><thead><tr><th>ID</th><th>Название</th><th>Учитель</th><th>Классы</th><th>Описание</th><th></th></tr></thead><tbody>
         {subjects.map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.name}</strong></td><td>{teacherLabel(item.teacherId)}</td><td>{item.schoolClassIds?.length ? <div className="badges">{item.schoolClassIds.map((id) => <span key={id} className="badge">{classLabel(id)}</span>)}</div> : <span className="muted">Не назначен</span>}</td><td>{item.description || '—'}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
         </tbody></table></div></>
     );

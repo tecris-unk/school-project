@@ -102,6 +102,11 @@ th { color: var(--muted); font-size: .9rem; }
 .success { background: #edf9f3; color: var(--success); border: 1px solid #b8e3cb; }
 .section-stack { display: grid; gap: 18px; }
 .empty { padding: 24px; border: 1px dashed var(--border); border-radius: 16px; text-align: center; color: var(--muted); }
+.relation-overview {
+    background: #f8fbff;
+    border-style: dashed;
+    box-shadow: none;
+}
 @media (max-width: 1024px) {
     .grid { grid-template-columns: 1fr; }
     .hero, .panel { border-radius: 16px; }

@@ -107,6 +107,27 @@ th { color: var(--muted); font-size: .9rem; }
     border-style: dashed;
     box-shadow: none;
 }
+.relation-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.relation-card {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+}
+.relation-card h4 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+}
+.relation-list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 10px;
+}
 @media (max-width: 1024px) {
     .grid { grid-template-columns: 1fr; }
     .hero, .panel { border-radius: 16px; }

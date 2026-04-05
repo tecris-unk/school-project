@@ -311,14 +311,14 @@ function App() {
                 </section>
 
                 <section className="panel section-stack">
-                    <div className="panel relation-overview">
-                        <h3>Отображение связей</h3>
-                        <div className="badges">
-                            <span className="badge">One-to-Many: Учитель → Предметы</span>
-                            <span className="badge">One-to-Many: Ученик → Оценки</span>
-                            <span className="badge">Many-to-Many: Класс ↔ Предметы</span>
-                        </div>
-                    </div>
+                    <RelationshipOverview
+                        teachers={data.teachers}
+                        students={data.students}
+                        classes={data.classes}
+                        subjects={data.subjects}
+                        classLabel={classLabel}
+                        subjectLabel={subjectLabel}
+                    />
                     {activeTab === 'students' && (
                         <>
                             <h2>Ученики и связь One-to-Many с оценками</h2>
@@ -431,3 +431,82 @@ function GradeTable({ grades, studentLabel, subjectLabel, onEdit, onDelete }) {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+function RelationshipOverview({ teachers, students, classes, subjects, classLabel, subjectLabel }) {
+    return (
+        <div className="panel relation-overview">
+            <h3>Отображение связей</h3>
+            <div className="relation-grid">
+                <article className="relation-card">
+                    <h4>One-to-Many: Учитель → Предметы</h4>
+                    {teachers.length ? (
+                        <ul className="relation-list">
+                            {teachers.slice(0, 4).map((teacher) => (
+                                <li key={teacher.id}>
+                                    <strong>{teacher.firstName} {teacher.lastName}</strong>
+                                    {teacher.subjects?.length ? (
+                                        <div className="badges">
+                                            {teacher.subjects.map((subject) => <span key={subject.id} className="badge">{subject.name}</span>)}
+                                        </div>
+                                    ) : <span className="muted"> Нет предметов</span>}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : <div className="empty">Нет данных по учителям.</div>}
+                </article>
+
+                <article className="relation-card">
+                    <h4>One-to-Many: Ученик → Оценки</h4>
+                    {students.length ? (
+                        <ul className="relation-list">
+                            {students.slice(0, 4).map((student) => (
+                                <li key={student.id}>
+                                    <strong>{student.firstName} {student.lastName}</strong>
+                                    <span className="muted"> ({classLabel(student.schoolClassId)})</span>
+                                    {student.grades?.length ? (
+                                        <div className="badges">
+                                            {student.grades.map((grade) => <span key={grade.id} className="badge">{subjectLabel(grade.subjectId)}: {grade.score}</span>)}
+                                        </div>
+                                    ) : <span className="muted"> Нет оценок</span>}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : <div className="empty">Нет данных по ученикам.</div>}
+                </article>
+
+                <article className="relation-card">
+                    <h4>Many-to-Many: Класс ↔ Предметы</h4>
+                    {classes.length ? (
+                        <ul className="relation-list">
+                            {classes.slice(0, 4).map((schoolClass) => (
+                                <li key={schoolClass.id}>
+                                    <strong>{schoolClass.grade}{schoolClass.letter}</strong>
+                                    {schoolClass.subjectIds?.length ? (
+                                        <div className="badges">
+                                            {schoolClass.subjectIds.map((id) => <span key={id} className="badge">{subjectLabel(id)}</span>)}
+                                        </div>
+                                    ) : <span className="muted"> Предметы не назначены</span>}
+                                </li>
+                            ))}
+                            {subjects.some((subject) => subject.schoolClassIds?.length) && (
+                                <li>
+                                    <strong>Обратная связь: предмет → классы</strong>
+                                    <div className="badges">
+                                        {subjects
+                                            .filter((subject) => subject.schoolClassIds?.length)
+                                            .slice(0, 4)
+                                            .map((subject) => (
+                                                <span key={subject.id} className="badge">
+                                                    {subject.name}: {subject.schoolClassIds.map((id) => classLabel(id)).join(', ')}
+                                                </span>
+                                            ))}
+                                    </div>
+                                </li>
+                            )}
+                        </ul>
+                    ) : <div className="empty">Нет данных по классам.</div>}
+                </article>
+            </div>
+        </div>
+    );
+}

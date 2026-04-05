@@ -147,6 +147,19 @@ function App() {
         }
     };
 
+    const submitGrade = async () => {
+        if (!forms.grade.studentId || !forms.grade.subjectId) {
+            setMessage({ type: 'error', text: 'Для оценки нужно выбрать ученика и предмет из списка.' });
+            return;
+        }
+        await handleSubmit('grade', '/api/grades', (form) => ({
+            ...form,
+            score: Number(form.score),
+            studentId: Number(form.studentId),
+            subjectId: Number(form.subjectId),
+        }));
+    };
+
     const startEdit = (entity, item) => {
         const payloads = {
             student: {
@@ -291,12 +304,12 @@ function App() {
                         <label>Описание<textarea value={forms.subject.description} onChange={(e) => updateForm('subject', 'description', e.target.value)} /></label>
                     </EntityForm>
 
-                    <EntityForm title="Оценка" active={activeTab === 'grades'} editing={editing.entity === 'grade'} onSubmit={() => handleSubmit('grade', '/api/grades', (form) => ({ ...form, score: Number(form.score), studentId: Number(form.studentId), subjectId: Number(form.subjectId) }))} onReset={() => resetEntityForm('grade')}>
+                    <EntityForm title="Оценка" active={activeTab === 'grades'} editing={editing.entity === 'grade'} onSubmit={submitGrade} onReset={() => resetEntityForm('grade')}>
                         <div className="form-grid two">
                             <label>Балл<input type="number" min="2" max="10" value={forms.grade.score} onChange={(e) => updateForm('grade', 'score', e.target.value)} /></label>
                             <label>Дата<input type="date" value={forms.grade.date} onChange={(e) => updateForm('grade', 'date', e.target.value)} /></label>
-                            <label>Ученик<select value={forms.grade.studentId} onChange={(e) => updateForm('grade', 'studentId', e.target.value)}>{data.students.map((item) => <option key={item.id} value={item.id}>{item.firstName} {item.lastName}</option>)}</select></label>
-                            <label>Предмет<select value={forms.grade.subjectId} onChange={(e) => updateForm('grade', 'subjectId', e.target.value)}>{data.subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+                            <label>Ученик<select value={forms.grade.studentId} onChange={(e) => updateForm('grade', 'studentId', e.target.value)}><option value="">Выберите ученика</option>{data.students.map((item) => <option key={item.id} value={item.id}>{item.firstName} {item.lastName}</option>)}</select></label>
+                            <label>Предмет<select value={forms.grade.subjectId} onChange={(e) => updateForm('grade', 'subjectId', e.target.value)}><option value="">Выберите предмет</option>{data.subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
                         </div>
                     </EntityForm>
 

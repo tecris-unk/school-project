@@ -340,14 +340,16 @@ function App() {
                 </section>
 
                 <section className="panel section-stack">
-                    <RelationshipOverview
-                        teachers={data.teachers}
-                        students={data.students}
-                        classes={data.classes}
-                        subjects={data.subjects}
-                        classLabel={classLabel}
-                        subjectLabel={subjectLabel}
-                    />
+                    {(activeTab === 'classes' || activeTab === 'subjects') && (
+                        <RelationshipOverview
+                            teachers={data.teachers}
+                            students={data.students}
+                            classes={data.classes}
+                            subjects={data.subjects}
+                            classLabel={classLabel}
+                            subjectLabel={subjectLabel}
+                        />
+                    )}
                     {activeTab === 'students' && (
                         <>
                             <h2>Ученики и связь One-to-Many с оценками</h2>

@@ -253,9 +253,7 @@ function App() {
                 <div>
                     <h1>School SPA client</h1>
                     <p>
-                        Единый React SPA для работы с REST API школы: CRUD-операции, фильтрация учеников,
-                        отображение связей One-to-Many (ученики → оценки, учителя → предметы) и Many-to-Many
-                        (классы ↔ предметы).
+                        Единый React SPA для работы с REST API школы
                     </p>
                 </div>
                 <div className="stats">

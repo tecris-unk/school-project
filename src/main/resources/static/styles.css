@@ -75,7 +75,11 @@ button {
     background: var(--primary);
     color: #fff;
     font-weight: 700;
+    transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
+    box-shadow: 0 6px 14px rgba(36, 79, 209, .18);
 }
+button:hover:not(:disabled) { filter: brightness(1.04); box-shadow: 0 10px 22px rgba(36, 79, 209, .24); }
+button:active:not(:disabled) { transform: translateY(1px) scale(.98); box-shadow: 0 4px 10px rgba(22, 50, 79, .18); }
 button.secondary { background: #eef3ff; color: var(--primary-dark); }
 button.danger { background: var(--danger); }
 button:disabled { opacity: .6; cursor: not-allowed; }
@@ -136,4 +140,8 @@ th { color: var(--muted); font-size: .9rem; }
     .form-grid.two, .filters-grid.two { grid-template-columns: 1fr; }
     .container { padding: 16px; }
     .actions button, .inline-actions button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    button { transition: none; }
+    button:active:not(:disabled) { transform: none; }
 }

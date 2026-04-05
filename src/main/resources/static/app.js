@@ -148,15 +148,29 @@ function App() {
     };
 
     const submitGrade = async () => {
-        if (!forms.grade.studentId || !forms.grade.subjectId) {
+        const studentId = Number(forms.grade.studentId);
+        const subjectId = Number(forms.grade.subjectId);
+        const score = Number(forms.grade.score);
+        const hasStudent = data.students.some((student) => Number(student.id) === studentId);
+        const hasSubject = data.subjects.some((subject) => Number(subject.id) === subjectId);
+
+        if (!forms.grade.studentId || !forms.grade.subjectId || !Number.isFinite(studentId) || !Number.isFinite(subjectId)) {
             setMessage({ type: 'error', text: 'Для оценки нужно выбрать ученика и предмет из списка.' });
+            return;
+        }
+        if (studentId <= 0 || subjectId <= 0 || !hasStudent || !hasSubject) {
+            setMessage({ type: 'error', text: 'Выбранный ученик или предмет некорректен. Обновите данные и выберите снова.' });
+            return;
+        }
+        if (!Number.isFinite(score) || score < 2 || score > 10) {
+            setMessage({ type: 'error', text: 'Балл должен быть числом от 2 до 10.' });
             return;
         }
         await handleSubmit('grade', '/api/grades', (form) => ({
             ...form,
-            score: Number(form.score),
-            studentId: Number(form.studentId),
-            subjectId: Number(form.subjectId),
+            score,
+            studentId,
+            subjectId,
         }));
     };
 

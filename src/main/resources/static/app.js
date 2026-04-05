@@ -327,14 +327,16 @@ function App() {
                         </div>
                     </EntityForm>
 
-                    <div className="panel">
-                        <h3>Связь Many-to-Many: класс ↔ предмет</h3>
-                        <div className="form-grid two">
-                            <label>Класс<select value={forms.relation.classId} onChange={(e) => updateForm('relation', 'classId', e.target.value)}><option value="">Выберите класс</option>{data.classes.map((item) => <option key={item.id} value={item.id}>{item.grade}{item.letter}</option>)}</select></label>
-                            <label>Предмет<select value={forms.relation.subjectId} onChange={(e) => updateForm('relation', 'subjectId', e.target.value)}><option value="">Выберите предмет</option>{data.subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+                    {(activeTab === 'classes' || activeTab === 'subjects') && (
+                        <div className="panel">
+                            <h3>Связь Many-to-Many: класс ↔ предмет</h3>
+                            <div className="form-grid two">
+                                <label>Класс<select value={forms.relation.classId} onChange={(e) => updateForm('relation', 'classId', e.target.value)}><option value="">Выберите класс</option>{data.classes.map((item) => <option key={item.id} value={item.id}>{item.grade}{item.letter}</option>)}</select></label>
+                                <label>Предмет<select value={forms.relation.subjectId} onChange={(e) => updateForm('relation', 'subjectId', e.target.value)}><option value="">Выберите предмет</option>{data.subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+                            </div>
+                            <div className="actions"><button onClick={connectSubjectToClass} disabled={!forms.relation.classId || !forms.relation.subjectId}>Добавить предмет в класс</button></div>
                         </div>
-                        <div className="actions"><button onClick={connectSubjectToClass} disabled={!forms.relation.classId || !forms.relation.subjectId}>Добавить предмет в класс</button></div>
-                    </div>
+                    )}
                 </section>
 
                 <section className="panel section-stack">

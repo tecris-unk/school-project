@@ -321,6 +321,41 @@ function shellTemplate(content) {
   `;
 }
 
+function renderClassSubjectMatrix() {
+    const classes = state.data.classes;
+    const subjectsById = new Map(state.refs.subjects.map((subject) => [subject.id, subject.name]));
+
+    return `
+    <section class="mt-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+      <div class="p-4 border-b border-slate-100">
+        <h3 class="text-base font-semibold text-slate-900">Many-to-many: Класс ↔ Предмет</h3>
+        <p class="text-sm text-slate-500 mt-1">Таблица показывает, какие предметы закреплены за каждым классом.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-3 py-3 text-left text-xs uppercase tracking-wider text-slate-500">Класс</th>
+              <th class="px-3 py-3 text-left text-xs uppercase tracking-wider text-slate-500">Предметы</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${classes.map((schoolClass) => {
+        const subjectNames = (schoolClass.subjectIds || [])
+            .map((subjectId) => subjectsById.get(subjectId))
+            .filter(Boolean);
+        return `<tr class="border-t border-slate-100">
+                    <td class="px-3 py-3 text-sm text-slate-700 font-medium">${classLabel(schoolClass)}</td>
+                    <td class="px-3 py-3 text-sm text-slate-700">${subjectNames.length ? subjectNames.join(', ') : '—'}</td>
+                </tr>`;
+    }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
 function captureFocusSnapshot() {
     const active = document.activeElement;
     if (!active || !app.contains(active)) return null;
@@ -383,6 +418,14 @@ function render() {
     const canEdit = canEditEntity(state.route);
     const canDelete = canDeleteEntity(state.route);
 
+    const classSubjectRelationsSection = state.route === 'classes' ? `
+    <section class="mt-4">
+      <button data-toggle-class-subject-matrix class="px-3 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-100">
+        ${state.ui.classSubjectMatrixVisible ? 'Скрыть связь класс-предмет' : 'Показать связь класс-предмет'}
+      </button>
+      ${state.ui.classSubjectMatrixVisible ? renderClassSubjectMatrix() : ''}
+    </section>` : '';
+
     const content = `
     <section class="grid lg:grid-cols-12 gap-4">
       <div class="lg:col-span-8">
@@ -401,6 +444,7 @@ function render() {
       </div>
      ${canEdit ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow, state.route)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Изменение данных в этом разделе доступно только администратору.</div></div>`}
     </section>
+    ${classSubjectRelationsSection}
   `;
 
     app.innerHTML = shellTemplate(content);
@@ -447,7 +491,15 @@ const debouncedSearch = debounce((value) => {
     });
 }, 300);
 
-function bindEntityHandlers(config, allFiltered, displayedRows) {
+function bindEntityHandlers(config, allFiltered, displayedRows  ) {
+    if (state.route === 'classes') {
+        document.querySelector('[data-toggle-class-subject-matrix]')?.addEventListener('click', () => {
+            setState((s) => {
+                s.ui.classSubjectMatrixVisible = !s.ui.classSubjectMatrixVisible;
+            });
+        });
+    }
+
     if (canEditEntity(state.route)) {
         document.getElementById('entity-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();

@@ -34,6 +34,7 @@ export const state = {
         sort: {key: 'id', dir: 'desc'},
         selectedIds: new Set(),
         editingId: null,
+        classSubjectMatrixVisible: false,
         toastQueue: [],
     },
 };
@@ -55,6 +56,7 @@ export function resetUiState() {
         s.ui.sort = {key: 'id', dir: 'desc'};
         s.ui.selectedIds = new Set();
         s.ui.editingId = null;
+        s.ui.classSubjectMatrixVisible = false;
     });
 }
 

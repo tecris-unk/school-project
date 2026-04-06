@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -62,12 +63,48 @@ public class SchoolClassController {
             @ApiResponse(responseCode = "204", description = "Список классов пуст")
     })
     @GetMapping("/with-subjects")
-    public ResponseEntity<List<SchoolClassResponse>> getAllSchoolClassesWithSubjects() {
+    public ResponseEntity<List<SchoolClassResponse>> getAllSchoolClassesWithSubjects(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) @Positive Long subjectId,
+            @RequestParam(required = false) @Positive Long studentId) {
         List<SchoolClassResponse> schoolClasses = service.findAllSchoolClassesWithSubjects();
+        String normalizedQuery = normalizeTextParam(query);
+
+        if (subjectId != null) {
+            schoolClasses = schoolClasses.stream()
+                    .filter(schoolClass -> schoolClass.getSubjectIds().contains(subjectId))
+                    .toList();
+        }
+
+        if (studentId != null) {
+            schoolClasses = schoolClasses.stream()
+                    .filter(schoolClass -> schoolClass.getStudentIds().contains(studentId))
+                    .toList();
+        }
+
+        if (normalizedQuery != null) {
+            String searchQuery = normalizedQuery.toLowerCase();
+            schoolClasses = schoolClasses.stream()
+                    .filter(schoolClass -> matchesClassQuery(schoolClass, searchQuery))
+                    .toList();
+        }
+
         if (schoolClasses.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return new ResponseEntity<>(schoolClasses, HttpStatus.OK);
+    }
+
+    private String normalizeTextParam(final String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private boolean matchesClassQuery(final SchoolClassResponse schoolClass, final String query) {
+        return String.format("%s%s", schoolClass.getGrade(), schoolClass.getLetter()).toLowerCase().contains(query);
     }
 
     @Operation(summary = "Создать новый класс")

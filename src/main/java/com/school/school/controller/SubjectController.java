@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -47,12 +48,42 @@ public class SubjectController {
             @ApiResponse(responseCode = "204", description = "Список предметов пуст")
     })
     @GetMapping
-    public ResponseEntity<List<SubjectResponse>> getAllSubjects() {
+    public ResponseEntity<List<SubjectResponse>> getAllSubjects(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) @Positive Long teacherId) {
         List<SubjectResponse> subjects = service.findAllSubjects();
+        String normalizedQuery = normalizeTextParam(query);
+
+        if (teacherId != null) {
+            subjects = subjects.stream()
+                    .filter(subject -> teacherId.equals(subject.getTeacherId()))
+                    .toList();
+        }
+
+        if (normalizedQuery != null) {
+            String searchQuery = normalizedQuery.toLowerCase();
+            subjects = subjects.stream()
+                    .filter(subject -> containsIgnoreCase(subject.getName(), searchQuery)
+                            || containsIgnoreCase(subject.getDescription(), searchQuery))
+                    .toList();
+        }
+
         if (subjects.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(subjects);
+    }
+
+    private String normalizeTextParam(final String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private boolean containsIgnoreCase(final String value, final String query) {
+        return value != null && value.toLowerCase().contains(query);
     }
 
     @Operation(summary = "Создать предмет")

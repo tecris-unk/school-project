@@ -216,36 +216,60 @@ function App() {
         }
     };
 
-    const filteredGrades = useMemo(() => (
-        data.grades.filter((grade) => !gradeFilter || String(grade.studentId) === gradeFilter || String(grade.subjectId) === gradeFilter)
-    ), [data.grades, gradeFilter]);
-    const filteredTeachers = useMemo(() => {
-        const query = teacherFilter.trim().toLowerCase();
-        if (!query) return data.teachers;
-        return data.teachers.filter((teacher) => (
-            `${teacher.firstName} ${teacher.lastName}`.toLowerCase().includes(query)
-            || teacher.email.toLowerCase().includes(query)
-            || teacher.subjects?.some((subject) => subject.name.toLowerCase().includes(query))
-        ));
-    }, [data.teachers, teacherFilter]);
-    const filteredSubjects = useMemo(() => {
-        const query = subjectFilter.trim().toLowerCase();
-        if (!query) return data.subjects;
-        return data.subjects.filter((subject) => (
-            subject.name.toLowerCase().includes(query)
-            || (subject.description || '').toLowerCase().includes(query)
-            || teacherLabel(subject.teacherId).toLowerCase().includes(query)
-        ));
-    }, [data.subjects, subjectFilter]);
-    const filteredClasses = useMemo(() => {
-        const query = classFilter.trim().toLowerCase();
-        if (!query) return data.classes;
-        return data.classes.filter((schoolClass) => (
-            `${schoolClass.grade}${schoolClass.letter}`.toLowerCase().includes(query)
-            || schoolClass.subjectIds?.some((id) => subjectLabel(id).toLowerCase().includes(query))
-            || schoolClass.studentIds?.some((id) => studentLabel(id).toLowerCase().includes(query))
-        ));
-    }, [classFilter, data.classes]);
+    const searchTeachers = async () => {
+        try {
+            const params = new URLSearchParams();
+            if (teacherFilter.trim()) params.set('query', teacherFilter.trim());
+            const teachers = await api(`/api/teachers${params.toString() ? `?${params.toString()}` : ''}`);
+            setData((current) => ({ ...current, teachers: teachers || [] }));
+            setMessage({ type: 'success', text: 'Фильтрация учителей выполнена через API.' });
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        }
+    };
+
+    const searchSubjects = async () => {
+        try {
+            const params = new URLSearchParams();
+            if (subjectFilter.trim()) params.set('query', subjectFilter.trim());
+            const subjects = await api(`/api/subjects${params.toString() ? `?${params.toString()}` : ''}`);
+            setData((current) => ({ ...current, subjects: subjects || [] }));
+            setMessage({ type: 'success', text: 'Фильтрация предметов выполнена через API.' });
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        }
+    };
+
+    const searchClasses = async () => {
+        try {
+            const params = new URLSearchParams();
+            if (classFilter.trim()) params.set('query', classFilter.trim());
+            const classes = await api(`/api/classes/with-subjects${params.toString() ? `?${params.toString()}` : ''}`);
+            setData((current) => ({ ...current, classes: classes || [] }));
+            setMessage({ type: 'success', text: 'Фильтрация классов выполнена через API.' });
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        }
+    };
+
+    const searchGrades = async () => {
+        try {
+            const params = new URLSearchParams();
+            if (gradeFilter.trim()) {
+                const numericFilter = Number(gradeFilter.trim());
+                if (!Number.isFinite(numericFilter) || numericFilter <= 0) {
+                    setMessage({ type: 'error', text: 'Для фильтра оценок используйте положительный ID ученика или предмета.' });
+                    return;
+                }
+                params.set('studentId', String(numericFilter));
+            }
+            const grades = await api(`/api/grades${params.toString() ? `?${params.toString()}` : ''}`);
+            setData((current) => ({ ...current, grades: grades || [] }));
+            setMessage({ type: 'success', text: 'Фильтрация оценок выполнена через API.' });
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        }
+    };
 
     return (
         <div className="container">
@@ -366,28 +390,44 @@ function App() {
                         <>
                             <h2>Классы и связь Many-to-Many с предметами</h2>
                             <label>Фильтр классов (класс, предмет или ученик)<input value={classFilter} onChange={(e) => setClassFilter(e.target.value)} placeholder="Например, 10Б или Математика" /></label>
-                            <ClassTable classes={filteredClasses} subjectLabel={subjectLabel} studentLabel={studentLabel} onEdit={(item) => startEdit('class', item)} onDelete={(id) => handleDelete(`/api/classes/${id}`)} />
+                            <div className="inline-actions">
+                                <button onClick={searchClasses}>Фильтровать через API</button>
+                                <button className="secondary" onClick={() => { setClassFilter(''); loadAll(); }}>Сбросить</button>
+                            </div>
+                            <ClassTable classes={data.classes} subjectLabel={subjectLabel} studentLabel={studentLabel} onEdit={(item) => startEdit('class', item)} onDelete={(id) => handleDelete(`/api/classes/${id}`)} />
                         </>
                     )}
                     {activeTab === 'teachers' && (
                         <>
                             <h2>Учителя и предметы (One-to-Many)</h2>
                             <label>Фильтр учителей (ФИО, email, предмет)<input value={teacherFilter} onChange={(e) => setTeacherFilter(e.target.value)} placeholder="Например, ivanov@school.ru" /></label>
-                            <TeacherTable teachers={filteredTeachers} onEdit={(item) => startEdit('teacher', item)} onDelete={(id) => handleDelete(`/api/teachers/${id}`)} />
+                            <div className="inline-actions">
+                                <button onClick={searchTeachers}>Фильтровать через API</button>
+                                <button className="secondary" onClick={() => { setTeacherFilter(''); loadAll(); }}>Сбросить</button>
+                            </div>
+                            <TeacherTable teachers={data.teachers} onEdit={(item) => startEdit('teacher', item)} onDelete={(id) => handleDelete(`/api/teachers/${id}`)} />
                         </>
                     )}
                     {activeTab === 'subjects' && (
                         <>
                             <h2>Предметы</h2>
                             <label>Фильтр предметов (название, описание, учитель)<input value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)} placeholder="Например, алгебра" /></label>
-                            <SubjectTable subjects={filteredSubjects} teacherLabel={teacherLabel} classLabel={classLabel} onEdit={(item) => startEdit('subject', item)} onDelete={(id) => handleDelete(`/api/subjects/${id}`)} />
+                            <div className="inline-actions">
+                                <button onClick={searchSubjects}>Фильтровать через API</button>
+                                <button className="secondary" onClick={() => { setSubjectFilter(''); loadAll(); }}>Сбросить</button>
+                            </div>
+                            <SubjectTable subjects={data.subjects} teacherLabel={teacherLabel} classLabel={classLabel} onEdit={(item) => startEdit('subject', item)} onDelete={(id) => handleDelete(`/api/subjects/${id}`)} />
                         </>
                     )}
                     {activeTab === 'grades' && (
                         <>
                             <h2>Оценки</h2>
                             <label>Быстрый фильтр по ID ученика или предмета<input value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)} placeholder="Например, 1" /></label>
-                            <GradeTable grades={filteredGrades} studentLabel={studentLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('grade', item)} onDelete={(id) => handleDelete(`/api/grades/${id}`)} />
+                            <div className="inline-actions">
+                                <button onClick={searchGrades}>Фильтровать через API</button>
+                                <button className="secondary" onClick={() => { setGradeFilter(''); loadAll(); }}>Сбросить</button>
+                            </div>
+                            <GradeTable grades={data.grades} studentLabel={studentLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('grade', item)} onDelete={(id) => handleDelete(`/api/grades/${id}`)} />
                         </>
                     )}
                 </section>

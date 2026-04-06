@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -46,14 +48,53 @@ public class TeacherController {
             @ApiResponse(responseCode = "200", description = "Учителя найдены"),
             @ApiResponse(responseCode = "204", description = "Список учителей пуст")
     })
-
     @GetMapping
-    public ResponseEntity<List<TeacherResponse>> getAllTeachers() {
+    public ResponseEntity<List<TeacherResponse>> getAllTeachers(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) @Email String email) {
         List<TeacherResponse> teachers = service.findAllTeachers();
+        String normalizedQuery = normalizeTextParam(query);
+        String normalizedEmail = normalizeTextParam(email);
+
+        if (normalizedEmail != null) {
+            String emailQuery = normalizedEmail.toLowerCase();
+            teachers = teachers.stream()
+                    .filter(teacher -> teacher.getEmail() != null
+                            && teacher.getEmail().toLowerCase().contains(emailQuery))
+                    .toList();
+        }
+
+        if (normalizedQuery != null) {
+            String searchQuery = normalizedQuery.toLowerCase();
+            teachers = teachers.stream()
+                    .filter(teacher -> matchesTeacherQuery(teacher, searchQuery))
+                    .toList();
+        }
+
         if (teachers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(teachers);
+    }
+
+    private String normalizeTextParam(final String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private boolean matchesTeacherQuery(final TeacherResponse teacher, final String query) {
+        return containsIgnoreCase(teacher.getFirstName(), query)
+                || containsIgnoreCase(teacher.getLastName(), query)
+                || containsIgnoreCase(teacher.getEmail(), query)
+                || teacher.getSubjects().stream()
+                .anyMatch(subject -> containsIgnoreCase(subject.getName(), query));
+    }
+
+    private boolean containsIgnoreCase(final String value, final String query) {
+        return value != null && value.toLowerCase().contains(query);
     }
 
     @Operation(summary = "Создать учителя")

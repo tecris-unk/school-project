@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -49,8 +50,27 @@ public class GradeController {
             @ApiResponse(responseCode = "204", description = "Список оценок пуст")
     })
     @GetMapping
-    public ResponseEntity<List<GradeResponse>> getAllGrades() {
+    public ResponseEntity<List<GradeResponse>> getAllGrades(
+            @RequestParam(required = false) @Positive Long studentId,
+            @RequestParam(required = false) @Positive Long subjectId,
+            @RequestParam(required = false) @Min(2) Integer minScore) {
         List<GradeResponse> grades = service.findAllGrades();
+        if (studentId != null) {
+            grades = grades.stream()
+                    .filter(grade -> studentId.equals(grade.getStudentId()))
+                    .toList();
+        }
+        if (subjectId != null) {
+            grades = grades.stream()
+                    .filter(grade -> subjectId.equals(grade.getSubjectId()))
+                    .toList();
+        }
+        if (minScore != null) {
+            grades = grades.stream()
+                    .filter(grade -> grade.getScore() != null && grade.getScore() >= minScore)
+                    .toList();
+        }
+
         if (grades.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }

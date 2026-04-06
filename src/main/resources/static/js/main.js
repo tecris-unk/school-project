@@ -251,9 +251,14 @@ function shellTemplate(content) {
       </header>
       <main class="max-w-7xl mx-auto p-4">
         ${renderNav(state.route, state.auth.role)}
-        ${state.loading ? '<div class="mb-4 p-3 rounded-lg bg-white border border-slate-200 animate-pulse">Загрузка данных...</div>' : ''}
         ${content}
       </main>
+      <div class="fixed right-4 top-4 z-50 transition-opacity duration-200 ${state.loading ? 'opacity-100' : 'opacity-0 pointer-events-none'}">
+        <div class="flex items-center gap-2 rounded-lg bg-slate-900 text-white px-3 py-2 shadow-lg">
+          <span class="inline-block h-3 w-3 rounded-full border-2 border-white/40 border-t-white animate-spin"></span>
+          <span class="text-xs">Загрузка...</span>
+        </div>
+      </div>
     </div>
   `;
 }

@@ -9,6 +9,15 @@ textarea,
 a,
 button {
     transition: background-color 0.24s ease, color 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease, transform 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:focus,
+button:focus-visible,
+a:focus,
+a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(148 163 184 / 0.45);
 }
 
 input:focus,

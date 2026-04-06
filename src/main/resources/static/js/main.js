@@ -137,7 +137,7 @@ function canEditEntity(entity) {
     return state.auth.role === 'admin' || (isTeacherRole() && entity === 'grades');
 }
 
-function canDeleteEntity(entity) {
+function canDeleteEntity() {
     return state.auth.role === 'admin';
 }
 
@@ -447,7 +447,7 @@ const debouncedSearch = debounce((value) => {
     });
 }, 300);
 
-function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
+function bindEntityHandlers(config, allFiltered, displayedRows) {
     if (canEditEntity(state.route)) {
         document.getElementById('entity-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();

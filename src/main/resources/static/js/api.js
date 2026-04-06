@@ -22,31 +22,31 @@ export async function request(path, options = {}) {
         headers.Authorization = `Bearer ${state.auth.token}`;
     }
 
+    let response;
     try {
-        const response = await fetch(path, { ...options, headers });
-
-        if (response.status === 401) {
-            setToken('');
-            window.location.hash = '#/login';
-            throw new Error('Сессия истекла. Выполните вход повторно.');
-        }
-
-        if (response.status === 204) return null;
-
-        const text = await response.text();
-        const payload = text ? JSON.parse(text) : null;
-
-        if (!response.ok) {
-            throw new Error(payload?.message || payload?.error || `Ошибка ${response.status}`);
-        }
-
-        return payload;
+        response = await fetch(path, {...options, headers});
     } catch (error) {
         if (error.name === 'TypeError') {
             throw new Error('Проблема с сетью. Проверьте соединение и попробуйте снова.');
         }
         throw error;
     }
+    if (response.status === 401) {
+        setToken('');
+        window.location.hash = '#/login';
+        throw new Error('Сессия истекла. Выполните вход повторно.');
+    }
+
+    if (response.status === 204) return null;
+
+    const text = await response.text();
+    const payload = text ? JSON.parse(text) : null;
+
+    if (!response.ok) {
+        throw new Error(payload?.message || payload?.error || `Ошибка ${response.status}`);
+    }
+
+    return payload;
 }
 
 export const api = {

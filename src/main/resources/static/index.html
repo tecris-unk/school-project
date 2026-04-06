@@ -4,52 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Сайт школы №12 "Солнечные детки"»</title>
+    <link rel="stylesheet" href="https://unpkg.com/antd@5.27.3/dist/reset.css" />
     <link rel="stylesheet" href="/styles.css" />
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/antd@5.27.3/dist/antd.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-<header class="top-hero">
-    <div class="overlay"></div>
-    <div class="hero-content wrapper">
-        <p class="date" id="todayDate"></p>
-        <h1>Школьный портал</h1>
-        <p class="hero-text">Cайт для работы с учениками, классами, предметами, учителями и оценками.</p>
-    </div>
-</header>
-
-<main class="wrapper">
-    <nav class="main-nav" id="mainNav"></nav>
-
-    <section class="notice" id="notice" aria-live="polite"></section>
-
-    <section class="layout">
-        <article class="panel" id="listPanel">
-            <h2 id="entityTitle">Список</h2>
-            <div class="table-wrap">
-                <table>
-                    <thead id="tableHead"></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-            <p id="emptyState" class="empty hidden">Пока записей нет.</p>
-        </article>
-
-        <article class="panel" id="formPanel">
-            <h2 id="formTitle">Форма</h2>
-            <form id="entityForm"></form>
-        </article>
-    </section>
-</main>
-
-<footer class="school-footer">
-    <div class="wrapper footer-content">
-        <h3>Контакты школы</h3>
-        <p><strong>Адрес:</strong> г. Витебск, ул. Школьная, д. 12</p>
-        <p><strong>Телефон:</strong> +375 (29) 000-00-00</p>
-        <p><strong>Email:</strong> school12@example.by</p>
-        <p><strong>Время работы:</strong> пн–пт с 08:00 до 18:00</p>
-    </div>
-</footer>
-
-<script src="/app.js"></script>
+<div id="root"></div>
+<script type="text/babel" src="/app.js"></script>
 </body>
 </html>

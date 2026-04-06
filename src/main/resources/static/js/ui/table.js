@@ -79,7 +79,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
               ${
                     canManage
                         ? `<td class="px-3 py-3 text-right whitespace-nowrap">
-                       <button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Inline save' : 'Ред.'}</button>
+                       <button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Сохранить' : 'Ред.'}</button>
                        <button data-delete-id="${row.id}" class="ml-2 px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-sm">Удалить</button>
                      </td>`
                         : ''
@@ -115,7 +115,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
             <tr>
               ${canManage ? `<th class="px-3 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
               ${headers}
-              ${canManage ? '<th class="px-3 py-3 text-right text-xs uppercase text-slate-500">Actions</th>' : ''}
+              ${canManage ? '<th class="px-3 py-3 text-right text-xs uppercase text-slate-500">Действия</th>' : ''}
             </tr>
           </thead>
           <tbody>${body}</tbody>

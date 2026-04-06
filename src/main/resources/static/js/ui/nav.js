@@ -1,5 +1,5 @@
 export const navItems = [
-    { key: 'dashboard', label: 'Dashboard' },
+    { key: 'dashboard', label: 'Панель' },
     { key: 'students', label: 'Ученики' },
     { key: 'classes', label: 'Классы' },
     { key: 'subjects', label: 'Предметы' },

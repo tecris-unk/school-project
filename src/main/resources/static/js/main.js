@@ -15,10 +15,10 @@ const entityConfigs = {
         title: 'Ученики',
         endpoint: 'students',
         inlineEditable: ['firstName', 'lastName', 'email'],
-        columns: [{key: 'id', label: 'ID'}, {key: 'firstName', label: 'Имя'}, {
+        columns: [{key: 'id', label: 'Номер'}, {key: 'firstName', label: 'Имя'}, {
             key: 'lastName',
             label: 'Фамилия'
-        }, {key: 'gender', label: 'Пол'}, {key: 'email', label: 'Email'}, {key: 'schoolClassId', label: 'Класс'},],
+        }, {key: 'gender', label: 'Пол'}, {key: 'email', label: 'Эл. почта'}, {key: 'schoolClassId', label: 'Класс'},],
         filters: [{
             key: 'schoolClassId',
             label: 'Класс',
@@ -35,7 +35,7 @@ const entityConfigs = {
             required: true,
             defaultValue: 'MALE',
             options: [{value: 'MALE', label: 'Мужской'}, {value: 'FEMALE', label: 'Женский'},],
-        }, {key: 'email', label: 'Email', type: 'email', required: true}, {
+        }, {key: 'email', label: 'Эл. почта', type: 'email', required: true}, {
             key: 'schoolClassId',
             label: 'Класс',
             type: 'ref',
@@ -47,7 +47,7 @@ const entityConfigs = {
         title: 'Классы',
         endpoint: 'classes',
         inlineEditable: ['grade', 'letter'],
-        columns: [{key: 'id', label: 'ID'}, {key: 'grade', label: 'Параллель'}, {key: 'letter', label: 'Буква'},],
+        columns: [{key: 'id', label: 'Номер'}, {key: 'grade', label: 'Параллель'}, {key: 'letter', label: 'Буква'},],
         filters: [],
         fields: [{key: 'grade', label: 'Параллель', type: 'number', required: true}, {
             key: 'letter',
@@ -59,7 +59,7 @@ const entityConfigs = {
         title: 'Предметы',
         endpoint: 'subjects',
         inlineEditable: ['name', 'description'],
-        columns: [{key: 'id', label: 'ID'}, {key: 'name', label: 'Название'}, {
+        columns: [{key: 'id', label: 'Номер'}, {key: 'name', label: 'Название'}, {
             key: 'description',
             label: 'Описание'
         }, {key: 'teacherId', label: 'Учитель'},],
@@ -78,22 +78,22 @@ const entityConfigs = {
         title: 'Учителя',
         endpoint: 'teachers',
         inlineEditable: ['firstName', 'lastName', 'email'],
-        columns: [{key: 'id', label: 'ID'}, {key: 'firstName', label: 'Имя'}, {
+        columns: [{key: 'id', label: 'Номер'}, {key: 'firstName', label: 'Имя'}, {
             key: 'lastName',
             label: 'Фамилия'
-        }, {key: 'email', label: 'Email'},],
+        }, {key: 'email', label: 'Эл. почта'},],
         filters: [],
         fields: [{key: 'firstName', label: 'Имя', required: true}, {
             key: 'lastName',
             label: 'Фамилия',
             required: true
-        }, {key: 'email', label: 'Email', type: 'email', required: true},],
+        }, {key: 'email', label: 'Эл. почта', type: 'email', required: true},],
         payload: (v) => v,
     }, grades: {
         title: 'Оценки',
         endpoint: 'grades',
         inlineEditable: ['score', 'date'],
-        columns: [{key: 'id', label: 'ID'}, {key: 'score', label: 'Оценка'}, {
+        columns: [{key: 'id', label: 'Номер'}, {key: 'score', label: 'Оценка'}, {
             key: 'date',
             label: 'Дата'
         }, {key: 'studentId', label: 'Ученик'}, {key: 'subjectId', label: 'Предмет'},],
@@ -219,20 +219,20 @@ function loginTemplate() {
     return `
     <div class="min-h-screen flex items-center justify-center bg-slate-100 p-4">
       <form id="login-form" class="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-lg p-6">
-        <h1 class="text-2xl font-semibold text-slate-900 mb-1">School Admin</h1>
+        <h1 class="text-2xl font-semibold text-slate-900 mb-1">Панель школы</h1>
         <p class="text-sm text-slate-500 mb-5">Вход в административную панель</p>
-        <label class="block text-sm mb-3">Email
+        <label class="block text-sm mb-3">Эл. почта
           <input class="mt-1 w-full rounded-lg border-slate-300" type="email" name="email" required />
         </label>
         <label class="block text-sm mb-3">Пароль
           <input class="mt-1 w-full rounded-lg border-slate-300" type="password" name="password" required />
         </label>
         <label class="block text-sm mb-5">Роль
-          <select class="mt-1 w-full rounded-lg border-slate-300" name="role"><option value="admin">admin</option><option value="teacher">teacher</option></select>
+          <select class="mt-1 w-full rounded-lg border-slate-300" name="role"><option value="admin">администратор</option><option value="teacher">учитель</option></select>
         </label>
         <div class="mb-4 rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 leading-relaxed">
-          <p><strong>admin:</strong> полный доступ (CRUD, bulk delete, inline edit) только для <code>admin@gov.by</code> / <code>1111</code>.</p>
-          <p class="mt-1"><strong>teacher:</strong> режим просмотра (без создания/изменения/удаления), доступны Dashboard, Ученики, Оценки.</p>
+          <p><strong>Администратор:</strong> полный доступ (создание, изменение, удаление, массовое удаление, встроенное редактирование) только для <code>admin@gov.by</code> / <code>1111</code>.</p>
+          <p class="mt-1"><strong>Учитель:</strong> режим просмотра (без создания/изменения/удаления), доступны: Панель, Ученики, Оценки.</p>
         </div>
         <button class="w-full py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-700">Войти</button>
       </form>
@@ -296,7 +296,7 @@ function render() {
         canManage,
     })}
       </div>
-      ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>teacher</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
+      ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>учитель</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
     </section>
   `;
 
@@ -311,7 +311,7 @@ function bindLogin() {
         e.preventDefault();
         const values = Object.fromEntries(new FormData(form).entries());
         if (values.role === 'admin' && (values.email !== 'admin@gov.by' || values.password !== '1111')) {
-            notify('Для роли admin используйте email admin@gov.by и пароль 1111', 'error');
+            notify('Для роли «администратор» используйте почту admin@gov.by и пароль 1111', 'error');
             return;
         }
         setToken(`fake-jwt-${Date.now()}`, values.role);

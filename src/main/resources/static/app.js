@@ -253,9 +253,9 @@ function App() {
         <div className="container">
             <section className="hero">
                 <div>
-                    <h1>School SPA client</h1>
+                    <h1>Школа №12 г.Витебска "Солнечные детки"</h1>
                     <p>
-                        Единый React SPA для работы с REST API школы
+                        Наша школа лучшая на районе, да и в городе тоже лучшая, мы вообще крутые ребята
                     </p>
                 </div>
                 <div className="stats">
@@ -287,38 +287,42 @@ function App() {
                         onReset={() => resetEntityForm('student')}
                     >
                         <div className="form-grid two">
-                            <label>Имя<input value={forms.student.firstName} onChange={(e) => updateForm('student', 'firstName', e.target.value)} /></label>
-                            <label>Фамилия<input value={forms.student.lastName} onChange={(e) => updateForm('student', 'lastName', e.target.value)} /></label>
+                            <label>Имя<input value={forms.student.firstName} onChange={(e) => updateForm('student', 'firstName', e.target.value)} placeholder="Например, Иван" /></label>
+                            <label>Фамилия<input value={forms.student.lastName} onChange={(e) => updateForm('student', 'lastName', e.target.value)} placeholder="Например, Петров" /></label>
                             <label>Пол<select value={forms.student.gender} onChange={(e) => updateForm('student', 'gender', e.target.value)}><option>MALE</option><option>FEMALE</option></select></label>
-                            <label>Email<input type="email" value={forms.student.email} onChange={(e) => updateForm('student', 'email', e.target.value)} /></label>
+                            <label>Email<input type="email" value={forms.student.email} onChange={(e) => updateForm('student', 'email', e.target.value)} placeholder="ivan.petrov@school.ru" /></label>
                             <label>Класс<select value={forms.student.schoolClassId} onChange={(e) => updateForm('student', 'schoolClassId', e.target.value)}><option value="">Без класса</option>{data.classes.map((item) => <option key={item.id} value={item.id}>{item.grade}{item.letter}</option>)}</select></label>
                         </div>
                     </EntityForm>
 
                     <EntityForm title="Класс" active={activeTab === 'classes'} editing={editing.entity === 'class'} onSubmit={() => handleSubmit('class', '/api/classes', (form) => ({ ...form, grade: Number(form.grade) }))} onReset={() => resetEntityForm('class')}>
+                        <p className="helper-text">Создайте класс: параллель и буква (например, 7А).</p>
                         <div className="form-grid two">
                             <label>Параллель<input type="number" min="1" max="11" value={forms.class.grade} onChange={(e) => updateForm('class', 'grade', e.target.value)} /></label>
-                            <label>Буква<input value={forms.class.letter} onChange={(e) => updateForm('class', 'letter', e.target.value)} /></label>
+                            <label>Буква<input value={forms.class.letter} onChange={(e) => updateForm('class', 'letter', e.target.value)} placeholder="А, Б, В..." /></label>
                         </div>
                     </EntityForm>
 
                     <EntityForm title="Учитель" active={activeTab === 'teachers'} editing={editing.entity === 'teacher'} onSubmit={() => handleSubmit('teacher', '/api/teachers', (form) => form)} onReset={() => resetEntityForm('teacher')}>
+                        <p className="helper-text">Добавьте учителя и рабочий email.</p>
                         <div className="form-grid two">
-                            <label>Имя<input value={forms.teacher.firstName} onChange={(e) => updateForm('teacher', 'firstName', e.target.value)} /></label>
-                            <label>Фамилия<input value={forms.teacher.lastName} onChange={(e) => updateForm('teacher', 'lastName', e.target.value)} /></label>
-                            <label>Email<input type="email" value={forms.teacher.email} onChange={(e) => updateForm('teacher', 'email', e.target.value)} /></label>
+                            <label>Имя<input value={forms.teacher.firstName} onChange={(e) => updateForm('teacher', 'firstName', e.target.value)} placeholder="Мария" /></label>
+                            <label>Фамилия<input value={forms.teacher.lastName} onChange={(e) => updateForm('teacher', 'lastName', e.target.value)} placeholder="Иванова" /></label>
+                            <label>Email<input type="email" value={forms.teacher.email} onChange={(e) => updateForm('teacher', 'email', e.target.value)} placeholder="m.ivanova@school.ru" /></label>
                         </div>
                     </EntityForm>
 
                     <EntityForm title="Предмет" active={activeTab === 'subjects'} editing={editing.entity === 'subject'} onSubmit={() => handleSubmit('subject', '/api/subjects', (form) => ({ ...form, teacherId: form.teacherId || null }))} onReset={() => resetEntityForm('subject')}>
+                        <p className="helper-text">Создайте предмет и закрепите его за учителем (необязательно).</p>
                         <div className="form-grid two">
-                            <label>Название<input value={forms.subject.name} onChange={(e) => updateForm('subject', 'name', e.target.value)} /></label>
+                            <label>Название<input value={forms.subject.name} onChange={(e) => updateForm('subject', 'name', e.target.value)} placeholder="Математика" /></label>
                             <label>Учитель<select value={forms.subject.teacherId} onChange={(e) => updateForm('subject', 'teacherId', e.target.value)}><option value="">Без учителя</option>{data.teachers.map((item) => <option key={item.id} value={item.id}>{item.firstName} {item.lastName}</option>)}</select></label>
                         </div>
-                        <label>Описание<textarea value={forms.subject.description} onChange={(e) => updateForm('subject', 'description', e.target.value)} /></label>
+                        <label>Описание<textarea value={forms.subject.description} onChange={(e) => updateForm('subject', 'description', e.target.value)} placeholder="Кратко: что проходят на уроках" /></label>
                     </EntityForm>
 
                     <EntityForm title="Оценка" active={activeTab === 'grades'} editing={editing.entity === 'grade'} onSubmit={submitGrade} onReset={() => resetEntityForm('grade')}>
+                        <p className="helper-text">Выберите ученика, предмет и поставьте оценку.</p>
                         <div className="form-grid two">
                             <label>Балл<input type="number" min="2" max="10" value={forms.grade.score} onChange={(e) => updateForm('grade', 'score', e.target.value)} /></label>
                             <label>Дата<input type="date" value={forms.grade.date} onChange={(e) => updateForm('grade', 'date', e.target.value)} /></label>
@@ -329,7 +333,8 @@ function App() {
 
                     {(activeTab === 'classes' || activeTab === 'subjects') && (
                         <div className="panel">
-                            <h3>Связь Many-to-Many: класс ↔ предмет</h3>
+                            <h3>Связь «Класс ↔ Предмет»</h3>
+                            <p className="helper-text">Здесь можно назначить предмет конкретному классу.</p>
                             <div className="form-grid two">
                                 <label>Класс<select value={forms.relation.classId} onChange={(e) => updateForm('relation', 'classId', e.target.value)}><option value="">Выберите класс</option>{data.classes.map((item) => <option key={item.id} value={item.id}>{item.grade}{item.letter}</option>)}</select></label>
                                 <label>Предмет<select value={forms.relation.subjectId} onChange={(e) => updateForm('relation', 'subjectId', e.target.value)}><option value="">Выберите предмет</option>{data.subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
@@ -350,7 +355,7 @@ function App() {
                     />
                     {activeTab === 'students' && (
                         <>
-                            <h2>Ученики и связь One-to-Many с оценками</h2>
+                            <h2>Список учеников</h2>
                             <div className="filters-grid two">
                                 <label>Email учителя<input value={studentFilters.teacherEmail} onChange={(e) => setStudentFilters((current) => ({ ...current, teacherEmail: e.target.value }))} /></label>
                                 <label>Предмет<input value={studentFilters.subjectName} onChange={(e) => setStudentFilters((current) => ({ ...current, subjectName: e.target.value }))} /></label>
@@ -366,7 +371,7 @@ function App() {
 
                     {activeTab === 'classes' && (
                         <>
-                            <h2>Классы и связь Many-to-Many с предметами</h2>
+                            <h2>Список классов</h2>
                             <label>Фильтр классов (класс, предмет или ученик)<input value={classFilter} onChange={(e) => setClassFilter(e.target.value)} placeholder="Например, 10Б или Математика" /></label>
                             <div className="inline-actions">
                                 <button onClick={searchClasses}>Фильтровать через API</button>
@@ -377,7 +382,7 @@ function App() {
                     )}
                     {activeTab === 'teachers' && (
                         <>
-                            <h2>Учителя и предметы (One-to-Many)</h2>
+                            <h2>Список учителей</h2>
                             <label>Фильтр учителей (ФИО, email, предмет)<input value={teacherFilter} onChange={(e) => setTeacherFilter(e.target.value)} placeholder="Например, ivanov@school.ru" /></label>
                             <div className="inline-actions">
                                 <button onClick={searchTeachers}>Фильтровать через API</button>
@@ -446,7 +451,7 @@ function App() {
 function EntityForm({ title, active, editing, onSubmit, onReset, children }) {
     if (!active) return null;
     return (
-        <div>
+        <div className="form-block">
             <h3>{editing ? `Редактировать: ${title}` : `Создать: ${title}`}</h3>
             {children}
             <div className="actions">

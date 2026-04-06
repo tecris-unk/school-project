@@ -129,26 +129,63 @@ function parseRoute() {
     return navItems.find((item) => item.key === hash)?.key || (hash === 'login' ? 'login' : 'dashboard');
 }
 
-function canManageData() {
+function isTeacherRole() {
+    return state.auth.role === 'teacher';
+}
+
+function canEditEntity(entity) {
+    return state.auth.role === 'admin' || (isTeacherRole() && entity === 'grades');
+}
+
+function canDeleteEntity(entity) {
     return state.auth.role === 'admin';
 }
 
 function allowedRoutesForRole() {
-    if (state.auth.role === 'teacher') {
-        return new Set(['dashboard', 'students', 'grades']);
+    if (isTeacherRole()) {
+        return new Set(['dashboard', 'classes', 'grades']);
     }
     return new Set(navItems.map((item) => item.key));
 }
 
+function getTeacherSubjectIds() {
+    return new Set(state.refs.subjects.map((subject) => subject.id));
+}
+
 async function loadRefs() {
     if (state.refs.classes.length && state.refs.teachers.length && state.refs.subjects.length) return;
-    const [classes, teachers, subjects] = await Promise.all([api.classes.list(), api.teachers.list(), api.subjects.list()]);
+    if (!isTeacherRole()) {
+        const [classes, teachers, subjects] = await Promise.all([api.classes.list(), api.teachers.list(), api.subjects.list()]);
+        setState((s) => {
+            s.refs.classes = classes.items;
+            s.refs.teachers = teachers.items;
+            s.refs.subjects = subjects.items;
+            s.data.classes = classes.items;
+            s.data.teachers = teachers.items;
+            s.data.subjects = subjects.items;
+        });
+        return;
+    }
+
+    const teachers = await api.teachers.list({email: state.auth.email});
+    const currentTeacher = teachers.items.find((teacher) => teacher.email === state.auth.email);
+    if (!currentTeacher) {
+        throw new Error('Учитель с таким email не найден. Попросите администратора добавить вас в систему.');
+    }
+
+    const subjects = await api.subjects.list({teacherId: currentTeacher.id});
+    const teacherSubjectIds = new Set(subjects.items.map((subject) => subject.id));
+    const classes = await api.classes.list();
+    const availableClasses = classes.items.filter((schoolClass) =>
+        schoolClass.subjectIds?.some((subjectId) => teacherSubjectIds.has(subjectId)),
+    );
+
     setState((s) => {
-        s.refs.classes = classes.items;
-        s.refs.teachers = teachers.items;
+        s.refs.classes = availableClasses;
+        s.refs.teachers = [currentTeacher];
         s.refs.subjects = subjects.items;
-        s.data.classes = classes.items;
-        s.data.teachers = teachers.items;
+        s.data.classes = availableClasses;
+        s.data.teachers = [currentTeacher];
         s.data.subjects = subjects.items;
     });
 }
@@ -163,14 +200,25 @@ async function loadEntity(entity, force = false) {
 
     try {
         const params = meta.pageable ? {page: meta.page, size: meta.size} : {};
-        const result = await api[entity].list(params);
+        const teacherParams = isTeacherRole() && entity === 'students' ? {teacherEmail: state.auth.email} : {};
+        const result = await api[entity].list({...params, ...teacherParams});
+        const teacherSubjectIds = getTeacherSubjectIds();
+        let filteredItems = result.items;
+        if (isTeacherRole() && entity === 'grades') {
+            filteredItems = result.items.filter((grade) => teacherSubjectIds.has(grade.subjectId));
+        }
+        if (isTeacherRole() && entity === 'classes') {
+            filteredItems = result.items.filter((schoolClass) =>
+                schoolClass.subjectIds?.some((subjectId) => teacherSubjectIds.has(subjectId)),
+            );
+        }
 
         setState((s) => {
-            s.data[entity] = result.items;
+            s.data[entity] = filteredItems;
             s.meta[entity] = {
                 ...s.meta[entity], ...result.meta,
-                totalElements: result.meta?.totalElements ?? result.items.length,
-                totalPages: result.meta?.totalPages ?? Math.max(1, Math.ceil(result.items.length / s.meta[entity].size)),
+                totalElements: result.meta?.totalElements ?? filteredItems.length,
+                totalPages: result.meta?.totalPages ?? Math.max(1, Math.ceil(filteredItems.length / s.meta[entity].size)),
             };
             s.loading = false;
         });
@@ -200,19 +248,27 @@ function getVisibleRows(entity) {
 }
 
 function dashboardTemplate() {
-    const studentsCount = state.data.students.length;
     const grades = state.data.grades.map((grade) => grade.score).filter((score) => Number.isFinite(score));
     const avg = average(grades);
-    const teachersCount = state.data.teachers.length;
+    if (isTeacherRole()) {
+        return `
+        <section class="grid md:grid-cols-3 gap-4 mb-6">
+          <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Мои классы</p><h2 class="text-3xl font-semibold mt-2">${state.data.classes.length}</h2></article>
+          <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Мои предметы</p><h2 class="text-3xl font-semibold mt-2">${state.data.subjects.length}</h2></article>
+          <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
+        </section>
+        <div class="bg-white rounded-xl border border-slate-200 p-5 text-slate-600">Вам доступны только ваши классы и журнал оценок по вашим предметам.</div>
+      `;
+    }
 
     return `
     <section class="grid md:grid-cols-3 gap-4 mb-6">
-      <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${studentsCount}</h2></article>
-      <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
-      <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${teachersCount}</h2></article>
+        <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${state.data.students.length}</h2></article>
+        <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
+        <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article>
     </section>
     <div class="bg-white rounded-xl border border-slate-200 p-5 text-slate-600">Выберите раздел слева, чтобы управлять данными в режиме реального времени.</div>
-  `;
+        `;
 }
 
 function loginTemplate() {
@@ -232,8 +288,7 @@ function loginTemplate() {
         </label>
         <div class="mb-4 rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 leading-relaxed">
           <p><strong>Администратор:</strong> полный доступ (создание, изменение, удаление, массовое удаление, встроенное редактирование) только для <code>admin@gov.by</code> / <code>1111</code>.</p>
-          <p class="mt-1"><strong>Учитель:</strong> режим просмотра (без создания/изменения/удаления), доступны: Панель, Ученики, Оценки.</p>
-        </div>
+          <p class="mt-1"><strong>Учитель:</strong> вход по email, который создал администратор. Доступны только «Классы» с его предметами и «Оценки» (можно ставить/редактировать).</p>
         <button class="w-full py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-700">Войти</button>
       </form>
     </div>
@@ -325,7 +380,8 @@ function render() {
     const config = entityConfigs[state.route];
     const {rows, allFiltered = rows, meta} = getVisibleRows(state.route);
     const editingRow = byId(state.data[state.route], state.ui.editingId);
-    const canManage = canManageData();
+    const canEdit = canEditEntity(state.route);
+    const canDelete = canDeleteEntity(state.route);
 
     const content = `
     <section class="grid lg:grid-cols-12 gap-4">
@@ -339,10 +395,11 @@ function render() {
         ui: state.ui,
         meta,
         pageableFromApi: state.meta[state.route].pageable,
-        canManage,
+        canEdit,
+        canDelete,
     })}
       </div>
-     ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow, state.route)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>учитель</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
+     ${canEdit ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow, state.route)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Изменение данных в этом разделе доступно только администратору.</div></div>`}
     </section>
   `;
 
@@ -354,14 +411,23 @@ function render() {
 
 function bindLogin() {
     const form = document.getElementById('login-form');
-    form?.addEventListener('submit', (e) => {
+    form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const values = Object.fromEntries(new FormData(form).entries());
         if (values.role === 'admin' && (values.email !== 'admin@gov.by' || values.password !== '1111')) {
             notify('Для роли «администратор» используйте почту admin@gov.by и пароль 1111', 'error');
             return;
         }
-        setToken(`fake-jwt-${Date.now()}`, values.role);
+        if (values.role === 'teacher') {
+            const teachers = await api.teachers.list({email: values.email});
+            const matchedTeacher = teachers.items.find((teacher) => teacher.email === values.email);
+            if (!matchedTeacher) {
+                notify('Учитель с таким email не найден. Попросите администратора добавить вас.', 'error');
+                return;
+            }
+        }
+
+        setToken(`fake-jwt-${Date.now()}`, values.role, values.email);
         window.location.hash = '#/dashboard';
         notify(`Добро пожаловать, ${values.email}`, 'success');
     });
@@ -382,7 +448,7 @@ const debouncedSearch = debounce((value) => {
 }, 300);
 
 function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
-    if (canManageData()) {
+    if (canEditEntity(state.route)) {
         document.getElementById('entity-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const values = formDataToObject(e.target);
@@ -460,7 +526,7 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
         });
     });
 
-    if (canManageData()) {
+    if (canEditEntity(state.route)) {
         document.querySelectorAll('[data-edit-id]').forEach((element) => {
             element.addEventListener('click', async (e) => {
                 const id = Number(e.currentTarget.dataset.editId);
@@ -491,7 +557,7 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
         });
     }
 
-    if (canManageData()) {
+    if (canDeleteEntity(state.route)) {
         document.querySelectorAll('[data-delete-id]').forEach((element) => {
             element.addEventListener('click', (e) => {
                 const id = Number(e.currentTarget.dataset.deleteId);
@@ -519,7 +585,7 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
         });
     }
 
-    if (canManageData()) {
+    if (canDeleteEntity(state.route)) {
         document.querySelectorAll('[data-select-id]').forEach((element) => {
             element.addEventListener('change', (e) => {
                 const id = Number(e.currentTarget.dataset.selectId);
@@ -605,8 +671,15 @@ async function routeChanged() {
         try {
             await loadRefs();
             if (route === 'dashboard') {
-                await Promise.all([loadEntity('students', true), loadEntity('grades', true), loadEntity('teachers', true)]);
+                if (isTeacherRole()) {
+                    await loadEntity('grades', true);
+                } else {
+                    await Promise.all([loadEntity('students', true), loadEntity('grades', true), loadEntity('teachers', true)]);
+                }
             } else if (entityConfigs[route]) {
+                if (isTeacherRole() && route === 'grades') {
+                    await loadEntity('students', true);
+                }
                 await loadEntity(route, true);
             }
         } catch (error) {

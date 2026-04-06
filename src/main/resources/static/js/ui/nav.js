@@ -10,7 +10,8 @@ export const navItems = [
 ];
 
 export function renderNav(active, role = 'admin') {
-    const visibleItems = navItems.filter((item) => role === 'admin' || ['dashboard', 'grades', 'students'].includes(item.key));
+    const teacherRoutes = ['dashboard', 'classes', 'grades'];
+    const visibleItems = navItems.filter((item) => role === 'admin' || teacherRoutes.includes(item.key));
 
     return `
     <nav class="bg-white border border-slate-200 shadow-sm rounded-xl p-2 mb-6 flex flex-wrap gap-2">

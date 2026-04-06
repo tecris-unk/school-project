@@ -69,8 +69,8 @@ export const api = {
         remove: (id) => request(`/api/students/${id}`, { method: 'DELETE' }),
     },
     classes: {
-        async list() {
-            const payload = await request('/api/classes/with-subjects');
+        async list(params = {}) {
+            const payload = await request(buildUrl('/api/classes/with-subjects', params));
             return { items: payload || [], meta: { pageable: false } };
         },
         create: (body) => request('/api/classes', { method: 'POST', body: JSON.stringify(body) }),
@@ -78,8 +78,8 @@ export const api = {
         remove: (id) => request(`/api/classes/${id}`, { method: 'DELETE' }),
     },
     subjects: {
-        async list() {
-            const payload = await request('/api/subjects');
+        async list(params = {}) {
+            const payload = await request(buildUrl('/api/subjects', params));
             return { items: payload || [], meta: { pageable: false } };
         },
         create: (body) => request('/api/subjects', { method: 'POST', body: JSON.stringify(body) }),
@@ -87,8 +87,8 @@ export const api = {
         remove: (id) => request(`/api/subjects/${id}`, { method: 'DELETE' }),
     },
     teachers: {
-        async list() {
-            const payload = await request('/api/teachers');
+        async list(params = {}) {
+            const payload = await request(buildUrl('/api/teachers', params));
             return { items: payload || [], meta: { pageable: false } };
         },
         create: (body) => request('/api/teachers', { method: 'POST', body: JSON.stringify(body) }),

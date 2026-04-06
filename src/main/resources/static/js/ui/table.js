@@ -45,7 +45,18 @@ export function paginate(items, page = 0, size = 10) {
     return items.slice(start, start + size);
 }
 
-export function renderTable({ entity, config, rows, refs, data, ui, meta, pageableFromApi, canManage = true }) {
+export function renderTable({
+                                entity,
+                                config,
+                                rows,
+                                refs,
+                                data,
+                                ui,
+                                meta,
+                                pageableFromApi,
+                                canEdit = true,
+                                canDelete = true,
+                            }) {
     const hasRows = rows.length > 0;
     const headers = config.columns
         .map((col) => {
@@ -74,13 +85,13 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
 
                 return `
             <tr class="border-t border-slate-100 hover:bg-slate-50">
-             ${canManage ? `<td class="px-3 py-3"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>` : ''}
+             ${canDelete ? `<td class="px-3 py-3"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>` : ''}
               ${cells}
               ${
-                    canManage
+                    (canEdit || canDelete)
                         ? `<td class="px-3 py-3 text-right whitespace-nowrap">
-                       <button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Сохранить' : 'Ред.'}</button>
-                       <button data-delete-id="${row.id}" class="ml-2 px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-sm">Удалить</button>
+                        ${canEdit ? `<button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Сохранить' : 'Ред.'}</button>` : ''}
+                       ${canDelete ? `<button data-delete-id="${row.id}" class="ml-2 px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-sm">Удалить</button>` : ''}
                      </td>`
                         : ''
                 }
@@ -88,7 +99,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
           `;
             })
             .join('')
-        : `<tr><td colspan="${config.columns.length + (canManage ? 2 : 0)}" class="p-6 text-center text-slate-500">Нет данных</td></tr>`;
+        : `<tr><td colspan="${config.columns.length + ((canEdit || canDelete) ? 2 : 0)}" class="p-6 text-center text-slate-500">Нет данных</td></tr>`;
 
     const pages = pageableFromApi ? meta.totalPages : Math.max(1, Math.ceil((meta.totalElements || 0) / meta.size));
 
@@ -107,15 +118,15 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
         )
         .join('')}
         <button id="export-csv" class="ml-auto px-3 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-100">CSV экспорт</button>
-        ${canManage ? `<button id="bulk-delete" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 text-sm hover:bg-rose-200">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
+       ${canDelete ? `<button id="bulk-delete" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 text-sm hover:bg-rose-200">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full">
           <thead class="bg-slate-50">
             <tr>
-              ${canManage ? `<th class="px-3 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
+              ${canDelete ? `<th class="px-3 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
               ${headers}
-              ${canManage ? '<th class="px-3 py-3 text-right text-xs uppercase text-slate-500">Действия</th>' : ''}
+              ${(canEdit || canDelete) ? '<th class="px-3 py-3 text-right text-xs uppercase text-slate-500">Действия</th>' : ''}
             </tr>
           </thead>
           <tbody>${body}</tbody>

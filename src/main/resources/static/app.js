@@ -1,3 +1,4 @@
+/* global React, ReactDOM */
 const { useEffect, useMemo, useState } = React;
 
 const TABS = [
@@ -44,7 +45,7 @@ function App() {
     const [forms, setForms] = useState(initialForms);
     const [editing, setEditing] = useState({ entity: null, id: null });
     const [studentFilters, setStudentFilters] = useState({ teacherEmail: '', subjectName: '', minScore: '' });
-    const [gradeFilter, setGradeFilter] = useState('');
+    const [gradeFilters, setGradeFilters] = useState({ studentId: '', subjectId: '', minScore: '' });
     const [teacherFilter, setTeacherFilter] = useState('');
     const [subjectFilter, setSubjectFilter] = useState('');
     const [classFilter, setClassFilter] = useState('');
@@ -78,7 +79,7 @@ function App() {
         }
     };
 
-    useEffect(() => { loadAll(); }, []);
+    useEffect(() => { void loadAll(); }, []);
 
     const referenceMaps = useMemo(() => ({
         classById: Object.fromEntries(data.classes.map((item) => [item.id, item])),
@@ -148,29 +149,11 @@ function App() {
     };
 
     const submitGrade = async () => {
-        const studentId = Number(forms.grade.studentId);
-        const subjectId = Number(forms.grade.subjectId);
-        const score = Number(forms.grade.score);
-        const hasStudent = data.students.some((student) => Number(student.id) === studentId);
-        const hasSubject = data.subjects.some((subject) => Number(subject.id) === subjectId);
-
-        if (!forms.grade.studentId || !forms.grade.subjectId || !Number.isFinite(studentId) || !Number.isFinite(subjectId)) {
-            setMessage({ type: 'error', text: 'Для оценки нужно выбрать ученика и предмет из списка.' });
-            return;
-        }
-        if (studentId <= 0 || subjectId <= 0 || !hasStudent || !hasSubject) {
-            setMessage({ type: 'error', text: 'Выбранный ученик или предмет некорректен. Обновите данные и выберите снова.' });
-            return;
-        }
-        if (!Number.isFinite(score) || score < 2 || score > 10) {
-            setMessage({ type: 'error', text: 'Балл должен быть числом от 2 до 10.' });
-            return;
-        }
         await handleSubmit('grade', '/api/grades', (form) => ({
             ...form,
-            score,
-            studentId,
-            subjectId,
+            score: Number(form.score),
+            studentId: Number(form.studentId),
+            subjectId: Number(form.subjectId),
         }));
     };
 
@@ -255,14 +238,9 @@ function App() {
     const searchGrades = async () => {
         try {
             const params = new URLSearchParams();
-            if (gradeFilter.trim()) {
-                const numericFilter = Number(gradeFilter.trim());
-                if (!Number.isFinite(numericFilter) || numericFilter <= 0) {
-                    setMessage({ type: 'error', text: 'Для фильтра оценок используйте положительный ID ученика или предмета.' });
-                    return;
-                }
-                params.set('studentId', String(numericFilter));
-            }
+            if (gradeFilters.studentId.trim()) params.set('studentId', gradeFilters.studentId.trim());
+            if (gradeFilters.subjectId.trim()) params.set('subjectId', gradeFilters.subjectId.trim());
+            if (gradeFilters.minScore.trim()) params.set('minScore', gradeFilters.minScore.trim());
             const grades = await api(`/api/grades${params.toString() ? `?${params.toString()}` : ''}`);
             setData((current) => ({ ...current, grades: grades || [] }));
             setMessage({ type: 'success', text: 'Фильтрация оценок выполнена через API.' });
@@ -380,7 +358,7 @@ function App() {
                             </div>
                             <div className="inline-actions">
                                 <button onClick={searchStudents}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setStudentFilters({ teacherEmail: '', subjectName: '', minScore: '' }); loadAll(); }}>Сбросить</button>
+                                <button className="secondary" onClick={() => { setStudentFilters({ teacherEmail: '', subjectName: '', minScore: '' }); void loadAll(); }}>Сбросить</button>
                             </div>
                             <StudentTable students={data.students} classLabel={classLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('student', item)} onDelete={(id) => handleDelete(`/api/students/${id}`)} />
                         </>
@@ -392,7 +370,7 @@ function App() {
                             <label>Фильтр классов (класс, предмет или ученик)<input value={classFilter} onChange={(e) => setClassFilter(e.target.value)} placeholder="Например, 10Б или Математика" /></label>
                             <div className="inline-actions">
                                 <button onClick={searchClasses}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setClassFilter(''); loadAll(); }}>Сбросить</button>
+                                <button className="secondary" onClick={() => { setClassFilter(''); void loadAll(); }}>Сбросить</button>
                             </div>
                             <ClassTable classes={data.classes} subjectLabel={subjectLabel} studentLabel={studentLabel} onEdit={(item) => startEdit('class', item)} onDelete={(id) => handleDelete(`/api/classes/${id}`)} />
                         </>
@@ -403,7 +381,7 @@ function App() {
                             <label>Фильтр учителей (ФИО, email, предмет)<input value={teacherFilter} onChange={(e) => setTeacherFilter(e.target.value)} placeholder="Например, ivanov@school.ru" /></label>
                             <div className="inline-actions">
                                 <button onClick={searchTeachers}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setTeacherFilter(''); loadAll(); }}>Сбросить</button>
+                                <button className="secondary" onClick={() => { setTeacherFilter(''); void loadAll(); }}>Сбросить</button>
                             </div>
                             <TeacherTable teachers={data.teachers} onEdit={(item) => startEdit('teacher', item)} onDelete={(id) => handleDelete(`/api/teachers/${id}`)} />
                         </>
@@ -414,7 +392,7 @@ function App() {
                             <label>Фильтр предметов (название, описание, учитель)<input value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)} placeholder="Например, алгебра" /></label>
                             <div className="inline-actions">
                                 <button onClick={searchSubjects}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setSubjectFilter(''); loadAll(); }}>Сбросить</button>
+                                <button className="secondary" onClick={() => { setSubjectFilter(''); void loadAll(); }}>Сбросить</button>
                             </div>
                             <SubjectTable subjects={data.subjects} teacherLabel={teacherLabel} classLabel={classLabel} onEdit={(item) => startEdit('subject', item)} onDelete={(id) => handleDelete(`/api/subjects/${id}`)} />
                         </>
@@ -422,10 +400,39 @@ function App() {
                     {activeTab === 'grades' && (
                         <>
                             <h2>Оценки</h2>
-                            <label>Быстрый фильтр по ID ученика или предмета<input value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)} placeholder="Например, 1" /></label>
+                            <div className="filters-grid two">
+                                <label>ID ученика
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={gradeFilters.studentId}
+                                        onChange={(e) => setGradeFilters((current) => ({ ...current, studentId: e.target.value }))}
+                                        placeholder="Например, 1"
+                                    />
+                                </label>
+                                <label>ID предмета
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={gradeFilters.subjectId}
+                                        onChange={(e) => setGradeFilters((current) => ({ ...current, subjectId: e.target.value }))}
+                                        placeholder="Например, 2"
+                                    />
+                                </label>
+                                <label>Минимальный балл
+                                    <input
+                                        type="number"
+                                        min="2"
+                                        max="10"
+                                        value={gradeFilters.minScore}
+                                        onChange={(e) => setGradeFilters((current) => ({ ...current, minScore: e.target.value }))}
+                                        placeholder="Например, 7"
+                                    />
+                                </label>
+                            </div>
                             <div className="inline-actions">
                                 <button onClick={searchGrades}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setGradeFilter(''); loadAll(); }}>Сбросить</button>
+                                <button className="secondary" onClick={() => { setGradeFilters({ studentId: '', subjectId: '', minScore: '' }); void loadAll(); }}>Сбросить</button>
                             </div>
                             <GradeTable grades={data.grades} studentLabel={studentLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('grade', item)} onDelete={(id) => handleDelete(`/api/grades/${id}`)} />
                         </>

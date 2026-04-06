@@ -246,7 +246,7 @@ function App() {
 
             <div className="grid">
                 <section className="panel section-stack">
-                    <h2>Управление сущностями</h2>
+                    <h2>Колонки для записи</h2>
                     <EntityForm
                         title="Ученик"
                         active={activeTab === 'students'}
@@ -315,7 +315,7 @@ function App() {
                 <section className="panel section-stack">
                     <div className="inline-actions">
                         <button className="secondary tiny-button" onClick={() => setShowRelations((value) => !value)}>
-                            {showRelations ? 'Скрыть подсказку связей' : 'Показать подсказку связей'}
+                            {showRelations ? 'Скрыть связи' : 'Показать связи'}
                         </button>
                     </div>
                     {showRelations && (

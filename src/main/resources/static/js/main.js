@@ -245,7 +245,10 @@ function shellTemplate(content) {
     <div class="min-h-screen bg-slate-100">
       <header class="bg-white/95 sticky top-0 backdrop-blur border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 py-4">
-          <h1 class="text-xl font-semibold">Школа №12 "Солнечные ребята" г.Витебска</h1>
+          <h1 class="text-xl font-semibold flex items-center gap-2">
+            <img src="/favicon.ico" alt="Логотип школы" class="h-7 w-7 rounded-md object-contain border border-slate-200 bg-white p-0.5" />
+            <span>Школа №12 "Солнечные ребята" г.Витебска</span>
+          </h1>
           <p class="text-sm text-slate-500">На этой страничке вы можете создать, просмотреть, изменить и удалить данные об этой школе</p>
         </div>
       </header>
@@ -339,7 +342,7 @@ function render() {
         canManage,
     })}
       </div>
-      ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow, entity)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>учитель</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
+     ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow, state.route)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>учитель</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
     </section>
   `;
 

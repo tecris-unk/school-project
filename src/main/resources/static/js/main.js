@@ -263,16 +263,59 @@ function shellTemplate(content) {
   `;
 }
 
+function captureFocusSnapshot() {
+    const active = document.activeElement;
+    if (!active || !app.contains(active)) return null;
+    if (!(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active instanceof HTMLSelectElement)) return null;
+
+    return {
+        id: active.id || null,
+        name: active.getAttribute('name'),
+        selectionStart: typeof active.selectionStart === 'number' ? active.selectionStart : null,
+        selectionEnd: typeof active.selectionEnd === 'number' ? active.selectionEnd : null,
+    };
+}
+
+function restoreFocusSnapshot(snapshot) {
+    if (!snapshot) return;
+
+    let candidate = null;
+    if (snapshot.id) {
+        candidate = document.getElementById(snapshot.id);
+    }
+
+    if (!candidate && snapshot.name) {
+        candidate = app.querySelector(`[name="${snapshot.name}"]`);
+    }
+
+    if (!(candidate instanceof HTMLElement)) return;
+
+    candidate.focus({preventScroll: true});
+
+    if (
+        candidate instanceof HTMLInputElement ||
+        candidate instanceof HTMLTextAreaElement
+    ) {
+        if (typeof snapshot.selectionStart === 'number' && typeof snapshot.selectionEnd === 'number') {
+            candidate.setSelectionRange(snapshot.selectionStart, snapshot.selectionEnd);
+        }
+    }
+}
+
 function render() {
+    const focusSnapshot = captureFocusSnapshot();
+
     if (state.route === 'login' || !state.auth.token) {
         app.innerHTML = loginTemplate();
         bindLogin();
+        restoreFocusSnapshot(focusSnapshot);
         return;
     }
 
     if (state.route === 'dashboard') {
         app.innerHTML = shellTemplate(dashboardTemplate());
         bindGlobalHandlers();
+        restoreFocusSnapshot(focusSnapshot);
         return;
     }
 
@@ -303,6 +346,7 @@ function render() {
     app.innerHTML = shellTemplate(content);
     bindEntityHandlers(config, allFiltered, rows, meta);
     bindGlobalHandlers();
+    restoreFocusSnapshot(focusSnapshot);
 }
 
 function bindLogin() {

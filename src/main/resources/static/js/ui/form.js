@@ -1,4 +1,5 @@
 import { classLabel, fullName } from '../utils/helpers.js';
+import {entityLabelWithIcon} from './entityMeta.js';
 
 function optionsForRef(field, refs, data) {
     const source = refs[field.ref] || data[field.ref] || [];
@@ -44,13 +45,13 @@ export function validateForm(entity, values) {
     return errors;
 }
 
-export function renderEntityForm(config, refs, data, row = null) {
+export function renderEntityForm(config, refs, data, row = null, entityKey = null) {
     const fieldHtml = config.fields
         .map((field) => {
             const value = row?.[field.key] ?? field.defaultValue ?? '';
             if (field.type === 'select') {
                 return `
-          <label class="block text-sm font-medium text-slate-700 mb-3">
+          <label class="entity-field block text-sm font-medium text-slate-700 mb-3">
             ${field.label}
             <select name="${field.key}" class="mt-1 w-full rounded-lg border-slate-300" ${field.required ? 'required' : ''}>
               <option value="">Выберите...</option>
@@ -63,7 +64,7 @@ export function renderEntityForm(config, refs, data, row = null) {
             }
             if (field.type === 'ref') {
                 return `
-          <label class="block text-sm font-medium text-slate-700 mb-3">
+         <label class="entity-field block text-sm font-medium text-slate-700 mb-3">
             ${field.label}
             <select name="${field.key}" class="mt-1 w-full rounded-lg border-slate-300" ${field.required ? 'required' : ''}>
               <option value="">${field.allowEmpty ? 'Не выбрано' : 'Выберите...'}</option>
@@ -74,14 +75,14 @@ export function renderEntityForm(config, refs, data, row = null) {
             }
             if (field.type === 'textarea') {
                 return `
-          <label class="block text-sm font-medium text-slate-700 mb-3">
+         <label class="entity-field block text-sm font-medium text-slate-700 mb-3">
             ${field.label}
             <textarea name="${field.key}" rows="3" class="mt-1 w-full rounded-lg border-slate-300">${value || ''}</textarea>
           </label>
         `;
             }
             return `
-        <label class="block text-sm font-medium text-slate-700 mb-3">
+       <label class="entity-field block text-sm font-medium text-slate-700 mb-3">
           ${field.label}
           <input type="${field.type || 'text'}" name="${field.key}" value="${value || ''}" class="mt-1 w-full rounded-lg border-slate-300" ${field.required ? 'required' : ''} />
         </label>
@@ -90,8 +91,8 @@ export function renderEntityForm(config, refs, data, row = null) {
         .join('');
 
     return `
-    <form id="entity-form" class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-      <h3 class="font-semibold text-slate-900 mb-4">${row ? 'Редактирование' : 'Создание'}: ${config.title}</h3>
+   <form id="entity-form" class="entity-form bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+      <h3 class="font-semibold text-slate-900 mb-4">${row ? 'Редактирование' : 'Создание'}: ${entityKey ? entityLabelWithIcon(entityKey, config.title) : config.title}</h3>
       ${fieldHtml}
       <div class="flex gap-2 pt-2">
         <button class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-700" type="submit">${row ? 'Сохранить' : 'Создать'}</button>

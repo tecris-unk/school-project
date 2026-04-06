@@ -1,3 +1,5 @@
+import {entityLabelWithIcon} from './entityMeta.js';
+
 export const navItems = [
     { key: 'dashboard', label: 'Панель' },
     { key: 'students', label: 'Ученики' },
@@ -16,7 +18,7 @@ export function renderNav(active, role = 'admin') {
         .map(
             (item) => `<a href="#/${item.key}" class="px-4 py-2 rounded-lg text-sm font-medium transition ${
                 item.key === active ? 'bg-slate-900 text-white shadow' : 'text-slate-700 hover:bg-slate-100'
-            }">${item.label}</a>`,
+            }">${entityLabelWithIcon(item.key, item.label)}</a>`,
         )
         .join('')}
       <div class="ml-auto"></div>

@@ -339,7 +339,7 @@ function render() {
         canManage,
     })}
       </div>
-      ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>учитель</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
+      ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow, entity)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>учитель</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
     </section>
   `;
 

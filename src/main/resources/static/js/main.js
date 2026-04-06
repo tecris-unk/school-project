@@ -1,12 +1,12 @@
-import { api } from './api.js';
-import { resetUiState, setState, setToken, state, subscribe } from './state.js';
-import { exportToCsv } from './utils/csv.js';
-import { debounce } from './utils/debounce.js';
-import { average, byId, classLabel, fullName } from './utils/helpers.js';
-import { renderEntityForm, formDataToObject, validateForm } from './ui/form.js';
-import { navItems, renderNav } from './ui/nav.js';
-import { confirmModal, notify } from './ui/notifications.js';
-import { applyQuery, paginate, renderTable } from './ui/table.js';
+import {api} from './api.js';
+import {resetUiState, setState, setToken, state, subscribe} from './state.js';
+import {exportToCsv} from './utils/csv.js';
+import {debounce} from './utils/debounce.js';
+import {average, byId, classLabel, fullName} from './utils/helpers.js';
+import {formDataToObject, renderEntityForm, validateForm} from './ui/form.js';
+import {navItems, renderNav} from './ui/nav.js';
+import {confirmModal, notify} from './ui/notifications.js';
+import {applyQuery, paginate, renderTable} from './ui/table.js';
 
 const app = document.getElementById('app');
 
@@ -15,126 +15,129 @@ const entityConfigs = {
         title: 'Ученики',
         endpoint: 'students',
         inlineEditable: ['firstName', 'lastName', 'email'],
-        columns: [
-            { key: 'id', label: 'ID' },
-            { key: 'firstName', label: 'Имя' },
-            { key: 'lastName', label: 'Фамилия' },
-            { key: 'gender', label: 'Пол' },
-            { key: 'email', label: 'Email' },
-            { key: 'schoolClassId', label: 'Класс' },
-        ],
-        filters: [
-            {
-                key: 'schoolClassId',
-                label: 'Класс',
-                options: (refs) => refs.classes.map((item) => ({ value: item.id, label: classLabel(item) })),
-            },
-        ],
-        fields: [
-            { key: 'firstName', label: 'Имя', required: true },
-            { key: 'lastName', label: 'Фамилия', required: true },
-            {
-                key: 'gender',
-                label: 'Пол',
-                type: 'select',
-                required: true,
-                defaultValue: 'MALE',
-                options: [
-                    { value: 'MALE', label: 'Мужской' },
-                    { value: 'FEMALE', label: 'Женский' },
-                ],
-            },
-            { key: 'email', label: 'Email', type: 'email', required: true },
-            { key: 'schoolClassId', label: 'Класс', type: 'ref', ref: 'classes', allowEmpty: true },
-        ],
-        payload: (v) => ({ ...v, schoolClassId: v.schoolClassId ? Number(v.schoolClassId) : null }),
-    },
-    classes: {
+        columns: [{key: 'id', label: 'ID'}, {key: 'firstName', label: 'Имя'}, {
+            key: 'lastName',
+            label: 'Фамилия'
+        }, {key: 'gender', label: 'Пол'}, {key: 'email', label: 'Email'}, {key: 'schoolClassId', label: 'Класс'},],
+        filters: [{
+            key: 'schoolClassId',
+            label: 'Класс',
+            options: (refs) => refs.classes.map((item) => ({value: item.id, label: classLabel(item)})),
+        },],
+        fields: [{key: 'firstName', label: 'Имя', required: true}, {
+            key: 'lastName',
+            label: 'Фамилия',
+            required: true
+        }, {
+            key: 'gender',
+            label: 'Пол',
+            type: 'select',
+            required: true,
+            defaultValue: 'MALE',
+            options: [{value: 'MALE', label: 'Мужской'}, {value: 'FEMALE', label: 'Женский'},],
+        }, {key: 'email', label: 'Email', type: 'email', required: true}, {
+            key: 'schoolClassId',
+            label: 'Класс',
+            type: 'ref',
+            ref: 'classes',
+            allowEmpty: true
+        },],
+        payload: (v) => ({...v, schoolClassId: v.schoolClassId ? Number(v.schoolClassId) : null}),
+    }, classes: {
         title: 'Классы',
         endpoint: 'classes',
         inlineEditable: ['grade', 'letter'],
-        columns: [
-            { key: 'id', label: 'ID' },
-            { key: 'grade', label: 'Параллель' },
-            { key: 'letter', label: 'Буква' },
-        ],
+        columns: [{key: 'id', label: 'ID'}, {key: 'grade', label: 'Параллель'}, {key: 'letter', label: 'Буква'},],
         filters: [],
-        fields: [
-            { key: 'grade', label: 'Параллель', type: 'number', required: true },
-            { key: 'letter', label: 'Буква', required: true },
-        ],
-        payload: (v) => ({ grade: Number(v.grade), letter: v.letter }),
-    },
-    subjects: {
+        fields: [{key: 'grade', label: 'Параллель', type: 'number', required: true}, {
+            key: 'letter',
+            label: 'Буква',
+            required: true
+        },],
+        payload: (v) => ({grade: Number(v.grade), letter: v.letter}),
+    }, subjects: {
         title: 'Предметы',
         endpoint: 'subjects',
         inlineEditable: ['name', 'description'],
-        columns: [
-            { key: 'id', label: 'ID' },
-            { key: 'name', label: 'Название' },
-            { key: 'description', label: 'Описание' },
-            { key: 'teacherId', label: 'Учитель' },
-        ],
-        filters: [
-            {
-                key: 'teacherId',
-                label: 'Учитель',
-                options: (refs) => refs.teachers.map((teacher) => ({ value: teacher.id, label: fullName(teacher) })),
-            },
-        ],
-        fields: [
-            { key: 'name', label: 'Название', required: true },
-            { key: 'description', label: 'Описание', type: 'textarea' },
-            { key: 'teacherId', label: 'Учитель', type: 'ref', ref: 'teachers', allowEmpty: true },
-        ],
-        payload: (v) => ({ ...v, teacherId: v.teacherId ? Number(v.teacherId) : null }),
-    },
-    teachers: {
+        columns: [{key: 'id', label: 'ID'}, {key: 'name', label: 'Название'}, {
+            key: 'description',
+            label: 'Описание'
+        }, {key: 'teacherId', label: 'Учитель'},],
+        filters: [{
+            key: 'teacherId',
+            label: 'Учитель',
+            options: (refs) => refs.teachers.map((teacher) => ({value: teacher.id, label: fullName(teacher)})),
+        },],
+        fields: [{key: 'name', label: 'Название', required: true}, {
+            key: 'description',
+            label: 'Описание',
+            type: 'textarea'
+        }, {key: 'teacherId', label: 'Учитель', type: 'ref', ref: 'teachers', allowEmpty: true},],
+        payload: (v) => ({...v, teacherId: v.teacherId ? Number(v.teacherId) : null}),
+    }, teachers: {
         title: 'Учителя',
         endpoint: 'teachers',
         inlineEditable: ['firstName', 'lastName', 'email'],
-        columns: [
-            { key: 'id', label: 'ID' },
-            { key: 'firstName', label: 'Имя' },
-            { key: 'lastName', label: 'Фамилия' },
-            { key: 'email', label: 'Email' },
-        ],
+        columns: [{key: 'id', label: 'ID'}, {key: 'firstName', label: 'Имя'}, {
+            key: 'lastName',
+            label: 'Фамилия'
+        }, {key: 'email', label: 'Email'},],
         filters: [],
-        fields: [
-            { key: 'firstName', label: 'Имя', required: true },
-            { key: 'lastName', label: 'Фамилия', required: true },
-            { key: 'email', label: 'Email', type: 'email', required: true },
-        ],
+        fields: [{key: 'firstName', label: 'Имя', required: true}, {
+            key: 'lastName',
+            label: 'Фамилия',
+            required: true
+        }, {key: 'email', label: 'Email', type: 'email', required: true},],
         payload: (v) => v,
-    },
-    grades: {
+    }, grades: {
         title: 'Оценки',
         endpoint: 'grades',
         inlineEditable: ['score', 'date'],
-        columns: [
-            { key: 'id', label: 'ID' },
-            { key: 'score', label: 'Оценка' },
-            { key: 'date', label: 'Дата' },
-            { key: 'studentId', label: 'Ученик' },
-            { key: 'subjectId', label: 'Предмет' },
-        ],
-        filters: [
-            { key: 'subjectId', label: 'Предмет', options: (refs) => refs.subjects.map((subject) => ({ value: subject.id, label: subject.name })) },
-            { key: 'studentId', label: 'Ученик', options: (_, data) => data.students.map((student) => ({ value: student.id, label: fullName(student) })) },
-        ],
-        fields: [
-            { key: 'score', label: 'Оценка', type: 'number', required: true },
-            { key: 'date', label: 'Дата', type: 'date', required: true },
-            { key: 'studentId', label: 'Ученик', type: 'ref', ref: 'students', required: true },
-            { key: 'subjectId', label: 'Предмет', type: 'ref', ref: 'subjects', required: true },
-        ],
-        payload: (v) => ({ ...v, score: Number(v.score), studentId: Number(v.studentId), subjectId: Number(v.subjectId) }),
+        columns: [{key: 'id', label: 'ID'}, {key: 'score', label: 'Оценка'}, {
+            key: 'date',
+            label: 'Дата'
+        }, {key: 'studentId', label: 'Ученик'}, {key: 'subjectId', label: 'Предмет'},],
+        filters: [{
+            key: 'subjectId',
+            label: 'Предмет',
+            options: (refs) => refs.subjects.map((subject) => ({value: subject.id, label: subject.name}))
+        }, {
+            key: 'studentId',
+            label: 'Ученик',
+            options: (_, data) => data.students.map((student) => ({value: student.id, label: fullName(student)}))
+        },],
+        fields: [{key: 'score', label: 'Оценка', type: 'number', required: true}, {
+            key: 'date',
+            label: 'Дата',
+            type: 'date',
+            required: true
+        }, {key: 'studentId', label: 'Ученик', type: 'ref', ref: 'students', required: true}, {
+            key: 'subjectId',
+            label: 'Предмет',
+            type: 'ref',
+            ref: 'subjects',
+            required: true
+        },],
+        payload: (v) => ({
+            ...v, score: Number(v.score), studentId: Number(v.studentId), subjectId: Number(v.subjectId)
+        }),
     },
 };
 
 function parseRoute() {
     const hash = window.location.hash.replace('#/', '') || 'dashboard';
     return navItems.find((item) => item.key === hash)?.key || (hash === 'login' ? 'login' : 'dashboard');
+}
+
+function canManageData() {
+    return state.auth.role === 'admin';
+}
+
+function allowedRoutesForRole() {
+    if (state.auth.role === 'teacher') {
+        return new Set(['dashboard', 'students', 'grades']);
+    }
+    return new Set(navItems.map((item) => item.key));
 }
 
 async function loadRefs() {
@@ -159,14 +162,13 @@ async function loadEntity(entity, force = false) {
     });
 
     try {
-        const params = meta.pageable ? { page: meta.page, size: meta.size } : {};
+        const params = meta.pageable ? {page: meta.page, size: meta.size} : {};
         const result = await api[entity].list(params);
 
         setState((s) => {
             s.data[entity] = result.items;
             s.meta[entity] = {
-                ...s.meta[entity],
-                ...result.meta,
+                ...s.meta[entity], ...result.meta,
                 totalElements: result.meta?.totalElements ?? result.items.length,
                 totalPages: result.meta?.totalPages ?? Math.max(1, Math.ceil(result.items.length / s.meta[entity].size)),
             };
@@ -186,17 +188,13 @@ function getVisibleRows(entity) {
     const queried = applyQuery(state.data[entity], config, state.ui);
 
     if (meta.pageable) {
-        return { rows: queried, meta: { ...meta, totalElements: meta.totalElements } };
+        return {rows: queried, meta: {...meta, totalElements: meta.totalElements}};
     }
 
     const paged = paginate(queried, meta.page, meta.size);
     return {
-        rows: paged,
-        allFiltered: queried,
-        meta: {
-            ...meta,
-            totalElements: queried.length,
-            totalPages: Math.max(1, Math.ceil(queried.length / meta.size)),
+        rows: paged, allFiltered: queried, meta: {
+            ...meta, totalElements: queried.length, totalPages: Math.max(1, Math.ceil(queried.length / meta.size)),
         },
     };
 }
@@ -232,6 +230,10 @@ function loginTemplate() {
         <label class="block text-sm mb-5">Роль
           <select class="mt-1 w-full rounded-lg border-slate-300" name="role"><option value="admin">admin</option><option value="teacher">teacher</option></select>
         </label>
+        <div class="mb-4 rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 leading-relaxed">
+          <p><strong>admin:</strong> полный доступ (CRUD, bulk delete, inline edit) только для <code>admin@gov.by</code> / <code>1111</code>.</p>
+          <p class="mt-1"><strong>teacher:</strong> режим просмотра (без создания/изменения/удаления), доступны Dashboard, Ученики, Оценки.</p>
+        </div>
         <button class="w-full py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-700">Войти</button>
       </form>
     </div>
@@ -243,8 +245,8 @@ function shellTemplate(content) {
     <div class="min-h-screen bg-slate-100">
       <header class="bg-white/95 sticky top-0 backdrop-blur border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 py-4">
-          <h1 class="text-xl font-semibold">School CRM Admin</h1>
-          <p class="text-sm text-slate-500">Production-ready CRUD с поиском, фильтрами, inline-редактированием и экспортом.</p>
+          <h1 class="text-xl font-semibold">Школа №12 "Солнечные ребята" г.Витебска</h1>
+          <p class="text-sm text-slate-500">На этой страничке вы можете создать, просмотреть, изменить и удалить данные об этой школе</p>
         </div>
       </header>
       <main class="max-w-7xl mx-auto p-4">
@@ -270,8 +272,9 @@ function render() {
     }
 
     const config = entityConfigs[state.route];
-    const { rows, allFiltered = rows, meta } = getVisibleRows(state.route);
+    const {rows, allFiltered = rows, meta} = getVisibleRows(state.route);
     const editingRow = byId(state.data[state.route], state.ui.editingId);
+    const canManage = canManageData();
 
     const content = `
     <section class="grid lg:grid-cols-12 gap-4">
@@ -285,11 +288,10 @@ function render() {
         ui: state.ui,
         meta,
         pageableFromApi: state.meta[state.route].pageable,
+        canManage,
     })}
       </div>
-      <div class="lg:col-span-4">
-        ${renderEntityForm(config, state.refs, state.data, editingRow)}
-      </div>
+      ${canManage ? `<div class="lg:col-span-4">${renderEntityForm(config, state.refs, state.data, editingRow)}</div>` : `<div class="lg:col-span-4"><div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-sm text-slate-600">Роль <strong>teacher</strong> работает в режиме просмотра. Изменения данных доступны только администратору.</div></div>`}
     </section>
   `;
 
@@ -303,6 +305,10 @@ function bindLogin() {
     form?.addEventListener('submit', (e) => {
         e.preventDefault();
         const values = Object.fromEntries(new FormData(form).entries());
+        if (values.role === 'admin' && (values.email !== 'admin@gov.by' || values.password !== '1111')) {
+            notify('Для роли admin используйте email admin@gov.by и пароль 1111', 'error');
+            return;
+        }
         setToken(`fake-jwt-${Date.now()}`, values.role);
         window.location.hash = '#/dashboard';
         notify(`Добро пожаловать, ${values.email}`, 'success');
@@ -324,58 +330,60 @@ const debouncedSearch = debounce((value) => {
 }, 300);
 
 function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
-    document.getElementById('entity-form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const values = formDataToObject(e.target);
-        const errors = validateForm(state.route, values);
-        if (errors.length) {
-            notify(errors[0], 'error');
-            return;
-        }
-
-        const payload = config.payload(values);
-        const previousData = [...state.data[state.route]];
-
-        try {
-            if (state.ui.editingId) {
-                const id = state.ui.editingId;
-                setState((s) => {
-                    const idx = s.data[s.route].findIndex((item) => item.id === id);
-                    if (idx > -1) s.data[s.route][idx] = { ...s.data[s.route][idx], ...payload };
-                });
-                const saved = await api[state.route].update(id, payload);
-                setState((s) => {
-                    const idx = s.data[s.route].findIndex((item) => item.id === id);
-                    if (idx > -1) s.data[s.route][idx] = saved;
-                    s.ui.editingId = null;
-                });
-                notify('Запись обновлена', 'success');
-            } else {
-                const tempId = Date.now() * -1;
-                setState((s) => {
-                    s.data[s.route].unshift({ id: tempId, ...payload });
-                });
-                const created = await api[state.route].create(payload);
-                setState((s) => {
-                    s.data[s.route] = s.data[s.route].map((item) => (item.id === tempId ? created : item));
-                    s.meta[s.route].totalElements += 1;
-                });
-                notify('Запись создана', 'success');
+    if (canManageData()) {
+        document.getElementById('entity-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const values = formDataToObject(e.target);
+            const errors = validateForm(state.route, values);
+            if (errors.length) {
+                notify(errors[0], 'error');
+                return;
             }
-            e.target.reset();
-        } catch (error) {
-            setState((s) => {
-                s.data[s.route] = previousData;
-            });
-            notify(error.message, 'error');
-        }
-    });
 
-    document.querySelector('[data-cancel-edit]')?.addEventListener('click', () => {
-        setState((s) => {
-            s.ui.editingId = null;
+            const payload = config.payload(values);
+            const previousData = [...state.data[state.route]];
+
+            try {
+                if (state.ui.editingId) {
+                    const id = state.ui.editingId;
+                    setState((s) => {
+                        const idx = s.data[s.route].findIndex((item) => item.id === id);
+                        if (idx > -1) s.data[s.route][idx] = {...s.data[s.route][idx], ...payload};
+                    });
+                    const saved = await api[state.route].update(id, payload);
+                    setState((s) => {
+                        const idx = s.data[s.route].findIndex((item) => item.id === id);
+                        if (idx > -1) s.data[s.route][idx] = saved;
+                        s.ui.editingId = null;
+                    });
+                    notify('Запись обновлена', 'success');
+                } else {
+                    const tempId = Date.now() * -1;
+                    setState((s) => {
+                        s.data[s.route].unshift({id: tempId, ...payload});
+                    });
+                    const created = await api[state.route].create(payload);
+                    setState((s) => {
+                        s.data[s.route] = s.data[s.route].map((item) => (item.id === tempId ? created : item));
+                        s.meta[s.route].totalElements += 1;
+                    });
+                    notify('Запись создана', 'success');
+                }
+                e.target.reset();
+            } catch (error) {
+                setState((s) => {
+                    s.data[s.route] = previousData;
+                });
+                notify(error.message, 'error');
+            }
         });
-    });
+
+        document.querySelector('[data-cancel-edit]')?.addEventListener('click', () => {
+            setState((s) => {
+                s.ui.editingId = null;
+            });
+        });
+    }
 
     document.getElementById('search-input')?.addEventListener('input', (e) => debouncedSearch(e.target.value));
 
@@ -395,132 +403,132 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
             const key = e.target.dataset.sort;
             setState((s) => {
                 const same = s.ui.sort.key === key;
-                s.ui.sort = { key, dir: same && s.ui.sort.dir === 'asc' ? 'desc' : 'asc' };
+                s.ui.sort = {key, dir: same && s.ui.sort.dir === 'asc' ? 'desc' : 'asc'};
             });
         });
     });
 
-    document.querySelectorAll('[data-edit-id]').forEach((element) => {
-        element.addEventListener('click', async (e) => {
-            const id = Number(e.currentTarget.dataset.editId);
-            if (state.ui.editingId === id) {
-                const rowElement = e.currentTarget.closest('tr');
-                const inlineValues = {};
-                rowElement.querySelectorAll('[data-inline-input]').forEach((input) => {
-                    inlineValues[input.dataset.inlineInput] = input.value;
-                });
-                try {
-                    const patch = config.payload({ ...byId(state.data[state.route], id), ...inlineValues });
-                    const saved = await api[state.route].update(id, patch);
-                    setState((s) => {
-                        const idx = s.data[s.route].findIndex((item) => item.id === id);
-                        if (idx > -1) s.data[s.route][idx] = saved;
-                        s.ui.editingId = null;
-                    });
-                    notify('Inline сохранение выполнено', 'success');
-                } catch (error) {
-                    notify(error.message, 'error');
-                }
-            } else {
-                setState((s) => {
-                    s.ui.editingId = id;
-                });
-            }
-        });
-    });
-
-    document.querySelectorAll('[data-delete-id]').forEach((element) => {
-        element.addEventListener('click', (e) => {
-            const id = Number(e.currentTarget.dataset.deleteId);
-            confirmModal({
-                title: 'Подтвердите удаление',
-                description: 'Эту операцию нельзя отменить.',
-                onConfirm: async () => {
-                    const previous = [...state.data[state.route]];
-                    setState((s) => {
-                        s.data[s.route] = s.data[s.route].filter((item) => item.id !== id);
-                        s.ui.selectedIds.delete(id);
+    if (canManageData()) {
+        document.querySelectorAll('[data-edit-id]').forEach((element) => {
+            element.addEventListener('click', async (e) => {
+                const id = Number(e.currentTarget.dataset.editId);
+                if (state.ui.editingId === id) {
+                    const rowElement = e.currentTarget.closest('tr');
+                    const inlineValues = {};
+                    rowElement.querySelectorAll('[data-inline-input]').forEach((input) => {
+                        inlineValues[input.dataset.inlineInput] = input.value;
                     });
                     try {
-                        await api[state.route].remove(id);
-                        notify('Запись удалена', 'success');
+                        const patch = config.payload({...byId(state.data[state.route], id), ...inlineValues});
+                        const saved = await api[state.route].update(id, patch);
+                        setState((s) => {
+                            const idx = s.data[s.route].findIndex((item) => item.id === id);
+                            if (idx > -1) s.data[s.route][idx] = saved;
+                            s.ui.editingId = null;
+                        });
+                        notify('Inline сохранение выполнено', 'success');
                     } catch (error) {
+                        notify(error.message, 'error');
+                    }
+                } else {
+                    setState((s) => {
+                        s.ui.editingId = id;
+                    });
+                }
+            });
+        });
+    }
+
+    if (canManageData()) {
+        document.querySelectorAll('[data-delete-id]').forEach((element) => {
+            element.addEventListener('click', (e) => {
+                const id = Number(e.currentTarget.dataset.deleteId);
+                confirmModal({
+                    title: 'Подтвердите удаление',
+                    description: 'Эту операцию нельзя отменить.',
+                    onConfirm: async () => {
+                        const previous = [...state.data[state.route]];
+                        setState((s) => {
+                            s.data[s.route] = s.data[s.route].filter((item) => item.id !== id);
+                            s.ui.selectedIds.delete(id);
+                        });
+                        try {
+                            await api[state.route].remove(id);
+                            notify('Запись удалена', 'success');
+                        } catch (error) {
+                            setState((s) => {
+                                s.data[s.route] = previous;
+                            });
+                            notify(error.message, 'error');
+                        }
+                    },
+                });
+            });
+        });
+    }
+
+    if (canManageData()) {
+        document.querySelectorAll('[data-select-id]').forEach((element) => {
+            element.addEventListener('change', (e) => {
+                const id = Number(e.currentTarget.dataset.selectId);
+                setState((s) => {
+                    if (e.currentTarget.checked) s.ui.selectedIds.add(id); else s.ui.selectedIds.delete(id);
+                });
+            });
+        });
+
+        document.getElementById('select-all')?.addEventListener('change', (e) => {
+            setState((s) => {
+                if (e.target.checked) displayedRows.forEach((row) => s.ui.selectedIds.add(row.id)); else displayedRows.forEach((row) => s.ui.selectedIds.delete(row.id));
+            });
+        });
+
+        document.getElementById('bulk-delete')?.addEventListener('click', () => {
+            if (!state.ui.selectedIds.size) return notify('Сначала отметьте записи', 'info');
+
+            confirmModal({
+                title: 'Массовое удаление',
+                description: `Будут удалены записи: ${state.ui.selectedIds.size}`,
+                onConfirm: async () => {
+                    const ids = [...state.ui.selectedIds];
+                    const previous = [...state.data[state.route]];
+                    setState((s) => {
+                        s.data[s.route] = s.data[s.route].filter((item) => !s.ui.selectedIds.has(item.id));
+                        s.ui.selectedIds = new Set();
+                    });
+                    const results = await Promise.allSettled(ids.map((id) => api[state.route].remove(id)));
+                    const failed = results.filter((r) => r.status === 'rejected').length;
+                    if (failed) {
                         setState((s) => {
                             s.data[s.route] = previous;
                         });
-                        notify(error.message, 'error');
+                        notify(`Удаление прервано, ошибок: ${failed}`, 'error');
+                    } else {
+                        notify('Выбранные записи удалены', 'success');
                     }
                 },
             });
         });
-    });
-
-    document.querySelectorAll('[data-select-id]').forEach((element) => {
-        element.addEventListener('change', (e) => {
-            const id = Number(e.currentTarget.dataset.selectId);
-            setState((s) => {
-                if (e.currentTarget.checked) s.ui.selectedIds.add(id);
-                else s.ui.selectedIds.delete(id);
-            });
-        });
-    });
-
-    document.getElementById('select-all')?.addEventListener('change', (e) => {
-        setState((s) => {
-            if (e.target.checked) displayedRows.forEach((row) => s.ui.selectedIds.add(row.id));
-            else displayedRows.forEach((row) => s.ui.selectedIds.delete(row.id));
-        });
-    });
-
-    document.getElementById('bulk-delete')?.addEventListener('click', () => {
-        if (!state.ui.selectedIds.size) return notify('Сначала отметьте записи', 'info');
-
-        confirmModal({
-            title: 'Массовое удаление',
-            description: `Будут удалены записи: ${state.ui.selectedIds.size}`,
-            onConfirm: async () => {
-                const ids = [...state.ui.selectedIds];
-                const previous = [...state.data[state.route]];
-                setState((s) => {
-                    s.data[s.route] = s.data[s.route].filter((item) => !s.ui.selectedIds.has(item.id));
-                    s.ui.selectedIds = new Set();
-                });
-                const results = await Promise.allSettled(ids.map((id) => api[state.route].remove(id)));
-                const failed = results.filter((r) => r.status === 'rejected').length;
-                if (failed) {
-                    setState((s) => {
-                        s.data[s.route] = previous;
-                    });
-                    notify(`Удаление прервано, ошибок: ${failed}`, 'error');
-                } else {
-                    notify('Выбранные записи удалены', 'success');
-                }
-            },
-        });
-    });
-
-    document.getElementById('export-csv')?.addEventListener('click', () => {
-        exportToCsv(
-            `${state.route}-${new Date().toISOString().slice(0, 10)}.csv`,
-            config.columns.map((column) => column.label),
-            allFiltered.map((row) => config.columns.map((column) => row[column.key] ?? '')),
-        );
-        notify('CSV экспорт готов', 'success');
-    });
-
-    document.querySelectorAll('[data-page-action]').forEach((element) => {
-        element.addEventListener('click', async (e) => {
-            const action = e.currentTarget.dataset.pageAction;
-            const canNext = meta.page + 1 < meta.totalPages;
-            setState((s) => {
-                if (action === 'prev' && s.meta[s.route].page > 0) s.meta[s.route].page -= 1;
-                if (action === 'next' && canNext) s.meta[s.route].page += 1;
-            });
-
-            if (state.meta[state.route].pageable) await loadEntity(state.route, true);
-        });
-    });
+    }
 }
+
+document.getElementById('export-csv')?.addEventListener('click', () => {
+    exportToCsv(`${state.route}-${new Date().toISOString().slice(0, 10)}.csv`, config.columns.map((column) => column.label), allFiltered.map((row) => config.columns.map((column) => row[column.key] ?? '')),);
+    notify('CSV экспорт готов', 'success');
+});
+
+document.querySelectorAll('[data-page-action]').forEach((element) => {
+    element.addEventListener('click', async (e) => {
+        const action = e.currentTarget.dataset.pageAction;
+        const canNext = meta.page + 1 < meta.totalPages;
+        setState((s) => {
+            if (action === 'prev' && s.meta[s.route].page > 0) s.meta[s.route].page -= 1;
+            if (action === 'next' && canNext) s.meta[s.route].page += 1;
+        });
+
+        if (state.meta[state.route].pageable) await loadEntity(state.route, true);
+    });
+});
 
 async function routeChanged() {
     const route = parseRoute();
@@ -534,6 +542,12 @@ async function routeChanged() {
         s.route = route;
         if (entityConfigs[route]) s.activeEntity = route;
     });
+
+    const allowedRoutes = allowedRoutesForRole();
+    if (route !== 'login' && !allowedRoutes.has(route)) {
+        window.location.hash = '#/dashboard';
+        return;
+    }
 
     if (route !== 'login') {
         try {

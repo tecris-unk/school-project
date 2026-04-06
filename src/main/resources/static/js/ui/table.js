@@ -45,7 +45,7 @@ export function paginate(items, page = 0, size = 10) {
     return items.slice(start, start + size);
 }
 
-export function renderTable({ entity, config, rows, refs, data, ui, meta, pageableFromApi }) {
+export function renderTable({ entity, config, rows, refs, data, ui, meta, pageableFromApi, canManage = true }) {
     const hasRows = rows.length > 0;
     const headers = config.columns
         .map((col) => {
@@ -74,27 +74,31 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
 
                 return `
             <tr class="border-t border-slate-100 hover:bg-slate-50">
-              <td class="px-3 py-3"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>
+             ${canManage ? `<td class="px-3 py-3"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>` : ''}
               ${cells}
-              <td class="px-3 py-3 text-right whitespace-nowrap">
-                <button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Inline save' : 'Ред.'}</button>
-                <button data-delete-id="${row.id}" class="ml-2 px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-sm">Удалить</button>
-              </td>
+              ${
+                    canManage
+                        ? `<td class="px-3 py-3 text-right whitespace-nowrap">
+                       <button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Inline save' : 'Ред.'}</button>
+                       <button data-delete-id="${row.id}" class="ml-2 px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-sm">Удалить</button>
+                     </td>`
+                        : ''
+                }
             </tr>
           `;
             })
             .join('')
-        : `<tr><td colspan="${config.columns.length + 2}" class="p-6 text-center text-slate-500">Нет данных</td></tr>`;
+        : `<tr><td colspan="${config.columns.length + (canManage ? 2 : 0)}" class="p-6 text-center text-slate-500">Нет данных</td></tr>`;
 
     const pages = pageableFromApi ? meta.totalPages : Math.max(1, Math.ceil((meta.totalElements || 0) / meta.size));
 
     return `
     <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
       <div class="flex flex-wrap items-center gap-3 p-4 border-b border-slate-100">
-        <input id="search-input" value="${ui.search || ''}" placeholder="Поиск..." class="w-64 rounded-lg border-slate-300 text-sm" />
+       <input id="search-input" value="${ui.search || ''}" placeholder="Поиск..." class="w-full max-w-xs md:max-w-sm lg:max-w-md rounded-lg border-slate-300 text-sm" />
         ${config.filters
         .map(
-            (filter) => `<select data-filter-key="${filter.key}" class="rounded-lg border-slate-300 text-sm">
+            (filter) => `<select data-filter-key="${filter.key}" class="w-full md:w-auto min-w-[220px] rounded-lg border-slate-300 text-sm">
                 <option value="">${filter.label}: все</option>
                 ${filter.options(refs, data)
                 .map((opt) => `<option ${String(ui.filters[filter.key] || '') === String(opt.value) ? 'selected' : ''} value="${opt.value}">${opt.label}</option>`)
@@ -103,15 +107,15 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
         )
         .join('')}
         <button id="export-csv" class="ml-auto px-3 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-100">CSV экспорт</button>
-        <button id="bulk-delete" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 text-sm hover:bg-rose-200">Удалить выбранные (${ui.selectedIds.size})</button>
+        ${canManage ? `<button id="bulk-delete" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 text-sm hover:bg-rose-200">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full">
           <thead class="bg-slate-50">
             <tr>
-              <th class="px-3 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>
+              ${canManage ? `<th class="px-3 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
               ${headers}
-              <th class="px-3 py-3 text-right text-xs uppercase text-slate-500">Actions</th>
+              ${canManage ? '<th class="px-3 py-3 text-right text-xs uppercase text-slate-500">Actions</th>' : ''}
             </tr>
           </thead>
           <tbody>${body}</tbody>

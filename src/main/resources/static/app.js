@@ -47,7 +47,6 @@ function App() {
     const [search, setSearch] = useState({ students: '', classes: '', teachers: '', subjects: '', grades: '' });
     const [showRelations, setShowRelations] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
-    const [loading, setLoading] = useState(false);
 
     const loadAll = async () => {
         setLoading(true);
@@ -84,14 +83,6 @@ function App() {
         subjectById: Object.fromEntries(data.subjects.map((item) => [item.id, item])),
         studentById: Object.fromEntries(data.students.map((item) => [item.id, item])),
     }), [data]);
-
-    const stats = [
-        ['Ученики', data.students.length],
-        ['Классы', data.classes.length],
-        ['Учителя', data.teachers.length],
-        ['Предметы', data.subjects.length],
-        ['Оценки', data.grades.length],
-    ];
 
     const classLabel = (id) => {
         const schoolClass = referenceMaps.classById[id];
@@ -225,12 +216,6 @@ function App() {
                     <p>
                         Наша школа лучшая на районе, да и в городе тоже лучшая, мы вообще крутые ребята
                     </p>
-                </div>
-                <div className="stats">
-                    {stats.map(([label, value]) => <div className="stat-card" key={label}><span>{label}</span><strong>{value}</strong></div>)}
-                </div>
-                <div className="inline-actions">
-                    <button onClick={loadAll} disabled={loading}>{loading ? 'Загрузка…' : 'Обновить данные'}</button>
                 </div>
             </section>
 

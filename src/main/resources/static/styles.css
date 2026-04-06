@@ -5,11 +5,18 @@
 
 input,
 select,
-textarea,
+textarea {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
 a,
 button {
-    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, transform 0.4s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
     -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    background-color: transparent;
 }
 
 button:focus,

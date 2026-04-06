@@ -4,7 +4,7 @@ const ENTITY_ICON_MAP = {
     classes: '/assets/entity-icons/classes.png',
     subjects: '/assets/entity-icons/subjects.png',
     teachers: '/assets/entity-icons/teachers.png',
-    grades: '/assets/entity-icons/grades.png',
+    grades: '/assets/entity-icons/grades.jpg',
 };
 
 export function entityIcon(entityKey) {

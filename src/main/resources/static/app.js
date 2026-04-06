@@ -44,11 +44,8 @@ function App() {
     const [data, setData] = useState({ students: [], classes: [], teachers: [], subjects: [], grades: [] });
     const [forms, setForms] = useState(initialForms);
     const [editing, setEditing] = useState({ entity: null, id: null });
-    const [studentFilters, setStudentFilters] = useState({ teacherEmail: '', subjectName: '', minScore: '' });
-    const [gradeFilters, setGradeFilters] = useState({ studentId: '', subjectId: '', minScore: '' });
-    const [teacherFilter, setTeacherFilter] = useState('');
-    const [subjectFilter, setSubjectFilter] = useState('');
-    const [classFilter, setClassFilter] = useState('');
+    const [search, setSearch] = useState({ students: '', classes: '', teachers: '', subjects: '', grades: '' });
+    const [showRelations, setShowRelations] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(false);
 
@@ -173,25 +170,11 @@ function App() {
         setActiveTab(entity === 'class' ? 'classes' : `${entity}s`);
     };
 
-    const searchStudents = async () => {
-        try {
-            const params = new URLSearchParams();
-            if (studentFilters.teacherEmail.trim()) params.set('teacherEmail', studentFilters.teacherEmail.trim());
-            if (studentFilters.subjectName.trim()) params.set('subjectName', studentFilters.subjectName.trim());
-            if (studentFilters.minScore) params.set('minScore', studentFilters.minScore);
-            const page = await api(`/api/students${params.toString() ? `?${params.toString()}` : ''}`);
-            setData((current) => ({ ...current, students: page?.content || [] }));
-            setMessage({ type: 'success', text: 'Фильтрация учеников выполнена.' });
-        } catch (error) {
-            setMessage({ type: 'error', text: error.message });
-        }
-    };
-
     const connectSubjectToClass = async () => {
         try {
             const { classId, subjectId } = forms.relation;
             await api(`/api/classes/${classId}/subjects/${subjectId}`, { method: 'PUT' });
-            setMessage({ type: 'success', text: 'Связь Many-to-Many обновлена.' });
+            setMessage({ type: 'success', text: 'Предмет добавлен в класс.' });
             setForms((current) => ({ ...current, relation: initialForms.relation }));
             await loadAll();
         } catch (error) {
@@ -199,55 +182,40 @@ function App() {
         }
     };
 
-    const searchTeachers = async () => {
-        try {
-            const params = new URLSearchParams();
-            if (teacherFilter.trim()) params.set('query', teacherFilter.trim());
-            const teachers = await api(`/api/teachers${params.toString() ? `?${params.toString()}` : ''}`);
-            setData((current) => ({ ...current, teachers: teachers || [] }));
-            setMessage({ type: 'success', text: 'Фильтрация учителей выполнена через API.' });
-        } catch (error) {
-            setMessage({ type: 'error', text: error.message });
-        }
-    };
+    const filteredStudents = useMemo(() => {
+        const q = search.students.trim().toLowerCase();
+        if (!q) return data.students;
+        return data.students.filter((student) => `${student.firstName} ${student.lastName}`.toLowerCase().includes(q));
+    }, [data.students, search.students]);
 
-    const searchSubjects = async () => {
-        try {
-            const params = new URLSearchParams();
-            if (subjectFilter.trim()) params.set('query', subjectFilter.trim());
-            const subjects = await api(`/api/subjects${params.toString() ? `?${params.toString()}` : ''}`);
-            setData((current) => ({ ...current, subjects: subjects || [] }));
-            setMessage({ type: 'success', text: 'Фильтрация предметов выполнена через API.' });
-        } catch (error) {
-            setMessage({ type: 'error', text: error.message });
-        }
-    };
+    const filteredTeachers = useMemo(() => {
+        const q = search.teachers.trim().toLowerCase();
+        if (!q) return data.teachers;
+        return data.teachers.filter((teacher) => `${teacher.firstName} ${teacher.lastName} ${teacher.email}`.toLowerCase().includes(q));
+    }, [data.teachers, search.teachers]);
 
-    const searchClasses = async () => {
-        try {
-            const params = new URLSearchParams();
-            if (classFilter.trim()) params.set('query', classFilter.trim());
-            const classes = await api(`/api/classes/with-subjects${params.toString() ? `?${params.toString()}` : ''}`);
-            setData((current) => ({ ...current, classes: classes || [] }));
-            setMessage({ type: 'success', text: 'Фильтрация классов выполнена через API.' });
-        } catch (error) {
-            setMessage({ type: 'error', text: error.message });
-        }
-    };
+    const filteredSubjects = useMemo(() => {
+        const q = search.subjects.trim().toLowerCase();
+        if (!q) return data.subjects;
+        return data.subjects.filter((subject) => `${subject.name} ${subject.description || ''} ${teacherLabel(subject.teacherId)}`.toLowerCase().includes(q));
+    }, [data.subjects, search.subjects, referenceMaps.teacherById]);
 
-    const searchGrades = async () => {
-        try {
-            const params = new URLSearchParams();
-            if (gradeFilters.studentId.trim()) params.set('studentId', gradeFilters.studentId.trim());
-            if (gradeFilters.subjectId.trim()) params.set('subjectId', gradeFilters.subjectId.trim());
-            if (gradeFilters.minScore.trim()) params.set('minScore', gradeFilters.minScore.trim());
-            const grades = await api(`/api/grades${params.toString() ? `?${params.toString()}` : ''}`);
-            setData((current) => ({ ...current, grades: grades || [] }));
-            setMessage({ type: 'success', text: 'Фильтрация оценок выполнена через API.' });
-        } catch (error) {
-            setMessage({ type: 'error', text: error.message });
-        }
-    };
+    const filteredClasses = useMemo(() => {
+        const q = search.classes.trim().toLowerCase();
+        if (!q) return data.classes;
+        return data.classes.filter((schoolClass) => {
+            const label = `${schoolClass.grade}${schoolClass.letter}`.toLowerCase();
+            const studentsText = (schoolClass.studentIds || []).map((id) => studentLabel(id).toLowerCase()).join(' ');
+            const subjectsText = (schoolClass.subjectIds || []).map((id) => subjectLabel(id).toLowerCase()).join(' ');
+            return `${label} ${studentsText} ${subjectsText}`.includes(q);
+        });
+    }, [data.classes, search.classes, referenceMaps.studentById, referenceMaps.subjectById]);
+
+    const filteredGrades = useMemo(() => {
+        const q = search.grades.trim().toLowerCase();
+        if (!q) return data.grades;
+        return data.grades.filter((grade) => `${studentLabel(grade.studentId)} ${subjectLabel(grade.subjectId)} ${grade.date || ''}`.toLowerCase().includes(q));
+    }, [data.grades, search.grades, referenceMaps.studentById, referenceMaps.subjectById]);
 
     return (
         <div className="container">
@@ -345,101 +313,59 @@ function App() {
                 </section>
 
                 <section className="panel section-stack">
-                    <RelationshipOverview
-                        teachers={data.teachers}
-                        students={data.students}
-                        classes={data.classes}
-                        subjects={data.subjects}
-                        classLabel={classLabel}
-                        subjectLabel={subjectLabel}
-                    />
+                    <div className="inline-actions">
+                        <button className="secondary tiny-button" onClick={() => setShowRelations((value) => !value)}>
+                            {showRelations ? 'Скрыть подсказку связей' : 'Показать подсказку связей'}
+                        </button>
+                    </div>
+                    {showRelations && (
+                        <RelationshipOverview
+                            teachers={data.teachers}
+                            students={data.students}
+                            classes={data.classes}
+                            subjects={data.subjects}
+                            classLabel={classLabel}
+                            subjectLabel={subjectLabel}
+                        />
+                    )}
                     {activeTab === 'students' && (
                         <>
                             <h2>Список учеников</h2>
-                            <div className="filters-grid two">
-                                <label>Email учителя<input value={studentFilters.teacherEmail} onChange={(e) => setStudentFilters((current) => ({ ...current, teacherEmail: e.target.value }))} /></label>
-                                <label>Предмет<input value={studentFilters.subjectName} onChange={(e) => setStudentFilters((current) => ({ ...current, subjectName: e.target.value }))} /></label>
-                                <label>Минимальный балл<input type="number" min="0" value={studentFilters.minScore} onChange={(e) => setStudentFilters((current) => ({ ...current, minScore: e.target.value }))} /></label>
-                            </div>
-                            <div className="inline-actions">
-                                <button onClick={searchStudents}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setStudentFilters({ teacherEmail: '', subjectName: '', minScore: '' }); void loadAll(); }}>Сбросить</button>
-                            </div>
-                            <StudentTable students={data.students} classLabel={classLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('student', item)} onDelete={(id) => handleDelete(`/api/students/${id}`)} />
+                            <label>Поиск по имени или фамилии
+                                <input value={search.students} onChange={(e) => setSearch((current) => ({ ...current, students: e.target.value }))} placeholder="Например, Андрей" />
+                            </label>
+                            <StudentTable students={filteredStudents} classLabel={classLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('student', item)} onDelete={(id) => handleDelete(`/api/students/${id}`)} />
                         </>
                     )}
 
                     {activeTab === 'classes' && (
                         <>
                             <h2>Список классов</h2>
-                            <label>Фильтр классов (класс, предмет или ученик)<input value={classFilter} onChange={(e) => setClassFilter(e.target.value)} placeholder="Например, 10Б или Математика" /></label>
-                            <div className="inline-actions">
-                                <button onClick={searchClasses}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setClassFilter(''); void loadAll(); }}>Сбросить</button>
-                            </div>
-                            <ClassTable classes={data.classes} subjectLabel={subjectLabel} studentLabel={studentLabel} onEdit={(item) => startEdit('class', item)} onDelete={(id) => handleDelete(`/api/classes/${id}`)} />
+                            <label>Поиск по классу, ученику или предмету<input value={search.classes} onChange={(e) => setSearch((current) => ({ ...current, classes: e.target.value }))} placeholder="Например, 10Б или Математика" /></label>
+                            <ClassTable classes={filteredClasses} subjectLabel={subjectLabel} studentLabel={studentLabel} onEdit={(item) => startEdit('class', item)} onDelete={(id) => handleDelete(`/api/classes/${id}`)} />
                         </>
                     )}
                     {activeTab === 'teachers' && (
                         <>
                             <h2>Список учителей</h2>
-                            <label>Фильтр учителей (ФИО, email, предмет)<input value={teacherFilter} onChange={(e) => setTeacherFilter(e.target.value)} placeholder="Например, ivanov@school.ru" /></label>
-                            <div className="inline-actions">
-                                <button onClick={searchTeachers}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setTeacherFilter(''); void loadAll(); }}>Сбросить</button>
-                            </div>
-                            <TeacherTable teachers={data.teachers} onEdit={(item) => startEdit('teacher', item)} onDelete={(id) => handleDelete(`/api/teachers/${id}`)} />
+                            <label>Поиск по имени, фамилии или email<input value={search.teachers} onChange={(e) => setSearch((current) => ({ ...current, teachers: e.target.value }))} placeholder="Например, Мария" /></label>
+                            <TeacherTable teachers={filteredTeachers} onEdit={(item) => startEdit('teacher', item)} onDelete={(id) => handleDelete(`/api/teachers/${id}`)} />
                         </>
                     )}
                     {activeTab === 'subjects' && (
                         <>
                             <h2>Предметы</h2>
-                            <label>Фильтр предметов (название, описание, учитель)<input value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)} placeholder="Например, алгебра" /></label>
-                            <div className="inline-actions">
-                                <button onClick={searchSubjects}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setSubjectFilter(''); void loadAll(); }}>Сбросить</button>
-                            </div>
-                            <SubjectTable subjects={data.subjects} teacherLabel={teacherLabel} classLabel={classLabel} onEdit={(item) => startEdit('subject', item)} onDelete={(id) => handleDelete(`/api/subjects/${id}`)} />
+                            <label>Поиск по названию, описанию или учителю<input value={search.subjects} onChange={(e) => setSearch((current) => ({ ...current, subjects: e.target.value }))} placeholder="Например, алгебра" /></label>
+                            <SubjectTable subjects={filteredSubjects} teacherLabel={teacherLabel} classLabel={classLabel} onEdit={(item) => startEdit('subject', item)} onDelete={(id) => handleDelete(`/api/subjects/${id}`)} />
                         </>
                     )}
                     {activeTab === 'grades' && (
                         <>
                             <h2>Оценки</h2>
-                            <div className="filters-grid two">
-                                <label>ID ученика
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={gradeFilters.studentId}
-                                        onChange={(e) => setGradeFilters((current) => ({ ...current, studentId: e.target.value }))}
-                                        placeholder="Например, 1"
-                                    />
-                                </label>
-                                <label>ID предмета
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={gradeFilters.subjectId}
-                                        onChange={(e) => setGradeFilters((current) => ({ ...current, subjectId: e.target.value }))}
-                                        placeholder="Например, 2"
-                                    />
-                                </label>
-                                <label>Минимальный балл
-                                    <input
-                                        type="number"
-                                        min="2"
-                                        max="10"
-                                        value={gradeFilters.minScore}
-                                        onChange={(e) => setGradeFilters((current) => ({ ...current, minScore: e.target.value }))}
-                                        placeholder="Например, 7"
-                                    />
-                                </label>
-                            </div>
-                            <div className="inline-actions">
-                                <button onClick={searchGrades}>Фильтровать через API</button>
-                                <button className="secondary" onClick={() => { setGradeFilters({ studentId: '', subjectId: '', minScore: '' }); void loadAll(); }}>Сбросить</button>
-                            </div>
-                            <GradeTable grades={data.grades} studentLabel={studentLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('grade', item)} onDelete={(id) => handleDelete(`/api/grades/${id}`)} />
+                            <label>Поиск по имени ученика или предмету
+                                <input value={search.grades} onChange={(e) => setSearch((current) => ({ ...current, grades: e.target.value }))} placeholder="Например, Андрей или Математика" />
+                            </label>
+                            <GradeTable grades={filteredGrades} studentLabel={studentLabel} subjectLabel={subjectLabel} onEdit={(item) => startEdit('grade', item)} onDelete={(id) => handleDelete(`/api/grades/${id}`)} />
                         </>
                     )}
                 </section>
@@ -465,9 +391,9 @@ function EntityForm({ title, active, editing, onSubmit, onReset, children }) {
 function StudentTable({ students, classLabel, subjectLabel, onEdit, onDelete }) {
     if (!students.length) return <div className="empty">Ученики не найдены.</div>;
     return (
-        <div className="table-wrap"><table><thead><tr><th>ID</th><th>Ученик</th><th>Класс</th><th>Email</th><th>Оценки</th><th></th></tr></thead><tbody>
+        <div className="table-wrap"><table><thead><tr><th>Ученик</th><th>Класс</th><th>Email</th><th>Оценки</th><th></th></tr></thead><tbody>
         {students.map((student) => (
-            <tr key={student.id}><td>{student.id}</td><td><strong>{student.firstName} {student.lastName}</strong><div className="muted">{student.gender}</div></td><td>{classLabel(student.schoolClassId)}</td><td>{student.email}</td><td>{student.grades?.length ? <div className="badges">{student.grades.map((grade) => <span key={grade.id} className="badge">{subjectLabel(grade.subjectId)}: {grade.score}</span>)}</div> : <span className="muted">Нет оценок</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(student)}>Изменить</button><button className="danger" onClick={() => onDelete(student.id)}>Удалить</button></div></td></tr>
+            <tr key={student.id}><td><strong>{student.firstName} {student.lastName}</strong><div className="muted">{student.gender}</div></td><td>{classLabel(student.schoolClassId)}</td><td>{student.email}</td><td>{student.grades?.length ? <div className="badges">{student.grades.map((grade) => <span key={grade.id} className="badge">{subjectLabel(grade.subjectId)}: {grade.score}</span>)}</div> : <span className="muted">Нет оценок</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(student)}>Изменить</button><button className="danger" onClick={() => onDelete(student.id)}>Удалить</button></div></td></tr>
         ))}
         </tbody></table></div>
     );
@@ -476,8 +402,8 @@ function StudentTable({ students, classLabel, subjectLabel, onEdit, onDelete }) 
 function ClassTable({ classes, subjectLabel, studentLabel, onEdit, onDelete }) {
     if (!classes.length) return <div className="empty">Классы не найдены.</div>;
     return (
-        <><div className="table-wrap"><table><thead><tr><th>ID</th><th>Класс</th><th>Ученики</th><th>Предметы</th><th></th></tr></thead><tbody>
-        {classes.map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.grade}{item.letter}</strong></td><td>{item.studentIds?.length ? <div className="badges">{item.studentIds.map((id) => <span key={id} className="badge">{studentLabel(id)}</span>)}</div> : <span className="muted">Нет учеников</span>}</td><td>{item.subjectIds?.length ? <div className="badges">{item.subjectIds.map((id) => <span key={id} className="badge">{subjectLabel(id)}</span>)}</div> : <span className="muted">Нет предметов</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
+        <><div className="table-wrap"><table><thead><tr><th>Класс</th><th>Ученики</th><th>Предметы</th><th></th></tr></thead><tbody>
+        {classes.map((item) => <tr key={item.id}><td><strong>{item.grade}{item.letter}</strong></td><td>{item.studentIds?.length ? <div className="badges">{item.studentIds.map((id) => <span key={id} className="badge">{studentLabel(id)}</span>)}</div> : <span className="muted">Нет учеников</span>}</td><td>{item.subjectIds?.length ? <div className="badges">{item.subjectIds.map((id) => <span key={id} className="badge">{subjectLabel(id)}</span>)}</div> : <span className="muted">Нет предметов</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
         </tbody></table></div></>
     );
 }
@@ -485,8 +411,8 @@ function ClassTable({ classes, subjectLabel, studentLabel, onEdit, onDelete }) {
 function TeacherTable({ teachers, onEdit, onDelete }) {
     if (!teachers.length) return <div className="empty">Учителя не найдены.</div>;
     return (
-        <><div className="table-wrap"><table><thead><tr><th>ID</th><th>Учитель</th><th>Email</th><th>Предметы</th><th></th></tr></thead><tbody>
-        {teachers.map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.firstName} {item.lastName}</strong></td><td>{item.email}</td><td>{item.subjects?.length ? <div className="badges">{item.subjects.map((subject) => <span key={subject.id} className="badge">{subject.name}</span>)}</div> : <span className="muted">Нет предметов</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
+        <><div className="table-wrap"><table><thead><tr><th>Учитель</th><th>Email</th><th>Предметы</th><th></th></tr></thead><tbody>
+        {teachers.map((item) => <tr key={item.id}><td><strong>{item.firstName} {item.lastName}</strong></td><td>{item.email}</td><td>{item.subjects?.length ? <div className="badges">{item.subjects.map((subject) => <span key={subject.id} className="badge">{subject.name}</span>)}</div> : <span className="muted">Нет предметов</span>}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
         </tbody></table></div></>
     );
 }
@@ -494,8 +420,8 @@ function TeacherTable({ teachers, onEdit, onDelete }) {
 function SubjectTable({ subjects, teacherLabel, classLabel, onEdit, onDelete }) {
     if (!subjects.length) return <div className="empty">Предметы не найдены.</div>;
     return (
-        <><div className="table-wrap"><table><thead><tr><th>ID</th><th>Название</th><th>Учитель</th><th>Классы</th><th>Описание</th><th></th></tr></thead><tbody>
-        {subjects.map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.name}</strong></td><td>{teacherLabel(item.teacherId)}</td><td>{item.schoolClassIds?.length ? <div className="badges">{item.schoolClassIds.map((id) => <span key={id} className="badge">{classLabel(id)}</span>)}</div> : <span className="muted">Не назначен</span>}</td><td>{item.description || '—'}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
+        <><div className="table-wrap"><table><thead><tr><th>Название</th><th>Учитель</th><th>Классы</th><th>Описание</th><th></th></tr></thead><tbody>
+        {subjects.map((item) => <tr key={item.id}><td><strong>{item.name}</strong></td><td>{teacherLabel(item.teacherId)}</td><td>{item.schoolClassIds?.length ? <div className="badges">{item.schoolClassIds.map((id) => <span key={id} className="badge">{classLabel(id)}</span>)}</div> : <span className="muted">Не назначен</span>}</td><td>{item.description || '—'}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
         </tbody></table></div></>
     );
 }
@@ -503,8 +429,8 @@ function SubjectTable({ subjects, teacherLabel, classLabel, onEdit, onDelete }) 
 function GradeTable({ grades, studentLabel, subjectLabel, onEdit, onDelete }) {
     if (!grades.length) return <div className="empty">Оценки не найдены.</div>;
     return (
-        <div className="table-wrap"><table><thead><tr><th>ID</th><th>Балл</th><th>Дата</th><th>Ученик</th><th>Предмет</th><th></th></tr></thead><tbody>
-        {grades.map((item) => <tr key={item.id}><td>{item.id}</td><td>{item.score}</td><td>{item.date}</td><td>{studentLabel(item.studentId)}</td><td>{subjectLabel(item.subjectId)}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
+        <div className="table-wrap"><table><thead><tr><th>Оценка</th><th>Дата</th><th>Ученик</th><th>Предмет</th><th></th></tr></thead><tbody>
+        {grades.map((item) => <tr key={item.id}><td>{item.score}</td><td>{item.date}</td><td>{studentLabel(item.studentId)}</td><td>{subjectLabel(item.subjectId)}</td><td><div className="inline-actions"><button className="secondary" onClick={() => onEdit(item)}>Изменить</button><button className="danger" onClick={() => onDelete(item.id)}>Удалить</button></div></td></tr>)}
         </tbody></table></div>
     );
 }
@@ -514,10 +440,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 function RelationshipOverview({ teachers, students, classes, subjects, classLabel, subjectLabel }) {
     return (
         <div className="panel relation-overview">
-            <h3>Отображение связей</h3>
+            <h3>Кто с кем связан</h3>
             <div className="relation-grid">
                 <article className="relation-card">
-                    <h4>One-to-Many: Учитель → Предметы</h4>
+                    <h4>Какие предметы ведут учителя</h4>
                     {teachers.length ? (
                         <ul className="relation-list">
                             {teachers.slice(0, 4).map((teacher) => (
@@ -535,7 +461,7 @@ function RelationshipOverview({ teachers, students, classes, subjects, classLabe
                 </article>
 
                 <article className="relation-card">
-                    <h4>One-to-Many: Ученик → Оценки</h4>
+                    <h4>Успеваемость учеников</h4>
                     {students.length ? (
                         <ul className="relation-list">
                             {students.slice(0, 4).map((student) => (
@@ -554,7 +480,7 @@ function RelationshipOverview({ teachers, students, classes, subjects, classLabe
                 </article>
 
                 <article className="relation-card">
-                    <h4>Many-to-Many: Класс ↔ Предметы</h4>
+                    <h4>Какие предметы в классах</h4>
                     {classes.length ? (
                         <ul className="relation-list">
                             {classes.slice(0, 4).map((schoolClass) => (
@@ -569,7 +495,7 @@ function RelationshipOverview({ teachers, students, classes, subjects, classLabe
                             ))}
                             {subjects.some((subject) => subject.schoolClassIds?.length) && (
                                 <li>
-                                    <strong>Обратная связь: предмет → классы</strong>
+                                    <strong>Предметы и где они есть</strong>
                                     <div className="badges">
                                         {subjects
                                             .filter((subject) => subject.schoolClassIds?.length)

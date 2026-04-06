@@ -101,6 +101,11 @@ button {
 button:hover:not(:disabled) { filter: brightness(1.04); box-shadow: 0 10px 22px rgba(36, 79, 209, .24); }
 button:active:not(:disabled) { transform: translateY(1px) scale(.98); box-shadow: 0 4px 10px rgba(22, 50, 79, .18); }
 button.secondary { background: #eef3ff; color: var(--primary-dark); }
+button.tiny-button {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
 button.danger { background: var(--danger); }
 button:disabled { opacity: .6; cursor: not-allowed; }
 .table-wrap { overflow: auto; }

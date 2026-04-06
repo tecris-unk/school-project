@@ -157,14 +157,37 @@ public class GlobalExceptionHandler {
             final DataIntegrityViolationException ex,
             final HttpServletRequest request) {
 
+        String message = resolveIntegrityViolationMessage(request);
         return buildResponse(
                 HttpStatus.CONFLICT,
                 "Conflict",
-                "Resource already exists or violates data integrity constraints",
+                message,
                 request,
                 null,
                 ex
         );
+    }
+
+    private String resolveIntegrityViolationMessage(final HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        if ("DELETE".equalsIgnoreCase(method) && path.startsWith("/api/subjects")) {
+            return "Нельзя удалить предмет: он используется в оценках или привязан к классам. "
+                    + "Сначала удалите связанные оценки и отвяжите предмет от классов.";
+        }
+
+        if ("DELETE".equalsIgnoreCase(method) && path.startsWith("/api/classes")) {
+            return "Нельзя удалить класс: к нему привязаны ученики или предметы. "
+                    + "Сначала удалите связанные данные.";
+        }
+
+        if ("DELETE".equalsIgnoreCase(method) && path.startsWith("/api/teachers")) {
+            return "Нельзя удалить учителя: за ним закреплены предметы. "
+                    + "Сначала отвяжите предметы от учителя.";
+        }
+
+        return "Resource already exists or violates data integrity constraints";
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

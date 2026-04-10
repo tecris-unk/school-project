@@ -90,6 +90,7 @@ export function renderTable({
               ${
                     (canEdit || canDelete)
                         ? `<td class="px-3 py-3 text-right whitespace-nowrap">
+                       ${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="mr-2 px-3 py-1 rounded border border-indigo-300 text-indigo-700 hover:bg-indigo-50 text-sm">${config.linkAction.label}</button>` : ''}
                         ${canEdit ? `<button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Сохранить' : 'Ред.'}</button>` : ''}
                        ${canDelete ? `<button data-delete-id="${row.id}" class="ml-2 px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-sm">Удалить</button>` : ''}
                      </td>`

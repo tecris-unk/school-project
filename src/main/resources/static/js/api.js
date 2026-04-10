@@ -76,6 +76,7 @@ export const api = {
         create: (body) => request('/api/classes', { method: 'POST', body: JSON.stringify(body) }),
         update: (id, body) => request(`/api/classes/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
         remove: (id) => request(`/api/classes/${id}`, { method: 'DELETE' }),
+        attachSubject: (classId, subjectId) => request(`/api/classes/${classId}/subjects/${subjectId}`, { method: 'PUT' }),
     },
     subjects: {
         async list(params = {}) {

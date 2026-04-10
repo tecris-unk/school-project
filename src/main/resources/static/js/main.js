@@ -43,6 +43,7 @@ const entityConfigs = {
             allowEmpty: true
         },],
         payload: (v) => ({...v, schoolClassId: v.schoolClassId ? Number(v.schoolClassId) : null}),
+        linkAction: {label: 'Привязать класс'},
     }, classes: {
         title: 'Классы',
         endpoint: 'classes',
@@ -55,6 +56,7 @@ const entityConfigs = {
             required: true
         },],
         payload: (v) => ({grade: Number(v.grade), letter: v.letter}),
+        linkAction: {label: 'Привязать предмет'},
     }, subjects: {
         title: 'Предметы',
         endpoint: 'subjects',
@@ -74,6 +76,7 @@ const entityConfigs = {
             type: 'textarea'
         }, {key: 'teacherId', label: 'Учитель', type: 'ref', ref: 'teachers', allowEmpty: true},],
         payload: (v) => ({...v, teacherId: v.teacherId ? Number(v.teacherId) : null}),
+        linkAction: {label: 'Привязать учителя'},
     }, teachers: {
         title: 'Учителя',
         endpoint: 'teachers',
@@ -89,6 +92,7 @@ const entityConfigs = {
             required: true
         }, {key: 'email', label: 'Эл. почта', type: 'email', required: true},],
         payload: (v) => v,
+        linkAction: {label: 'Привязать предмет'},
     }, grades: {
         title: 'Оценки',
         endpoint: 'grades',
@@ -152,8 +156,8 @@ function getTeacherSubjectIds() {
     return new Set(state.refs.subjects.map((subject) => subject.id));
 }
 
-async function loadRefs() {
-    if (state.refs.classes.length && state.refs.teachers.length && state.refs.subjects.length) return;
+async function loadRefs(force = false) {
+    if (!force && state.refs.classes.length && state.refs.teachers.length && state.refs.subjects.length) return;
     if (!isTeacherRole()) {
         const [classes, teachers, subjects] = await Promise.all([api.classes.list(), api.teachers.list(), api.subjects.list()]);
         setState((s) => {
@@ -491,6 +495,15 @@ const debouncedSearch = debounce((value) => {
     });
 }, 300);
 
+function requestIdFromUser(title, options) {
+    const optionsText = options.map((item) => `${item.id} — ${item.label}`).join('\n');
+    const entered = window.prompt(`${title}\n\n${optionsText}\n\nВведите ID:`);
+    if (!entered) return null;
+    const id = Number(entered);
+    if (!Number.isFinite(id)) return null;
+    return id;
+}
+
 function bindEntityHandlers(config, allFiltered, displayedRows  ) {
     if (state.route === 'classes') {
         document.querySelector('[data-toggle-class-subject-matrix]')?.addEventListener('click', () => {
@@ -501,6 +514,72 @@ function bindEntityHandlers(config, allFiltered, displayedRows  ) {
     }
 
     if (canEditEntity(state.route)) {
+        document.querySelectorAll('[data-link-id]').forEach((element) => {
+            element.addEventListener('click', async (e) => {
+                const rowId = Number(e.currentTarget.dataset.linkId);
+                try {
+                    if (state.route === 'students') {
+                        const classId = requestIdFromUser(
+                            'Выберите класс для ученика',
+                            state.refs.classes.map((item) => ({id: item.id, label: classLabel(item)})),
+                        );
+                        if (!classId) return;
+                        const student = byId(state.data.students, rowId);
+                        await api.students.update(rowId, {
+                            firstName: student.firstName,
+                            lastName: student.lastName,
+                            gender: student.gender,
+                            email: student.email,
+                            schoolClassId: classId,
+                        });
+                        notify('Ученик привязан к классу', 'success');
+                    } else if (state.route === 'subjects') {
+                        const teacherId = requestIdFromUser(
+                            'Выберите учителя для предмета',
+                            state.refs.teachers.map((item) => ({id: item.id, label: fullName(item)})),
+                        );
+                        if (!teacherId) return;
+                        const subject = byId(state.data.subjects, rowId);
+                        await api.subjects.update(rowId, {
+                            name: subject.name,
+                            description: subject.description,
+                            teacherId,
+                        });
+                        notify('Предмет привязан к учителю', 'success');
+                    } else if (state.route === 'classes') {
+                        const subjectId = requestIdFromUser(
+                            'Выберите предмет для класса',
+                            state.refs.subjects.map((item) => ({id: item.id, label: item.name})),
+                        );
+                        if (!subjectId) return;
+                        await api.classes.attachSubject(rowId, subjectId);
+                        notify('Предмет привязан к классу', 'success');
+                    } else if (state.route === 'teachers') {
+                        const subjectId = requestIdFromUser(
+                            'Выберите предмет для учителя',
+                            state.refs.subjects.map((item) => ({id: item.id, label: item.name})),
+                        );
+                        if (!subjectId) return;
+                        const subject = byId(state.data.subjects, subjectId) || byId(state.refs.subjects, subjectId);
+                        if (!subject) {
+                            notify('Предмет не найден', 'error');
+                            return;
+                        }
+                        await api.subjects.update(subjectId, {
+                            name: subject.name,
+                            description: subject.description,
+                            teacherId: rowId,
+                        });
+                        notify('Предмет привязан к учителю', 'success');
+                    }
+
+                    await loadRefs(true);
+                    await loadEntity(state.route, true);
+                } catch (error) {
+                    notify(error.message, 'error');
+                }
+            });
+        });
         document.getElementById('entity-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const values = formDataToObject(e.target);

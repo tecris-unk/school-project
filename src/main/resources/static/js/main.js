@@ -220,7 +220,7 @@ function loginTemplate() {
 
 function shellTemplate(content) {
     return `
-    <div class="min-h-screen bg-slate-100">
+    <div class="min-h-screen bg-slate-100 flex flex-col">
       <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 md:px-6 lg:px-8">
           <div class="flex items-center gap-3">
@@ -239,8 +239,8 @@ function shellTemplate(content) {
           </div>
         </div>
       </header>
-      <main class="mx-auto grid max-w-[1600px] gap-0 px-0 md:grid-cols-[260px_minmax(0,1fr)] md:px-0">
-        <aside class="min-h-[calc(100vh-76px)] border-r border-slate-200 bg-white p-4 md:p-5">
+      <main class="mx-auto grid w-full max-w-[1600px] flex-1 gap-0 px-0 md:grid-cols-[260px_minmax(0,1fr)] md:px-0">
+        <aside class="h-full border-r border-slate-200 bg-white p-4 md:p-5">
           <div id="shell-nav"></div>
         </aside>
          <section class="min-w-0 p-4 md:p-6 lg:p-8">
@@ -308,7 +308,7 @@ function render() {
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 class="text-2xl font-semibold tracking-tight text-slate-900">${config.title}</h2>
-            <p class="mt-1 text-sm text-slate-500">Управляйте записями, фильтрами и действиями в едином интерфейсе.</p>
+            <p class="mt-1 text-sm text-slate-500">Создавайте, изменяйте, удаляйте данные.</p>
           </div>
           ${canEdit ? `<button data-create-entity class="btn-primary">${state.route === 'grades' ? 'Создать запись' : 'Создать'}</button>` : ''}
         </div>

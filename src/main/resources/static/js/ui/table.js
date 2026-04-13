@@ -90,17 +90,17 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
     return `
                 <section class="card-base overflow-hidden">
                 <div class="border-b border-slate-200 bg-white px-5 py-5 sm:px-6">
-                <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
-                <label class="relative block">
+               <div class="grid gap-3 lg:grid-cols-12 lg:items-center">
+                <label class="relative block lg:col-span-5">
                 <span class="pointer-events-none absolute inset-y-0 left-3 inline-flex items-center text-slate-400">⌕</span>
             <input id="search-input" value="${ui.search || ''}" placeholder="Поиск по таблице" class="input-base pl-9" />
         </label>
-            <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                ${config.filters.map((filter) => `<select data-filter-key="${filter.key}" class="input-base min-w-[220px]"><option value="">${filter.label}: все</option>${filter.options(refs, data).map((opt) => `<option ${String(ui.filters[filter.key] || '') === String(opt.value) ? 'selected' : ''} value="${opt.value}">${opt.label}</option>`).join('')}</select>`).join('')}
-            </div>
-            <div class="lg:justify-self-end">
-                ${canDelete ? `<button id="bulk-delete" class="btn-danger w-full sm:w-auto" ${ui.selectedIds.size ? '' : 'disabled'}>Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
-            </div>
+            <div class="grid gap-3 sm:grid-cols-2 lg:col-span-5">
+            ${config.filters.map((filter) => `<select data-filter-key="${filter.key}" class="input-base"><option value="">${filter.label}: все</option>${filter.options(refs, data).map((opt) => `<option ${String(ui.filters[filter.key] || '') === String(opt.value) ? 'selected' : ''} value="${opt.value}">${opt.label}</option>`).join('')}</select>`).join('')}
+          </div>
+           <div class="lg:col-span-2 lg:justify-self-end">
+            ${canDelete ? `<button id="bulk-delete" class="btn-danger w-full lg:w-auto" ${ui.selectedIds.size ? '' : 'disabled'}>Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
+          </div>
         </div>
         </div>
                 ${!hasRows && !loading ? `<div class="px-5 py-6 sm:px-6">${emptyState(config, canEdit)}</div>` : `

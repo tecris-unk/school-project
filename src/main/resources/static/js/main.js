@@ -300,7 +300,7 @@ function shellTemplate(content) {
         <div class="max-w-7xl mx-auto px-4 py-4">
           <h1 class="text-xl font-semibold flex items-center gap-2">
             <img src="/favicon.ico" alt="Логотип школы" class="h-14 w-14 rounded-md object-contain border border-slate-200 bg-white p-1" />
-           <span class="hero-title">Школа №12 г.Витебска</span>
+           <span>Школа №12 г.Витебска</span>
           </h1>
           <p class="text-sm text-slate-500">На этой страничке вы можете создать, просмотреть, изменить и удалить данные об этой школе</p>
         </div>

@@ -50,7 +50,7 @@ export function validateForm(entity, values) {
 }
 
 function renderField(field, value, refs, data, error) {
-    const baseInputClass = `mt-1 w-full border px-3 py-2 text-sm ${error ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-200' : 'border-slate-300'}`;
+    const baseInputClass = `input-base mt-1.5 w-full ${error ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-200' : ''}`;
 
     if (field.type === 'select') {
         return `
@@ -101,12 +101,12 @@ export function renderEntityForm(config, refs, data, row = null, entityKey = nul
         .join('');
 
     return `
-  <form id="entity-form" class="space-y-4">
+  <form id="entity-form" class="space-y-5">
       <div>
-        <h3 class="font-semibold text-slate-900 text-lg">${row ? 'Редактирование' : 'Создание'}: ${entityKey ? entityLabelWithIcon(entityKey, config.title) : config.title}</h3>
+        <h3 class="font-semibold tracking-tight text-slate-900 text-lg">${row ? 'Редактирование' : 'Создание'}: ${entityKey ? entityLabelWithIcon(entityKey, config.title) : config.title}</h3>
       </div>
       <div class="space-y-4">${fieldHtml}</div>
-      <div class="flex gap-2 pt-2">
+      <div class="flex gap-2 pt-3">
         <button class="btn-primary" type="submit">${row ? 'Сохранить' : 'Создать'}</button>
         <button class="btn-secondary" type="button" data-cancel-edit>Отмена</button>
       </div>
@@ -118,14 +118,14 @@ export function renderDrawer({title, subtitle = '', body, open}) {
     <div class="fixed inset-0 z-40 ${open ? '' : 'pointer-events-none'}" data-drawer-root>
       <div class="absolute inset-0 bg-slate-900/40 transition-opacity ${open ? 'opacity-100' : 'opacity-0'}" data-drawer-close></div>
       <aside class="absolute right-0 top-0 h-full w-full max-w-xl bg-white border-l border-slate-200 shadow-2xl transition-transform duration-200 ${open ? 'translate-x-0' : 'translate-x-full'}">
-        <div class="p-6 border-b border-slate-200 flex items-start justify-between gap-4">
+        <div class="p-6 md:p-7 border-b border-slate-200 flex items-start justify-between gap-4">
           <div>
             <h2 class="text-xl font-semibold text-slate-900">${title}</h2>
             ${subtitle ? `<p class="text-sm text-slate-500 mt-1">${subtitle}</p>` : ''}
           </div>
           <button class="btn-secondary" type="button" data-drawer-close>Закрыть</button>
         </div>
-        <div class="p-6 overflow-y-auto h-[calc(100%-89px)]">${body}</div>
+        <div class="p-6 md:p-7 overflow-y-auto h-[calc(100%-89px)]">${body}</div>
       </aside>
     </div>`;
 }

@@ -207,38 +207,38 @@ function dashboardTemplate() {
     const grades = state.data.grades.map((grade) => grade.score).filter((score) => Number.isFinite(score));
     const avg = average(grades);
     if (isTeacherRole()) {
-        return `<section class="grid md:grid-cols-3 gap-4 mb-6"><article class="card-base p-5"><p class="text-sm text-slate-500">Мои классы</p><h2 class="text-3xl font-semibold mt-2">${state.data.classes.length}</h2></article><article class="card-base p-5"><p class="text-sm text-slate-500">Мои предметы</p><h2 class="text-3xl font-semibold mt-2">${state.data.subjects.length}</h2></article><article class="card-base p-5 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article></section><div class="card-base p-5 text-slate-600">Вам доступны только ваши классы и журнал оценок по вашим предметам.</div>`;
+        return `<section class="grid md:grid-cols-3 gap-5 mb-6"><article class="card-base p-6"><p class="text-sm text-slate-500">Мои классы</p><h2 class="text-3xl font-semibold mt-2">${state.data.classes.length}</h2></article><article class="card-base p-6"><p class="text-sm text-slate-500">Мои предметы</p><h2 class="text-3xl font-semibold mt-2">${state.data.subjects.length}</h2></article><article class="card-base p-6 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article></section><div class="card-base p-6 text-slate-600">Вам доступны только ваши классы и журнал оценок по вашим предметам.</div>`;
     }
 
-    return `<section class="grid md:grid-cols-3 gap-4 mb-6"><article class="card-base p-5"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${state.data.students.length}</h2></article><article class="card-base p-5 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article><article class="card-base p-5"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article></section>`;
+    return `<section class="grid md:grid-cols-3 gap-5 mb-6"><article class="card-base p-6"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${state.data.students.length}</h2></article><article class="card-base p-6 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article><article class="card-base p-6"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article></section>`;
 }
 
 function loginTemplate() {
-    return `<div class="min-h-screen flex items-center justify-center p-4"><form id="login-form" class="w-full max-w-md card-base p-7"><h1 class="text-3xl font-bold mb-1">Панель школы</h1><p class="text-sm text-slate-500 mb-5">Вход в административную панель</p><label class="block text-sm mb-3">Эл. почта<input class="mt-1 w-full input-base" type="email" name="email" required /></label><label class="block text-sm mb-3">Пароль<input class="mt-1 w-full input-base" type="password" name="password" required /></label><button class="w-full btn-primary">Войти</button></form></div>`;
+    return `<div class="min-h-screen flex items-center justify-center p-4 sm:p-6"><form id="login-form" class="w-full max-w-md card-base p-8 sm:p-10 space-y-5"><div><h1 class="text-3xl font-bold tracking-tight mb-1">Панель школы</h1><p class="text-sm text-slate-500">Вход в административную панель</p></div><label class="block text-sm text-slate-700">Эл. почта<input class="mt-1.5 w-full input-base" type="email" name="email" required /></label><label class="block text-sm text-slate-700">Пароль<input class="mt-1.5 w-full input-base" type="password" name="password" required /></label><button class="w-full btn-primary">Войти</button></form></div>`;
 }
 
 function shellTemplate(content) {
     return `
     <div class="min-h-screen">
-      <header class="sticky top-0 z-30 bg-white border-b border-slate-200">
-        <div class="px-4 py-4 md:px-6">
+      <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
+        <div class="mx-auto max-w-[1600px] px-4 py-4 md:px-6 lg:px-8">
           <div class="flex items-start justify-between gap-4">
             <div>
               <h1 class="text-xl font-semibold flex items-center gap-2">
-               <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-[72px] w-[72px] object-contain border border-slate-200 bg-white p-1" />
+               <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-14 w-14 object-contain rounded-lg border border-slate-200 bg-white p-1.5" />
                 <span>Школа №12 г.Витебска</span>
               </h1>
-              <p class="text-sm text-slate-500">Администрирование и управление учебными данными.</p>
+              <p class="text-sm text-slate-500 mt-1">Администрирование и управление учебными данными.</p>
             </div>
-            <a href="#/login" data-logout class="text-sm text-slate-500 hover:text-slate-900">Выйти</a>
+            <a href="#/login" data-logout class="text-sm font-medium text-slate-500 hover:text-slate-900">Выйти</a>
           </div>
         </div>
       </header>
-      <main class="md:grid md:grid-cols-[auto_1fr] md:min-h-[calc(100vh-113px)]">
-        <aside class="group border-b border-slate-200 md:border-b-0 md:border-r border-slate-200 bg-white p-3 md:w-[88px] md:hover:w-[260px] transition-[width] duration-200 overflow-hidden">
+      <main class="mx-auto max-w-[1600px] md:grid md:grid-cols-[auto_1fr] md:min-h-[calc(100vh-96px)]">
+        <aside class="group border-b border-slate-200 md:border-b-0 md:border-r border-slate-200 bg-white p-3 md:w-[92px] md:hover:w-[264px] transition-[width] duration-200 overflow-hidden">
           <div id="shell-nav"></div>
         </aside>
-        <section class="p-4 md:p-6">
+        <section class="p-4 md:p-6 lg:p-8">
           <div id="shell-content">${content}</div>
         </section>
       </main>
@@ -262,7 +262,7 @@ function renderClassSubjectMatrix() {
     const classes = state.data.classes;
     const subjectsById = new Map(state.refs.subjects.map((subject) => [subject.id, subject.name]));
 
-    return `<section class="mt-4 card-base"><div class="p-4 border-b border-slate-100"><h3 class="text-base font-semibold text-slate-900">Соответствие Класс ↔ Предмет</h3><p class="text-sm text-slate-500 mt-1">Таблица показывает, какие предметы закреплены за каждым классом.</p></div><table class="w-full"><thead class="bg-slate-50"><tr><th class="px-3 py-3 text-left text-xs uppercase tracking-wider text-slate-500">Класс</th><th class="px-3 py-3 text-left text-xs uppercase tracking-wider text-slate-500">Предметы</th></tr></thead><tbody>${classes.map((schoolClass) => { const subjectNames = (schoolClass.subjectIds || []).map((subjectId) => subjectsById.get(subjectId)).filter(Boolean); return `<tr class="border-t border-slate-100"><td class="px-3 py-3 text-sm text-slate-700 font-medium">${classLabel(schoolClass)}</td><td class="px-3 py-3 text-sm text-slate-700">${subjectNames.length ? subjectNames.join(', ') : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
+    return `<section class="mt-5 card-base overflow-hidden"><div class="p-5 border-b border-slate-100"><h3 class="text-base font-semibold text-slate-900">Соответствие Класс ↔ Предмет</h3><p class="text-sm text-slate-500 mt-1">Таблица показывает, какие предметы закреплены за каждым классом.</p></div><table class="w-full"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs uppercase tracking-wider text-slate-500">Класс</th><th class="px-4 py-3 text-left text-xs uppercase tracking-wider text-slate-500">Предметы</th></tr></thead><tbody>${classes.map((schoolClass) => { const subjectNames = (schoolClass.subjectIds || []).map((subjectId) => subjectsById.get(subjectId)).filter(Boolean); return `<tr class="border-t border-slate-100"><td class="px-4 py-3 text-sm text-slate-700 font-medium">${classLabel(schoolClass)}</td><td class="px-4 py-3 text-sm text-slate-700">${subjectNames.length ? subjectNames.join(', ') : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
 }
 
 function render() {
@@ -295,16 +295,21 @@ function render() {
         ? `Связь для ${config.title.toLowerCase()}`
         : `${state.ui.editingId ? 'Редактирование' : 'Создание'}: ${config.title}`;
 
-    const classSubjectRelationsSection = state.route === 'classes' ? `<section class="mt-4"><button data-toggle-class-subject-matrix class="btn-secondary">${state.ui.classSubjectMatrixVisible ? 'Скрыть связь класс-предмет' : 'Показать связь класс-предмет'}</button>${state.ui.classSubjectMatrixVisible ? renderClassSubjectMatrix() : ''}</section>` : '';
+    const classSubjectRelationsSection = state.route === 'classes' ? `<section class="mt-5"><button data-toggle-class-subject-matrix class="btn-secondary">${state.ui.classSubjectMatrixVisible ? 'Скрыть связь класс-предмет' : 'Показать связь класс-предмет'}</button>${state.ui.classSubjectMatrixVisible ? renderClassSubjectMatrix() : ''}</section>` : '';
 
     const content = `
-    <section class="space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-2xl font-semibold text-slate-900">${config.title}</h2>
-          ${canEdit ? '<button data-create-entity class="btn-primary">Создать запись</button>' : ''}
+    <section class="space-y-5">
+      <div class="card-base p-5 sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-900">${config.title}</h2>
+            <p class="mt-1 text-sm text-slate-500">Управляйте записями, фильтрами и действиями в едином интерфейсе.</p>
+          </div>
+          ${canEdit ? '<button data-create-entity class="btn-primary">Создать</button>' : ''}
         </div>
-        ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: false })}
-      </section>
+        </div>
+      ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: false })}
+    </section>
       ${classSubjectRelationsSection}
       ${renderDrawer({title: drawerTitle, subtitle: 'Заполните форму справа', body: drawerBody, open: state.ui.drawerOpen})}
     `;

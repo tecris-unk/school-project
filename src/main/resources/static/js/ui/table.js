@@ -55,7 +55,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
     const headers = config.columns.map((col) => {
         const active = ui.sort.key === col.key;
         const arrow = active ? (ui.sort.dir === 'asc' ? '↑' : '↓') : '';
-        return `<th data-sort="${col.key}" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 cursor-pointer hover:text-slate-900">${col.label} ${arrow}</th>`;
+        return `<th data-sort="${col.key}" class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 cursor-pointer hover:text-slate-900">${col.label} ${arrow}</th>`;
     }).join('');
 
     let body = '';
@@ -66,11 +66,11 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
     } else {
         body = rows.map((row, index) => {
             const isSelected = ui.selectedIds.has(row.id);
-            const cells = config.columns.map((column) => `<td class="px-4 py-3 text-sm text-slate-700">${renderCell(entity, column, row, refs, data)}</td>`).join('');
+            const cells = config.columns.map((column) => `<td class="px-4 py-3.5 text-sm text-slate-700">${renderCell(entity, column, row, refs, data)}</td>`).join('');
             return `<tr class="border-b border-slate-100 hover:bg-slate-50 ${index % 2 ? 'bg-slate-50/40' : ''}">
-              ${canDelete ? `<td class="px-4 py-3"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>` : ''}
+              ${canDelete ? `<td class="px-4 py-3.5"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>` : ''}
               ${cells}
-              ${(canEdit || canDelete) ? `<td class="px-4 py-3"><div class="flex justify-end gap-2">${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="btn-secondary text-xs">${config.linkAction.label}</button>` : ''}${canEdit ? `<button data-edit-id="${row.id}" class="btn-secondary text-xs">Редактировать</button>` : ''}${canDelete ? `<button data-delete-id="${row.id}" class="btn-danger text-xs">Удалить</button>` : ''}</div></td>` : ''}
+              ${(canEdit || canDelete) ? `<td class="px-4 py-3.5"><div class="flex justify-end gap-2">${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="btn-secondary text-xs">Связать</button>` : ''}${canEdit ? `<button data-edit-id="${row.id}" class="btn-secondary text-xs">Редактировать</button>` : ''}${canDelete ? `<button data-delete-id="${row.id}" class="btn-danger text-xs">Удалить</button>` : ''}</div></td>` : ''}
             </tr>`;
         }).join('');
     }
@@ -78,18 +78,25 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
     const pages = pageableFromApi ? meta.totalPages : Math.max(1, Math.ceil((meta.totalElements || 0) / meta.size));
 
     return `
-    <section class="card-base overflow-hidden">
-      <div class="flex flex-wrap items-center gap-3 p-4 border-b border-slate-200">
-        <input id="search-input" value="${ui.search || ''}" placeholder="Поиск" class="input-base w-full md:max-w-sm" />
-        ${config.filters.map((filter) => `<select data-filter-key="${filter.key}" class="input-base w-full md:w-auto min-w-[220px]"><option value="">${filter.label}: все</option>${filter.options(refs, data).map((opt) => `<option ${String(ui.filters[filter.key] || '') === String(opt.value) ? 'selected' : ''} value="${opt.value}">${opt.label}</option>`).join('')}</select>`).join('')}
-        <div class="ml-auto"></div>
-        ${canDelete ? `<button id="bulk-delete" class="btn-danger">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
+    <div class="border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+        <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
+          <label class="relative block">
+            <span class="pointer-events-none absolute inset-y-0 left-3 inline-flex items-center text-slate-400">⌕</span>
+            <input id="search-input" value="${ui.search || ''}" placeholder="Поиск по таблице" class="input-base pl-9" />
+          </label>
+          <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            ${config.filters.map((filter) => `<select data-filter-key="${filter.key}" class="input-base min-w-[220px]"><option value="">${filter.label}: все</option>${filter.options(refs, data).map((opt) => `<option ${String(ui.filters[filter.key] || '') === String(opt.value) ? 'selected' : ''} value="${opt.value}">${opt.label}</option>`).join('')}</select>`).join('')}
+          </div>
+          <div class="lg:justify-self-end">
+            ${canDelete ? `<button id="bulk-delete" class="btn-danger w-full sm:w-auto">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
+          </div>
+        </div>
       </div>
-     <div>
-        <table class="w-full table-fixed">
-          <thead class="bg-white sticky top-0 z-10 border-b border-slate-200">
+     <div class="overflow-x-auto">
+        <table class="min-w-full table-auto">
+          <thead class="sticky top-0 z-10 border-b border-slate-200 bg-white">
             <tr>
-              ${canDelete ? `<th class="px-4 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
+              ${canDelete ? `<th class="px-4 py-3 text-left"><input id="select-all" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
               ${headers}
               ${(canEdit || canDelete) ? '<th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Действия</th>' : ''}
             </tr>
@@ -97,7 +104,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
           <tbody>${body}</tbody>
         </table>
       </div>
-      <div class="flex items-center justify-between p-4 border-t border-slate-200 text-sm text-slate-600">
+      <div class="flex items-center justify-between p-5 border-t border-slate-200 text-sm text-slate-600">
         <span>Всего: ${meta.totalElements || 0}</span>
         <div class="flex items-center gap-2">
           <button data-page-action="prev" class="btn-secondary" ${meta.page <= 0 ? 'disabled' : ''}>Назад</button>

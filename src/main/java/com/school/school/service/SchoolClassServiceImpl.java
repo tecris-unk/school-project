@@ -1,6 +1,7 @@
 package com.school.school.service;
 
 import com.school.school.controller.mapper.SchoolClassMapper;
+import com.school.school.exceptions.ConflictException;
 import com.school.school.exceptions.ResourceNotFoundException;
 import com.school.school.model.SchoolClass;
 import com.school.school.model.Subject;
@@ -9,6 +10,8 @@ import com.school.school.repository.SubjectRepository;
 import com.school.school.service.dto.request.SchoolClassRequest;
 import com.school.school.service.dto.response.SchoolClassResponse;
 import java.util.List;
+import java.util.Locale;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +54,9 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
     @Override
     public SchoolClassResponse createClass(final SchoolClassRequest classRequest) {
+        String normalizedLetter = normalizeLetter(classRequest.getLetter());
+        validateClassUniqueness(classRequest.getGrade(), normalizedLetter, null);
+        classRequest.setLetter(normalizedLetter);
         SchoolClass schoolClass = repository.save(mapper.toEntity(classRequest));
         return mapper.toResponse(schoolClass);
     }
@@ -58,6 +64,10 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     @Override
     @Transactional
     public SchoolClassResponse updateClass(final Long id, final SchoolClassRequest classRequest) {
+        String normalizedLetter = normalizeLetter(classRequest.getLetter());
+        validateClassUniqueness(classRequest.getGrade(), normalizedLetter, id);
+        classRequest.setLetter(normalizedLetter);
+
         SchoolClass schoolClass = repository.findById(id)
                 .map(existingClass -> {
                     mapper.updateEntity(existingClass, classRequest);
@@ -90,5 +100,19 @@ public class SchoolClassServiceImpl implements SchoolClassService {
         SchoolClass schoolClass = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(SCHOOL_CLASS_NOT_FOUND_MSG + WITH_ID + id));
         repository.delete(schoolClass);
+    }
+
+    private String normalizeLetter(final String letter) {
+        return letter.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private void validateClassUniqueness(final Integer grade, final String letter, final Long id) {
+        boolean classAlreadyExists = id == null
+                ? repository.existsByGradeAndLetterIgnoreCase(grade, letter)
+                : repository.existsByGradeAndLetterIgnoreCaseAndIdNot(grade, letter, id);
+
+        if (classAlreadyExists) {
+            throw new ConflictException("Класс %s%s уже существует".formatted(grade, letter));
+        }
     }
 }

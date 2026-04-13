@@ -1,9 +1,6 @@
 package com.school.school.service.dto.request;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +24,7 @@ public class SchoolClassRequest {
     private Integer grade;
 
     @NotBlank
+    @Pattern(regexp = "^[A-Za-zА-Яа-яЁё]$", message = "Letter must contain exactly one alphabetic character")
     @Schema(description = "Буква класса", example = "A")
     private String letter;
 }

@@ -9,13 +9,15 @@ import {confirmModal, notify} from './ui/notifications.js';
 import {applyQuery, paginate, renderTable} from './ui/table.js';
 
 const app = document.getElementById('app');
+const SAVE_SUCCESS_MESSAGE = 'Сохранение выполнено';
+const DELETE_SUCCESS_MESSAGE = 'Удаление выполнено';
 
 const entityConfigs = {
     students: {
         title: 'Ученики',
         endpoint: 'students',
         inlineEditable: ['firstName', 'lastName', 'email'],
-        columns: [{key: 'id', label: 'Номер'}, {key: 'firstName', label: 'Имя'}, {
+        columns: [{key: 'firstName', label: 'Имя'}, {
             key: 'lastName',
             label: 'Фамилия'
         }, {key: 'gender', label: 'Пол'}, {key: 'email', label: 'Эл. почта'}, {key: 'schoolClassId', label: 'Класс'},],
@@ -48,7 +50,7 @@ const entityConfigs = {
         title: 'Классы',
         endpoint: 'classes',
         inlineEditable: ['grade', 'letter'],
-        columns: [{key: 'id', label: 'Номер'}, {key: 'grade', label: 'Параллель'}, {key: 'letter', label: 'Буква'},],
+        columns: [{key: 'grade', label: 'Параллель'}, {key: 'letter', label: 'Буква'},],
         filters: [],
         fields: [{key: 'grade', label: 'Параллель', type: 'number', required: true}, {
             key: 'letter',
@@ -61,7 +63,7 @@ const entityConfigs = {
         title: 'Предметы',
         endpoint: 'subjects',
         inlineEditable: ['name', 'description'],
-        columns: [{key: 'id', label: 'Номер'}, {key: 'name', label: 'Название'}, {
+        columns: [{key: 'name', label: 'Название'}, {
             key: 'description',
             label: 'Описание'
         }, {key: 'teacherId', label: 'Учитель'},],
@@ -81,7 +83,7 @@ const entityConfigs = {
         title: 'Учителя',
         endpoint: 'teachers',
         inlineEditable: ['firstName', 'lastName', 'email'],
-        columns: [{key: 'id', label: 'Номер'}, {key: 'firstName', label: 'Имя'}, {
+        columns: [{key: 'firstName', label: 'Имя'}, {
             key: 'lastName',
             label: 'Фамилия'
         }, {key: 'email', label: 'Эл. почта'},],
@@ -97,7 +99,7 @@ const entityConfigs = {
         title: 'Оценки',
         endpoint: 'grades',
         inlineEditable: ['score', 'date'],
-        columns: [{key: 'id', label: 'Номер'}, {key: 'score', label: 'Оценка'}, {
+        columns: [{key: 'score', label: 'Оценка'}, {
             key: 'date',
             label: 'Дата'
         }, {key: 'studentId', label: 'Ученик'}, {key: 'subjectId', label: 'Предмет'},],
@@ -332,7 +334,7 @@ function renderClassSubjectMatrix() {
     return `
     <section class="mt-4 bg-white border border-slate-200 rounded-xl shadow-sm">
       <div class="p-4 border-b border-slate-100">
-        <h3 class="text-base font-semibold text-slate-900">Many-to-many: Класс ↔ Предмет</h3>
+        <h3 class="text-base font-semibold text-slate-900"> Соответствие Класс ↔ Предмет</h3>
         <p class="text-sm text-slate-500 mt-1">Таблица показывает, какие предметы закреплены за каждым классом.</p>
       </div>
       <div class="overflow-x-auto">
@@ -605,7 +607,7 @@ function bindEntityHandlers(config, allFiltered, displayedRows  ) {
                         if (idx > -1) s.data[s.route][idx] = saved;
                         s.ui.editingId = null;
                     });
-                    notify('Запись обновлена', 'success');
+                    notify(SAVE_SUCCESS_MESSAGE, 'success');
                 } else {
                     const tempId = Date.now() * -1;
                     setState((s) => {
@@ -616,7 +618,7 @@ function bindEntityHandlers(config, allFiltered, displayedRows  ) {
                         s.data[s.route] = s.data[s.route].map((item) => (item.id === tempId ? created : item));
                         s.meta[s.route].totalElements += 1;
                     });
-                    notify('Запись создана', 'success');
+                    notify(SAVE_SUCCESS_MESSAGE, 'success');
                 }
                 e.target.reset();
             } catch (error) {
@@ -675,7 +677,7 @@ function bindEntityHandlers(config, allFiltered, displayedRows  ) {
                             if (idx > -1) s.data[s.route][idx] = saved;
                             s.ui.editingId = null;
                         });
-                        notify('Inline сохранение выполнено', 'success');
+                        notify(SAVE_SUCCESS_MESSAGE, 'success');
                     } catch (error) {
                         notify(error.message, 'error');
                     }
@@ -703,7 +705,7 @@ function bindEntityHandlers(config, allFiltered, displayedRows  ) {
                         });
                         try {
                             await api[state.route].remove(id);
-                            notify('Запись удалена', 'success');
+                            notify(DELETE_SUCCESS_MESSAGE, 'success');
                         } catch (error) {
                             setState((s) => {
                                 s.data[s.route] = previous;

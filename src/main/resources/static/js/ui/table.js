@@ -107,7 +107,7 @@ export function renderTable({
     return `
     <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
       <div class="flex flex-wrap items-center gap-3 p-4 border-b border-slate-100">
-       <input id="search-input" value="${ui.search || ''}" placeholder="Поиск..." class="w-full max-w-xs md:max-w-sm lg:max-w-md rounded-lg border-slate-300 text-sm" />
+        <input id="search-input" value="${ui.search || ''}" placeholder="Поиск" class="w-full md:max-w-2xl rounded-2xl border-slate-300 text-sm px-4 py-2" />
         ${config.filters
         .map(
             (filter) => `<select data-filter-key="${filter.key}" class="w-full md:w-auto min-w-[220px] rounded-lg border-slate-300 text-sm">

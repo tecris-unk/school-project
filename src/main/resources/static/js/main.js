@@ -752,20 +752,20 @@ function bindEntityHandlers(config, allFiltered, displayedRows  ) {
             });
         });
     }
-}
 
-document.querySelectorAll('[data-page-action]').forEach((element) => {
-    element.addEventListener('click', async (e) => {
-        const action = e.currentTarget.dataset.pageAction;
-        const canNext = meta.page + 1 < meta.totalPages;
-        setState((s) => {
-            if (action === 'prev' && s.meta[s.route].page > 0) s.meta[s.route].page -= 1;
-            if (action === 'next' && canNext) s.meta[s.route].page += 1;
+    document.querySelectorAll('[data-page-action]').forEach((element) => {
+        element.addEventListener('click', async (e) => {
+            const action = e.currentTarget.dataset.pageAction;
+            const canNext = meta.page + 1 < meta.totalPages;
+            setState((s) => {
+                if (action === 'prev' && s.meta[s.route].page > 0) s.meta[s.route].page -= 1;
+                if (action === 'next' && canNext) s.meta[s.route].page += 1;
+            });
+
+            if (state.meta[state.route].pageable) await loadEntity(state.route, true);
         });
-
-        if (state.meta[state.route].pageable) await loadEntity(state.route, true);
     });
-});
+}
 
 async function routeChanged() {
     const route = parseRoute();

@@ -221,11 +221,11 @@ function shellTemplate(content) {
     return `
     <div class="min-h-screen">
       <header class="sticky top-0 z-30 bg-white border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 py-4 md:px-6">
+        <div class="px-4 py-4 md:px-6">
           <div class="flex items-start justify-between gap-4">
             <div>
               <h1 class="text-xl font-semibold flex items-center gap-2">
-               <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-[72px] w-[72px] rounded-lg object-contain border border-slate-200 bg-white p-1 shadow-sm" />
+               <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-[72px] w-[72px] object-contain border border-slate-200 bg-white p-1" />
                 <span>Школа №12 г.Витебска</span>
               </h1>
               <p class="text-sm text-slate-500">Администрирование и управление учебными данными.</p>
@@ -234,9 +234,13 @@ function shellTemplate(content) {
           </div>
         </div>
       </header>
-      <main class="max-w-7xl mx-auto p-4 md:p-6">
-        <div id="shell-nav"></div>
-        <div id="shell-content">${content}</div>
+      <main class="md:grid md:grid-cols-[88px_1fr] md:min-h-[calc(100vh-113px)]">
+        <aside class="border-b border-slate-200 md:border-b-0 md:border-r border-slate-200 bg-white p-3">
+          <div id="shell-nav"></div>
+        </aside>
+        <section class="p-4 md:p-6">
+          <div id="shell-content">${content}</div>
+        </section>
       </main>
     </div>`;
 }

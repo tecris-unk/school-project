@@ -219,26 +219,30 @@ function loginTemplate() {
 
 function shellTemplate(content) {
     return `
-    <div class="min-h-screen">
-      <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
-        <div class="mx-auto max-w-[1600px] px-4 py-4 md:px-6 lg:px-8">
-          <div class="flex items-start justify-between gap-4">
+    <div class="min-h-screen bg-slate-100">
+      <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 md:px-6 lg:px-8">
+          <div class="flex items-center gap-3">
+            <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-11 w-11 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm" />
             <div>
-              <h1 class="text-xl font-semibold flex items-center gap-2">
-               <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-14 w-14 object-contain rounded-lg border border-slate-200 bg-white p-1.5" />
-                <span>Школа №12 г.Витебска</span>
-              </h1>
-              <p class="text-sm text-slate-500 mt-1">Администрирование и управление учебными данными.</p>
+              <h1 class="text-lg font-semibold tracking-tight text-slate-900">Школьная административная панель</h1>
+              <p class="text-sm text-slate-500">Администрирование и управление учебными данными.</p>
             </div>
-            <a href="#/login" data-logout class="text-sm font-medium text-slate-500 hover:text-slate-900">Выйти</a>
+            </div>
+          <div class="flex items-center gap-3">
+            <div class="hidden rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-right sm:block">
+              <p class="text-xs text-slate-500">Пользователь</p>
+              <p class="text-sm font-medium text-slate-700">${state.auth.email || 'admin@gov.by'}</p>
+            </div>
+            <a href="#/login" data-logout class="btn-secondary">Выйти</a>
           </div>
         </div>
       </header>
-      <main class="mx-auto max-w-[1600px] md:grid md:grid-cols-[auto_1fr] md:min-h-[calc(100vh-96px)]">
-        <aside class="group border-b border-slate-200 md:border-b-0 md:border-r border-slate-200 bg-white p-3 md:w-[92px] md:hover:w-[264px] transition-[width] duration-200 overflow-hidden">
+      <main class="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 md:grid-cols-[260px_minmax(0,1fr)] md:px-6 lg:px-8">
+        <aside class="card-base h-fit p-3">
           <div id="shell-nav"></div>
         </aside>
-        <section class="p-4 md:p-6 lg:p-8">
+        <section class="min-w-0">
           <div id="shell-content">${content}</div>
         </section>
       </main>
@@ -298,14 +302,14 @@ function render() {
     const classSubjectRelationsSection = state.route === 'classes' ? `<section class="mt-5"><button data-toggle-class-subject-matrix class="btn-secondary">${state.ui.classSubjectMatrixVisible ? 'Скрыть связь класс-предмет' : 'Показать связь класс-предмет'}</button>${state.ui.classSubjectMatrixVisible ? renderClassSubjectMatrix() : ''}</section>` : '';
 
     const content = `
-    <section class="space-y-5">
-      <div class="card-base p-5 sm:p-6">
+    <section class="space-y-6">
+      <div class="card-base p-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 class="text-2xl font-semibold tracking-tight text-slate-900">${config.title}</h2>
             <p class="mt-1 text-sm text-slate-500">Управляйте записями, фильтрами и действиями в едином интерфейсе.</p>
           </div>
-          ${canEdit ? '<button data-create-entity class="btn-primary">Создать</button>' : ''}
+          ${canEdit ? `<button data-create-entity class="btn-primary">${state.route === 'grades' ? 'Создать запись' : 'Создать'}</button>` : ''}
         </div>
         </div>
       ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: false })}

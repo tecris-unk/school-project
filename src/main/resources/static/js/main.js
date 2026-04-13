@@ -497,7 +497,7 @@ function requestIdFromUser(title, options) {
     return id;
 }
 
-function bindEntityHandlers(config, allFiltered, displayedRows  ) {
+function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
     if (state.route === 'classes') {
         document.querySelector('[data-toggle-class-subject-matrix]')?.addEventListener('click', () => {
             setState((s) => {

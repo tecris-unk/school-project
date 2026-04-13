@@ -20,7 +20,7 @@ select,
 textarea {
     background-color: #fff;
     border: 1px solid rgb(203 213 225);
-    border-radius: 0.75rem;
+    border-radius: 0;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 input:focus,
@@ -43,19 +43,19 @@ button:disabled {
 .card-base {
     background: #fff;
     border: 1px solid rgb(226 232 240);
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .input-base {
     border: 1px solid rgb(203 213 225);
-    border-radius: 0.75rem;
+    border-radius: 0;
     padding: 0.55rem 0.8rem;
     font-size: 0.875rem;
 }
 
 .btn-primary {
-    border-radius: 0.9rem;
+    border-radius: 0;
     padding: 0.75rem 1.15rem;
     font-size: 1rem;
     background: rgb(229 231 235);
@@ -65,7 +65,7 @@ button:disabled {
 .btn-primary:hover { background: rgb(209 213 219); }
 
 .btn-secondary {
-    border-radius: 0.9rem;
+    border-radius: 0;
     padding: 0.75rem 1.15rem;
     font-size: 1rem;
     border: 1px solid transparent;
@@ -75,7 +75,7 @@ button:disabled {
 .btn-secondary:hover { background: rgb(209 213 219); }
 
 .btn-danger {
-    border-radius: 0.9rem;
+    border-radius: 0;
     padding: 0.75rem 1.15rem;
     font-size: 1rem;
     background: rgb(254 226 226);

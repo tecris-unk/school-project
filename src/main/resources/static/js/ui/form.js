@@ -50,7 +50,7 @@ export function validateForm(entity, values) {
 }
 
 function renderField(field, value, refs, data, error) {
-    const baseInputClass = `mt-1 w-full rounded-xl border px-3 py-2 text-sm ${error ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-200' : 'border-slate-300'}`;
+    const baseInputClass = `mt-1 w-full border px-3 py-2 text-sm ${error ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-200' : 'border-slate-300'}`;
 
     if (field.type === 'select') {
         return `

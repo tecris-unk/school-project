@@ -225,7 +225,7 @@ function shellTemplate(content) {
           <div class="flex items-start justify-between gap-4">
             <div>
               <h1 class="text-xl font-semibold flex items-center gap-2">
-               <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-[72px] w-[128px] rounded-lg object-contain border border-slate-200 bg-white p-1 shadow-sm" />
+               <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-[72px] w-[72px] rounded-lg object-contain border border-slate-200 bg-white p-1 shadow-sm" />
                 <span>Школа №12 г.Витебска</span>
               </h1>
               <p class="text-sm text-slate-500">Администрирование и управление учебными данными.</p>

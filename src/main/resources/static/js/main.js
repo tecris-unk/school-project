@@ -288,12 +288,6 @@ function loginTemplate() {
         <label class="block text-sm mb-3">Пароль
           <input class="mt-1 w-full rounded-lg border-slate-300" type="password" name="password" required />
         </label>
-        <label class="block text-sm mb-5">Роль
-          <select class="mt-1 w-full rounded-lg border-slate-300" name="role"><option value="admin">администратор</option><option value="teacher">учитель</option></select>
-        </label>
-        <div class="mb-4 rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 leading-relaxed">
-          <p><strong>Администратор:</strong> полный доступ (создание, изменение, удаление, массовое удаление, встроенное редактирование) только для <code>admin@gov.by</code> / <code>1111</code>.</p>
-          <p class="mt-1"><strong>Учитель:</strong> вход по email, который создал администратор. Доступны только «Классы» с его предметами и «Оценки» (можно ставить/редактировать).</p>
         <button class="w-full py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-700">Войти</button>
       </form>
     </div>
@@ -463,20 +457,19 @@ function bindLogin() {
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const values = Object.fromEntries(new FormData(form).entries());
-        if (values.role === 'admin' && (values.email !== 'admin@gov.by' || values.password !== '1111')) {
-            notify('Для роли «администратор» используйте почту admin@gov.by и пароль 1111', 'error');
-            return;
-        }
-        if (values.role === 'teacher') {
+        const isAdmin = values.email === 'admin@gov.by' && values.password === '1111';
+        const role = isAdmin ? 'admin' : 'teacher';
+
+        if (!isAdmin) {
             const teachers = await api.teachers.list({email: values.email});
             const matchedTeacher = teachers.items.find((teacher) => teacher.email === values.email);
             if (!matchedTeacher) {
-                notify('Учитель с таким email не найден. Попросите администратора добавить вас.', 'error');
+                notify('Неверные данные входа', 'error');
                 return;
             }
         }
 
-        setToken(`fake-jwt-${Date.now()}`, values.role, values.email);
+        setToken(`fake-jwt-${Date.now()}`, role, values.email);
         window.location.hash = '#/dashboard';
         notify(`Добро пожаловать, ${values.email}`, 'success');
     });

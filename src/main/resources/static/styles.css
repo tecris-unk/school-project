@@ -11,8 +11,9 @@ body {
 
 body {
     min-height: 100vh;
-    background: #f8fafc;
+    background: #f1f5f9;
     color: #0f172a;
+    line-height: 1.5;
 }
 
 input,
@@ -20,7 +21,7 @@ select,
 textarea {
     background-color: #fff;
     border: 1px solid rgb(203 213 225);
-    border-radius: 0;
+    border-radius: 0.5rem;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 input:focus,
@@ -43,44 +44,47 @@ button:disabled {
 .card-base {
     background: #fff;
     border: 1px solid rgb(226 232 240);
-    border-radius: 0;
-    box-shadow: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .input-base {
     border: 1px solid rgb(203 213 225);
-    border-radius: 0;
-    padding: 0.55rem 0.8rem;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.85rem;
     font-size: 0.875rem;
 }
 
 .btn-primary {
-    border-radius: 0;
-    padding: 0.75rem 1.15rem;
-    font-size: 1rem;
-    background: rgb(229 231 235);
-    color: rgb(15 23 42);
-    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: rgb(79 70 229);
+    color: #fff;
+    border: 1px solid rgb(79 70 229);
 }
-.btn-primary:hover { background: rgb(209 213 219); }
+.btn-primary:hover { background: rgb(67 56 202); }
 
 .btn-secondary {
-    border-radius: 0;
-    padding: 0.75rem 1.15rem;
-    font-size: 1rem;
-    border: 1px solid transparent;
-    background: rgb(229 231 235);
-    color: rgb(15 23 42);
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid rgb(203 213 225);
+    background: #fff;
+    color: rgb(30 41 59);
 }
-.btn-secondary:hover { background: rgb(209 213 219); }
+.btn-secondary:hover { background: rgb(248 250 252); }
 
 .btn-danger {
-    border-radius: 0;
-    padding: 0.75rem 1.15rem;
-    font-size: 1rem;
-    background: rgb(254 226 226);
-    color: rgb(159 18 57);
-    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: rgb(254 242 242);
+    color: rgb(185 28 28);
+    border: 1px solid rgb(254 202 202);
 }
 .btn-danger:hover { background: rgb(254 202 202); }
 

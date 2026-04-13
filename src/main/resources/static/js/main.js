@@ -234,8 +234,8 @@ function shellTemplate(content) {
           </div>
         </div>
       </header>
-      <main class="md:grid md:grid-cols-[88px_1fr] md:min-h-[calc(100vh-113px)]">
-        <aside class="border-b border-slate-200 md:border-b-0 md:border-r border-slate-200 bg-white p-3">
+      <main class="md:grid md:grid-cols-[auto_1fr] md:min-h-[calc(100vh-113px)]">
+        <aside class="group border-b border-slate-200 md:border-b-0 md:border-r border-slate-200 bg-white p-3 md:w-[88px] md:hover:w-[260px] transition-[width] duration-200 overflow-hidden">
           <div id="shell-nav"></div>
         </aside>
         <section class="p-4 md:p-6">

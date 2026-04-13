@@ -551,11 +551,11 @@ async function routeChanged() {
         try {
             await loadRefs();
             if (route === 'dashboard') {
-                if (isTeacherRole()) await loadEntity('grades', true);
-                else await Promise.all([loadEntity('students', true), loadEntity('grades', true), loadEntity('teachers', true)]);
+                if (isTeacherRole()) await loadEntity('grades');
+                else await Promise.all([loadEntity('students'), loadEntity('grades'), loadEntity('teachers')]);
             } else if (entityConfigs[route]) {
-                if (isTeacherRole() && route === 'grades') await loadEntity('students', true);
-                await loadEntity(route, true);
+                if (isTeacherRole() && route === 'grades') await loadEntity('students');
+                await loadEntity(route);
             }
         } catch (error) {
             notify(error.message, 'error');

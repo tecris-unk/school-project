@@ -17,10 +17,10 @@ export function renderNav(active, role = 'admin') {
     <nav class="card-base mb-6 p-2 flex items-center gap-2 overflow-x-auto">
       ${visibleItems.map((item) => {
         const activeClass = item.key === active ? 'bg-slate-900 text-white border-slate-900' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-transparent';
-        return `<a href="#/${item.key}" title="${item.label}" class="h-11 w-11 shrink-0 rounded-xl border flex items-center justify-center ${activeClass}">${entityIcon(item.key)}<span class="sr-only">${item.label}</span></a>`;
+        return `<a href="#/${item.key}" title="${item.label}" class="h-14 w-14 shrink-0 rounded-xl border flex items-center justify-center ${activeClass}">${entityIcon(item.key)}<span class="sr-only">${item.label}</span></a>`;
     }).join('')}
       <div class="ml-auto"></div>
-      <a href="#/login" data-logout class="btn-secondary text-rose-600 border-rose-200 hover:bg-rose-50">Выйти</a>
+      <a href="#/login" data-logout class="btn-secondary text-base px-5 py-3 text-rose-600 border-rose-200 hover:bg-rose-50">Выйти</a>
     </nav>
   `;
 }

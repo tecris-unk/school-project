@@ -273,7 +273,6 @@ function dashboardTemplate() {
         <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
         <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article>
     </section>
-    <div class="bg-white rounded-xl border border-slate-200 p-5 text-slate-600">Выберите раздел слева, чтобы управлять данными в режиме реального времени.</div>
         `;
 }
 

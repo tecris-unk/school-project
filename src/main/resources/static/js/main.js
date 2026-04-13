@@ -225,7 +225,20 @@ function shellTemplate(content) {
           <div class="flex items-start justify-between gap-4">
             <div>
               <h1 class="text-xl font-semibold flex items-center gap-2">
-                <img src="/favicon.ico" alt="Логотип школы" class="h-10 w-10 rounded-md object-contain border border-slate-200 bg-white p-1" />
+               <span class="inline-flex h-[72px] w-[128px] items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm">
+                  <svg viewBox="0 0 160 90" class="h-full w-full" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Логотип школы">
+                    <defs>
+                      <linearGradient id="logoGrad" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#e0e7ff"/>
+                        <stop offset="100%" stop-color="#bae6fd"/>
+                      </linearGradient>
+                    </defs>
+                    <rect x="2" y="2" width="156" height="86" rx="12" fill="url(#logoGrad)"/>
+                    <path d="M44 58V39l36-18 36 18v19" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="70" y="47" width="20" height="20" rx="3" fill="#1e293b"/>
+                    <text x="80" y="80" text-anchor="middle" font-size="12" font-family="Arial, sans-serif" fill="#0f172a">ШКОЛА №12</text>
+                  </svg>
+                </span>
                 <span>Школа №12 г.Витебска</span>
               </h1>
               <p class="text-sm text-slate-500">Администрирование и управление учебными данными.</p>

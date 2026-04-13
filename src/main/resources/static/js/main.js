@@ -258,36 +258,36 @@ function dashboardTemplate() {
     if (isTeacherRole()) {
         return `
         <section class="grid md:grid-cols-3 gap-4 mb-6">
-          <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Мои классы</p><h2 class="text-3xl font-semibold mt-2">${state.data.classes.length}</h2></article>
-          <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Мои предметы</p><h2 class="text-3xl font-semibold mt-2">${state.data.subjects.length}</h2></article>
-          <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
+          <article class="modern-glass rounded-2xl p-5"><p class="text-sm text-slate-500">Мои классы</p><h2 class="text-3xl font-semibold mt-2">${state.data.classes.length}</h2></article>
+          <article class="modern-glass rounded-2xl p-5"><p class="text-sm text-slate-500">Мои предметы</p><h2 class="text-3xl font-semibold mt-2">${state.data.subjects.length}</h2></article>
+          <article class="gradient-card rounded-2xl p-5 shadow-lg"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
         </section>
-        <div class="bg-white rounded-xl border border-slate-200 p-5 text-slate-600">Вам доступны только ваши классы и журнал оценок по вашим предметам.</div>
+        <div class="modern-glass rounded-2xl p-5 text-slate-600">Вам доступны только ваши классы и журнал оценок по вашим предметам.</div>
       `;
     }
 
     return `
     <section class="grid md:grid-cols-3 gap-4 mb-6">
-        <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${state.data.students.length}</h2></article>
-        <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
-        <article class="bg-white rounded-xl shadow-sm border border-slate-200 p-5"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article>
+        <article class="modern-glass rounded-2xl p-5"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${state.data.students.length}</h2></article>
+        <article class="gradient-card rounded-2xl p-5 shadow-lg"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article>
+        <article class="modern-glass rounded-2xl p-5"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article>
     </section>
         `;
 }
 
 function loginTemplate() {
     return `
-    <div class="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-      <form id="login-form" class="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-lg p-6">
-        <h1 class="text-2xl font-semibold text-slate-900 mb-1">Панель школы</h1>
+     <div class="min-h-screen flex items-center justify-center p-4 subtle-grid">
+      <form id="login-form" class="w-full max-w-md modern-glass rounded-3xl p-7">
+        <h1 class="text-3xl font-bold hero-title mb-1">">Панель школы</h1>
         <p class="text-sm text-slate-500 mb-5">Вход в административную панель</p>
         <label class="block text-sm mb-3">Эл. почта
-          <input class="mt-1 w-full rounded-lg border-slate-300" type="email" name="email" required />
+          <input class="mt-1 w-full" type="email" name="email" required />
         </label>
         <label class="block text-sm mb-3">Пароль
-          <input class="mt-1 w-full rounded-lg border-slate-300" type="password" name="password" required />
+          <input class="mt-1 w-full" type="password" name="password" required />
         </label>
-        <button class="w-full py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-700">Войти</button>
+        <button class="w-full py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20">Войти</button>
       </form>
     </div>
   `;
@@ -295,12 +295,12 @@ function loginTemplate() {
 
 function shellTemplate(content) {
     return `
-    <div class="min-h-screen bg-slate-100">
-      <header class="bg-white/95 sticky top-0 backdrop-blur border-b border-slate-200">
+    <div class="min-h-screen">
+      <header class="sticky top-0 z-40 modern-glass border-b border-white/40">
         <div class="max-w-7xl mx-auto px-4 py-4">
           <h1 class="text-xl font-semibold flex items-center gap-2">
             <img src="/favicon.ico" alt="Логотип школы" class="h-14 w-14 rounded-md object-contain border border-slate-200 bg-white p-1" />
-            <span>Школа №12 г.Витебска</span>
+           <span class="hero-title">Школа №12 г.Витебска</span>
           </h1>
           <p class="text-sm text-slate-500">На этой страничке вы можете создать, просмотреть, изменить и удалить данные об этой школе</p>
         </div>

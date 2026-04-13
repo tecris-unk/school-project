@@ -1,4 +1,4 @@
-import {entityLabelWithIcon} from './entityMeta.js';
+import {entityIcon} from './entityMeta.js';
 
 export const navItems = [
     { key: 'dashboard', label: 'Панель' },
@@ -14,16 +14,13 @@ export function renderNav(active, role = 'admin') {
     const visibleItems = navItems.filter((item) => role === 'admin' || teacherRoutes.includes(item.key));
 
     return `
-    <nav class="bg-white border border-slate-200 shadow-sm rounded-xl p-2 mb-6 flex flex-wrap gap-2">
-      ${visibleItems
-        .map(
-            (item) => `<a href="#/${item.key}" class="px-4 py-2 rounded-lg text-sm font-medium transition ${
-                item.key === active ? 'bg-slate-900 text-white shadow' : 'text-slate-700 hover:bg-slate-100'
-            }">${entityLabelWithIcon(item.key, item.label)}</a>`,
-        )
-        .join('')}
+    <nav class="card-base mb-6 p-2 flex items-center gap-2 overflow-x-auto">
+      ${visibleItems.map((item) => {
+        const activeClass = item.key === active ? 'bg-slate-900 text-white border-slate-900' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-transparent';
+        return `<a href="#/${item.key}" title="${item.label}" class="h-11 w-11 shrink-0 rounded-xl border flex items-center justify-center ${activeClass}">${entityIcon(item.key)}<span class="sr-only">${item.label}</span></a>`;
+    }).join('')}
       <div class="ml-auto"></div>
-      <a href="#/login" data-logout class="px-4 py-2 rounded-lg text-sm font-medium text-rose-600 hover:bg-rose-50">Выйти</a>
+      <a href="#/login" data-logout class="btn-secondary text-rose-600 border-rose-200 hover:bg-rose-50">Выйти</a>
     </nav>
   `;
 }

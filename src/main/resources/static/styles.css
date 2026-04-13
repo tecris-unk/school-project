@@ -6,6 +6,7 @@ html,
 body {
     min-height: 100%;
     overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
 
 body {
@@ -88,10 +89,7 @@ button:disabled {
 }
 
 .entity-inline-icon {
-    width: 1.6rem;
-    height: 1.6rem;
-    border-radius: 0.4rem;
-    object-fit: cover;
-    border: 1px solid rgb(203 213 225);
-    background: rgb(255 255 255);
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
 }

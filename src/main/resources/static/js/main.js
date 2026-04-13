@@ -342,10 +342,13 @@ function bindLogin() {
 }
 
 function bindGlobalHandlers() {
-    document.querySelector('[data-logout]')?.addEventListener('click', () => {
+    const logoutLink = document.querySelector('[data-logout]');
+    if (!logoutLink) return;
+
+    logoutLink.onclick = () => {
         setToken('');
         notify('Вы вышли из системы', 'info');
-    });
+    };
 }
 
 const debouncedSearch = debounce((value) => {

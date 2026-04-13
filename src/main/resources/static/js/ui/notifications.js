@@ -3,7 +3,7 @@ let container;
 function ensureContainer() {
     if (!container) {
         container = document.createElement('div');
-        container.className = 'fixed top-4 right-4 z-50 space-y-2';
+        container.className = 'fixed top-4 right-4 z-[60] space-y-2';
         document.body.appendChild(container);
     }
 }
@@ -13,32 +13,32 @@ export function notify(message, type = 'success') {
 
     const item = document.createElement('div');
     const colorMap = {
-        success: 'bg-emerald-600',
-        error: 'bg-rose-600',
-        info: 'bg-sky-600',
+        success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+        error: 'border-rose-200 bg-rose-50 text-rose-800',
+        info: 'border-sky-200 bg-sky-50 text-sky-800',
     };
 
-    item.className = `${colorMap[type] || colorMap.info} text-white px-4 py-3 rounded-lg shadow-lg text-sm min-w-64`;
+    item.className = `${colorMap[type] || colorMap.info} border px-4 py-3 rounded-xl shadow-lg text-sm min-w-72 transition duration-200`;
     item.textContent = message;
     container.appendChild(item);
 
     setTimeout(() => {
-        item.classList.add('opacity-0', 'transition');
+        item.classList.add('opacity-0', 'translate-y-1');
         setTimeout(() => item.remove(), 250);
     }, 2600);
 }
 
 export function confirmModal({ title, description, onConfirm }) {
     const overlay = document.createElement('div');
-    overlay.className = 'fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4';
+    overlay.className = 'fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4';
 
     overlay.innerHTML = `
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+    <div class="w-full max-w-md card-base p-6">
       <h3 class="text-lg font-semibold text-slate-900 mb-2">${title}</h3>
       <p class="text-sm text-slate-600 mb-6">${description}</p>
       <div class="flex justify-end gap-3">
-        <button data-close class="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100">Отмена</button>
-        <button data-confirm class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700">Удалить</button>
+        <button data-close class="btn-secondary">Отмена</button>
+        <button data-confirm class="btn-danger">Удалить</button>
       </div>
     </div>
   `;

@@ -36,6 +36,9 @@ export const state = {
         editingId: null,
         classSubjectMatrixVisible: false,
         toastQueue: [],
+        drawerOpen: false,
+        formErrors: {},
+        relationContext: null,
     },
 };
 
@@ -57,6 +60,9 @@ export function resetUiState() {
         s.ui.selectedIds = new Set();
         s.ui.editingId = null;
         s.ui.classSubjectMatrixVisible = false;
+        s.ui.drawerOpen = false;
+        s.ui.formErrors = {};
+        s.ui.relationContext = null;
     });
 }
 

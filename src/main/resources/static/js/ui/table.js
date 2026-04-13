@@ -45,102 +45,65 @@ export function paginate(items, page = 0, size = 10) {
     return items.slice(start, start + size);
 }
 
-export function renderTable({
-                                entity,
-                                config,
-                                rows,
-                                refs,
-                                data,
-                                ui,
-                                meta,
-                                pageableFromApi,
-                                canEdit = true,
-                                canDelete = true,
-                            }) {
+function renderSkeleton(cols) {
+    return Array.from({length: 6}, (_, rowIndex) => `<tr class="border-b border-slate-100">${Array.from({length: cols}, () => `<td class="px-4 py-3"><div class="h-4 rounded bg-slate-200/80 animate-pulse ${rowIndex % 2 === 0 ? 'w-full' : 'w-4/5'}"></div></td>`).join('')}</tr>`).join('');
+}
+
+export function renderTable({ entity, config, rows, refs, data, ui, meta, pageableFromApi, canEdit = true, canDelete = true, loading = false }) {
     const hasRows = rows.length > 0;
-    const headers = config.columns
-        .map((col) => {
-            const active = ui.sort.key === col.key;
-            const arrow = active ? (ui.sort.dir === 'asc' ? '↑' : '↓') : '';
-            return `<th data-sort="${col.key}" class="px-3 py-3 text-left text-xs uppercase tracking-wider text-slate-500 cursor-pointer hover:text-slate-900">${col.label} ${arrow}</th>`;
-        })
-        .join('');
+    const columnCount = config.columns.length + ((canEdit || canDelete) ? 1 : 0) + (canDelete ? 1 : 0);
+    const headers = config.columns.map((col) => {
+        const active = ui.sort.key === col.key;
+        const arrow = active ? (ui.sort.dir === 'asc' ? '↑' : '↓') : '';
+        return `<th data-sort="${col.key}" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 cursor-pointer hover:text-slate-900">${col.label} ${arrow}</th>`;
+    }).join('');
 
-    const body = hasRows
-        ? rows
-            .map((row) => {
-                const isSelected = ui.selectedIds.has(row.id);
-                const cells = config.columns
-                    .map((column) => {
-                        const editable = config.inlineEditable?.includes(column.key);
-                        const editing = ui.editingId === row.id && editable;
-                        const value = row[column.key] ?? '';
-                        return `<td class="px-3 py-3 text-sm text-slate-700">${
-                            editing
-                                ? `<input data-inline-input="${column.key}" value="${value}" class="w-full rounded border-slate-300 text-sm"/>`
-                                : renderCell(entity, column, row, refs, data)
-                        }</td>`;
-                    })
-                    .join('');
-
-                return `
-            <tr class="border-t border-slate-100 hover:bg-slate-50">
-             ${canDelete ? `<td class="px-3 py-3"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>` : ''}
+    let body = '';
+    if (loading) {
+        body = renderSkeleton(columnCount);
+    } else if (!hasRows) {
+        body = `<tr><td colspan="${columnCount}" class="px-4 py-10 text-center"><p class="text-sm text-slate-500">Нет данных по текущим фильтрам</p></td></tr>`;
+    } else {
+        body = rows.map((row, index) => {
+            const isSelected = ui.selectedIds.has(row.id);
+            const cells = config.columns.map((column) => `<td class="px-4 py-3 text-sm text-slate-700">${renderCell(entity, column, row, refs, data)}</td>`).join('');
+            return `<tr class="border-b border-slate-100 hover:bg-slate-50 ${index % 2 ? 'bg-slate-50/40' : ''}">
+              ${canDelete ? `<td class="px-4 py-3"><input data-select-id="${row.id}" type="checkbox" ${isSelected ? 'checked' : ''} /></td>` : ''}
               ${cells}
-              ${
-                    (canEdit || canDelete)
-                        ? `<td class="px-3 py-3 text-right whitespace-nowrap">
-                       ${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="mr-2 px-3 py-1 rounded border border-indigo-300 text-indigo-700 hover:bg-indigo-50 text-sm">${config.linkAction.label}</button>` : ''}
-                        ${canEdit ? `<button data-edit-id="${row.id}" class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 text-sm">${ui.editingId === row.id ? 'Сохранить' : 'Ред.'}</button>` : ''}
-                       ${canDelete ? `<button data-delete-id="${row.id}" class="ml-2 px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-sm">Удалить</button>` : ''}
-                     </td>`
-                        : ''
-                }
-            </tr>
-          `;
-            })
-            .join('')
-        : `<tr><td colspan="${config.columns.length + ((canEdit || canDelete) ? 2 : 0)}" class="p-6 text-center text-slate-500">Нет данных</td></tr>`;
+              ${(canEdit || canDelete) ? `<td class="px-4 py-3"><div class="flex justify-end gap-2">${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="btn-secondary text-xs">${config.linkAction.label}</button>` : ''}${canEdit ? `<button data-edit-id="${row.id}" class="btn-secondary text-xs">Редактировать</button>` : ''}${canDelete ? `<button data-delete-id="${row.id}" class="btn-danger text-xs">Удалить</button>` : ''}</div></td>` : ''}
+            </tr>`;
+        }).join('');
+    }
 
     const pages = pageableFromApi ? meta.totalPages : Math.max(1, Math.ceil((meta.totalElements || 0) / meta.size));
 
     return `
-    <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-      <div class="flex flex-wrap items-center gap-3 p-4 border-b border-slate-100">
-        <input id="search-input" value="${ui.search || ''}" placeholder="Поиск" class="w-full md:max-w-2xl rounded-2xl border-slate-300 text-sm px-4 py-2" />
-        ${config.filters
-        .map(
-            (filter) => `<select data-filter-key="${filter.key}" class="w-full md:w-auto min-w-[220px] rounded-lg border-slate-300 text-sm">
-                <option value="">${filter.label}: все</option>
-                ${filter.options(refs, data)
-                .map((opt) => `<option ${String(ui.filters[filter.key] || '') === String(opt.value) ? 'selected' : ''} value="${opt.value}">${opt.label}</option>`)
-                .join('')}
-              </select>`,
-        )
-        .join('')}
-       <div class="ml-auto"></div>
-       ${canDelete ? `<button id="bulk-delete" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 text-sm hover:bg-rose-200">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
+    <section class="card-base overflow-hidden">
+      <div class="flex flex-wrap items-center gap-3 p-4 border-b border-slate-200">
+        <input id="search-input" value="${ui.search || ''}" placeholder="Поиск" class="input-base w-full md:max-w-sm" />
+        ${config.filters.map((filter) => `<select data-filter-key="${filter.key}" class="input-base w-full md:w-auto min-w-[220px]"><option value="">${filter.label}: все</option>${filter.options(refs, data).map((opt) => `<option ${String(ui.filters[filter.key] || '') === String(opt.value) ? 'selected' : ''} value="${opt.value}">${opt.label}</option>`).join('')}</select>`).join('')}
+        <div class="ml-auto"></div>
+        ${canDelete ? `<button id="bulk-delete" class="btn-danger">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
       </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full">
-          <thead class="bg-slate-50">
+     <div>
+        <table class="w-full table-fixed">
+          <thead class="bg-white sticky top-0 z-10 border-b border-slate-200">
             <tr>
-              ${canDelete ? `<th class="px-3 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
+              ${canDelete ? `<th class="px-4 py-3 text-left"><input id="select-all" type="checkbox" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
               ${headers}
-              ${(canEdit || canDelete) ? '<th class="px-3 py-3 text-right text-xs uppercase text-slate-500">Действия</th>' : ''}
+              ${(canEdit || canDelete) ? '<th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Действия</th>' : ''}
             </tr>
           </thead>
           <tbody>${body}</tbody>
         </table>
       </div>
-      <div class="flex items-center justify-between p-4 border-t border-slate-100 text-sm">
+      <div class="flex items-center justify-between p-4 border-t border-slate-200 text-sm text-slate-600">
         <span>Всего: ${meta.totalElements || 0}</span>
         <div class="flex items-center gap-2">
-          <button data-page-action="prev" class="px-3 py-1 rounded border border-slate-300 disabled:opacity-50" ${meta.page <= 0 ? 'disabled' : ''}>Назад</button>
+          <button data-page-action="prev" class="btn-secondary" ${meta.page <= 0 ? 'disabled' : ''}>Назад</button>
           <span>Стр. ${meta.page + 1} / ${pages}</span>
-          <button data-page-action="next" class="px-3 py-1 rounded border border-slate-300 disabled:opacity-50" ${meta.page + 1 >= pages ? 'disabled' : ''}>Вперёд</button>
+          <button data-page-action="next" class="btn-secondary" ${meta.page + 1 >= pages ? 'disabled' : ''}>Вперёд</button>
         </div>
       </div>
-    </div>
-  `;
+    </section>`;
 }

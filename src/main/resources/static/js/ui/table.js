@@ -118,7 +118,7 @@ export function renderTable({
               </select>`,
         )
         .join('')}
-        <button id="export-csv" class="ml-auto px-3 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-100">CSV экспорт</button>
+       <div class="ml-auto"></div>
        ${canDelete ? `<button id="bulk-delete" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 text-sm hover:bg-rose-200">Удалить выбранные (${ui.selectedIds.size})</button>` : ''}
       </div>
       <div class="overflow-x-auto">

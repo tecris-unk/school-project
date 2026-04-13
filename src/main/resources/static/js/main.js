@@ -1,6 +1,5 @@
 import {api} from './api.js';
 import {resetUiState, setState, setToken, state, subscribe} from './state.js';
-import {exportToCsv} from './utils/csv.js';
 import {debounce} from './utils/debounce.js';
 import {average, byId, classLabel, fullName} from './utils/helpers.js';
 import {formDataToObject, renderEntityForm, validateForm} from './ui/form.js';
@@ -754,11 +753,6 @@ function bindEntityHandlers(config, allFiltered, displayedRows  ) {
         });
     }
 }
-
-document.getElementById('export-csv')?.addEventListener('click', () => {
-    exportToCsv(`${state.route}-${new Date().toISOString().slice(0, 10)}.csv`, config.columns.map((column) => column.label), allFiltered.map((row) => config.columns.map((column) => row[column.key] ?? '')),);
-    notify('CSV экспорт готов', 'success');
-});
 
 document.querySelectorAll('[data-page-action]').forEach((element) => {
     element.addEventListener('click', async (e) => {

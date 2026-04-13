@@ -238,11 +238,11 @@ function shellTemplate(content) {
           </div>
         </div>
       </header>
-      <main class="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 md:grid-cols-[260px_minmax(0,1fr)] md:px-6 lg:px-8">
-        <aside class="card-base h-fit p-3">
+      <main class="mx-auto grid max-w-[1600px] gap-0 px-0 md:grid-cols-[260px_minmax(0,1fr)] md:px-0">
+        <aside class="min-h-[calc(100vh-76px)] border-r border-slate-200 bg-white p-4 md:p-5">
           <div id="shell-nav"></div>
         </aside>
-        <section class="min-w-0">
+         <section class="min-w-0 p-4 md:p-6 lg:p-8">
           <div id="shell-content">${content}</div>
         </section>
       </main>
@@ -395,7 +395,7 @@ async function submitRelationForm(values) {
 
 function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
     document.querySelectorAll('[data-drawer-close]').forEach((el) => el.addEventListener('click', closeDrawer));
-    document.querySelector('[data-create-entity]')?.addEventListener('click', () => openEntityDrawer(null));
+    document.querySelectorAll('[data-create-entity]').forEach((el) => el.addEventListener('click', () => openEntityDrawer(null)));
 
     if (state.route === 'classes') {
         document.querySelector('[data-toggle-class-subject-matrix]')?.addEventListener('click', () => {

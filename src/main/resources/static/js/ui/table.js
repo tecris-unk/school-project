@@ -51,9 +51,9 @@ function renderSkeleton(cols) {
 
 function emptyState(config, canCreate) {
     return `
-    <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
-      <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200">
-        <span class="text-2xl">📄</span>
+    <div class="flex min-h-[360px] flex-col items-center justify-center px-6 py-10 text-center">
+      <div class="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+        <span class="text-xl">📄</span>
       </div>
       <h3 class="text-base font-semibold text-slate-900">Пока нет записей</h3>
       <p class="mt-1 max-w-sm text-sm text-slate-500">Нет данных по текущим фильтрам. Измените условия поиска или создайте новую запись.</p>

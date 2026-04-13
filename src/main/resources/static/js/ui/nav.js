@@ -14,7 +14,7 @@ export function renderNav(active, role = 'admin') {
     const visibleItems = navItems.filter((item) => role === 'admin' || teacherRoutes.includes(item.key));
 
     return `
-    <nav class="space-y-1.5">
+    <nav class="sticky top-24 flex flex-col gap-1.5">
       ${visibleItems.map((item) => {
         const activeClass = item.key === active
             ? 'bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/10'

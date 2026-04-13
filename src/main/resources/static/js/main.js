@@ -176,8 +176,6 @@ async function loadEntity(entity, force = false) {
     const meta = state.meta[entity];
     if (!force && state.data[entity].length > 0 && !meta.pageable) return;
 
-    setState((s) => { s.loading = true; });
-
     try {
         const params = meta.pageable ? {page: meta.page, size: meta.size} : {};
         const teacherParams = isTeacherRole() && entity === 'students' ? {teacherEmail: state.auth.email} : {};
@@ -190,10 +188,8 @@ async function loadEntity(entity, force = false) {
         setState((s) => {
             s.data[entity] = filteredItems;
             s.meta[entity] = { ...s.meta[entity], ...result.meta, totalElements: result.meta?.totalElements ?? filteredItems.length, totalPages: result.meta?.totalPages ?? Math.max(1, Math.ceil(filteredItems.length / s.meta[entity].size)) };
-            s.loading = false;
         });
     } catch (error) {
-        setState((s) => { s.loading = false; });
         notify(error.message, 'error');
     }
 }
@@ -237,10 +233,6 @@ function shellTemplate(content) {
         ${renderNav(state.route, state.auth.role)}
         ${content}
       </main>
-      <div class="fixed inset-0 z-[45] ${state.loading ? '' : 'hidden'}">
-        <div class="absolute inset-0 bg-white/50"></div>
-        <div class="absolute top-4 right-4 card-base px-3 py-2 text-sm flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-full border-2 border-slate-400 border-t-indigo-500 animate-spin"></span>Загрузка...</div>
-      </div>
     </div>`;
 }
 
@@ -287,7 +279,7 @@ function render() {
           <h2 class="text-2xl font-semibold text-slate-900">${config.title}</h2>
           ${canEdit ? '<button data-create-entity class="btn-primary">Создать запись</button>' : ''}
         </div>
-        ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: state.loading })}
+        ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: false })}
       </section>
       ${classSubjectRelationsSection}
       ${renderDrawer({title: drawerTitle, subtitle: 'Заполните форму справа', body: drawerBody, open: state.ui.drawerOpen})}

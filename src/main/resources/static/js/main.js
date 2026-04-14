@@ -10,6 +10,7 @@ import {applyQuery, paginate, renderTable} from './ui/table.js';
 const app = document.getElementById('app');
 const SAVE_SUCCESS_MESSAGE = 'Сохранение выполнено';
 const DELETE_SUCCESS_MESSAGE = 'Удаление выполнено';
+const CREATE_ACTION_LABEL = 'Создать запись';
 
 const entityConfigs = {
     students: {
@@ -359,7 +360,7 @@ function render() {
             <h2 class="text-2xl font-semibold tracking-tight text-slate-900">${config.title}</h2>
             <p class="mt-1 text-sm text-slate-500">Создавайте, изменяйте, удаляйте данные.</p>
           </div>
-          ${canEdit ? `<button data-create-entity class="btn-primary">${state.route === 'grades' ? 'Создать запись' : 'Создать'}</button>` : ''}
+          ${canEdit ? `<button data-create-entity class="btn-primary" aria-label="${CREATE_ACTION_LABEL}">${CREATE_ACTION_LABEL}</button>` : ''}
         </div>
         </div>
       ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: false })}

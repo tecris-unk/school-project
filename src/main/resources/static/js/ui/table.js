@@ -1,4 +1,5 @@
 import { byId, classLabel, fullName } from '../utils/helpers.js';
+const CREATE_ACTION_LABEL = 'Создать запись';
 
 function renderCell(entity, column, row, refs, data) {
     const value = row[column.key];
@@ -57,7 +58,7 @@ function emptyState(config, canCreate, hasQuery) {
       </div>
       <h3 class="text-base font-semibold text-slate-900">${hasQuery ? 'Ничего не найдено' : 'Пока нет записей'}</h3>
       <p class="mt-1 max-w-sm text-sm text-slate-500">${hasQuery ? 'Попробуйте очистить поиск или фильтры.' : 'Добавьте первую запись, чтобы начать работу с разделом.'}</p>
-      ${canCreate ? `<button data-create-entity class="btn-primary mt-5">${config.title === 'Оценки' ? 'Создать запись' : 'Создать'}</button>` : ''}
+      ${canCreate ? `<button data-create-entity class="btn-primary mt-5" aria-label="${CREATE_ACTION_LABEL}">${CREATE_ACTION_LABEL}</button>` : ''}
     </div>`;
 }
 

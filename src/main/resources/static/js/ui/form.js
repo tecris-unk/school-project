@@ -1,6 +1,8 @@
 import { classLabel, fullName } from '../utils/helpers.js';
 import {entityLabelWithIcon} from './entityMeta.js';
 
+const CREATE_ACTION_LABEL = 'Создать запись';
+
 function getRefLabel(field, item) {
     if (field.ref === 'classes') return classLabel(item);
     if (field.ref === 'teachers' || field.ref === 'students') return fullName(item);
@@ -107,7 +109,7 @@ export function renderEntityForm(config, refs, data, row = null, entityKey = nul
       </div>
       <div class="space-y-4">${fieldHtml}</div>
       <div class="flex gap-2 border-t border-slate-100 pt-4">
-        <button class="btn-primary" type="submit">${row ? 'Сохранить' : 'Создать'}</button>
+        <button class="btn-primary" type="submit">${row ? 'Сохранить' : CREATE_ACTION_LABEL}</button>
         <button class="btn-secondary" type="button" data-cancel-edit>Отмена</button>
       </div>
    </form>`;

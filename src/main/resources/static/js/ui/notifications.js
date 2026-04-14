@@ -54,22 +54,3 @@ export function confirmModal({ title, description, onConfirm }) {
 
     document.body.appendChild(overlay);
 }
-
-export function infoModal({ title, body }) {
-    const overlay = document.createElement('div');
-    overlay.className = 'fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4';
-    overlay.innerHTML = `
-    <div class="w-full max-w-lg card-base p-6">
-      <div class="mb-4 flex items-start justify-between gap-3">
-        <h3 class="text-lg font-semibold text-slate-900">${title}</h3>
-        <button data-close class="btn-secondary">Закрыть</button>
-      </div>
-      <div class="text-sm text-slate-700 space-y-2">${body}</div>
-    </div>
-  `;
-    overlay.querySelector('[data-close]')?.addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', (event) => {
-        if (event.target === overlay) overlay.remove();
-    });
-    document.body.appendChild(overlay);
-}

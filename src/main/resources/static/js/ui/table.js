@@ -77,11 +77,11 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
     } else {
         body = rows.map((row, index) => {
             const isSelected = ui.selectedIds.has(row.id);
-            const cells = config.columns.map((column) => `<td class="px-6 py-4 text-sm text-slate-700">${renderCell(entity, column, row, refs, data)}</td>`).join('');
+            const cells = config.columns.map((column) => `<td class="px-6 py-4 align-middle text-sm text-slate-700">${renderCell(entity, column, row, refs, data)}</td>`).join('');
             return `<tr class="border-b border-slate-100 hover:bg-indigo-50/40 transition-colors ${index % 2 ? 'bg-slate-50/20' : ''}">
-                ${canDelete ? `<td class="px-6 py-4"><input data-select-id="${row.id}" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" ${isSelected ? 'checked' : ''} /></td>` : ''}
+                ${canDelete ? `<td class="px-6 py-4 align-middle"><input data-select-id="${row.id}" type="checkbox" class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" ${isSelected ? 'checked' : ''} /></td>` : ''}
             ${cells}
-            ${(canEdit || canDelete) ? `<td class="px-6 py-4"><div class="flex flex-wrap justify-end gap-2"><button data-view-id="${row.id}" class="btn-secondary text-xs">Просмотр</button>${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="btn-secondary text-xs">Связать</button>` : ''}${canEdit ? `<button data-edit-id="${row.id}" class="btn-secondary text-xs">Редактировать</button>` : ''}${canDelete ? `<button data-delete-id="${row.id}" class="btn-danger text-xs">Удалить</button>` : ''}</div></td>` : ''}
+            ${(canEdit || canDelete) ? `<td class="px-6 py-4 align-middle"><div class="flex items-center justify-end gap-2 whitespace-nowrap">${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="btn-secondary text-xs">Связать</button>` : ''}${canEdit ? `<button data-edit-id="${row.id}" class="btn-secondary text-xs">Редактировать</button>` : ''}${canDelete ? `<button data-delete-id="${row.id}" class="btn-danger text-xs">Удалить</button>` : ''}</div></td>` : ''}
         </tr>`;
         }).join('');
     }
@@ -109,7 +109,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
         <table class="min-w-full table-auto">
           <thead class="border-b border-slate-200 bg-slate-50">
             <tr>
-              ${canDelete ? `<th class="px-6 py-4 text-left"><input id="select-all" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
+              ${canDelete ? `<th class="px-6 py-4 text-left"><input id="select-all" type="checkbox" class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" ${hasRows && rows.every((r) => ui.selectedIds.has(r.id)) ? 'checked' : ''}/></th>` : ''}
               ${headers}
               ${(canEdit || canDelete) ? '<th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Действия</th>' : ''}
             </tr>

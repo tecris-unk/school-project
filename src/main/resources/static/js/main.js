@@ -4,7 +4,7 @@ import {debounce} from './utils/debounce.js';
 import {average, byId, classLabel, formatDate, fullName, initials} from './utils/helpers.js';
 import {formDataToObject, renderDrawer, renderEntityForm, validateForm} from './ui/form.js';
 import {navItems, renderNav} from './ui/nav.js';
-import {confirmModal, infoModal, notify} from './ui/notifications.js';
+import {confirmModal, notify} from './ui/notifications.js';
 import {applyQuery, paginate, renderTable} from './ui/table.js';
 
 const app = document.getElementById('app');
@@ -139,20 +139,6 @@ function relationDrawerTemplate() {
       </form>`;
 }
 
-function renderEntityDetails(entity, row) {
-    if (!row) return '<p>Запись не найдена.</p>';
-    const fields = entityConfigs[entity].columns.map((column) => {
-        let value = row[column.key] ?? '—';
-        if (column.key === 'schoolClassId') value = classLabel(byId(state.refs.classes, row.schoolClassId));
-        if (column.key === 'teacherId') value = fullName(byId(state.refs.teachers, row.teacherId));
-        if (column.key === 'studentId') value = fullName(byId(state.data.students, row.studentId));
-        if (column.key === 'subjectId') value = byId(state.refs.subjects, row.subjectId)?.name || '—';
-        if (column.key === 'date') value = formatDate(value);
-        return `<div class="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2"><span class="text-slate-500">${column.label}</span><span class="font-medium text-slate-900 text-right">${value}</span></div>`;
-    }).join('');
-    return `<div class="space-y-2">${fields}</div>`;
-}
-
 async function loadRefs(force = false) {
     if (!force && state.refs.classes.length && state.refs.teachers.length && state.refs.subjects.length) return;
     if (!isTeacherRole()) {
@@ -256,7 +242,7 @@ function dashboardTemplate() {
     const classesCount = state.data.classes.length || 1;
     const topSubjects = topSubjectsByAverage();
     const recent = recentActivity();
-    const schoolInfo = `<section class="grid gap-5 xl:grid-cols-3"><article class="card-base p-6 xl:col-span-2"><h3 class="text-lg font-semibold text-slate-900">МБОУ «Средняя школа №12»</h3><p class="mt-2 text-sm text-slate-600">Официальная панель школы: успеваемость, расписание предметов и ключевые показатели учебного процесса.</p><div class="mt-5 grid gap-3 sm:grid-cols-2"><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Классов в системе</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.classes.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Учебных предметов</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.subjects.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Обучающихся</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.students.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Оценок в журнале</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.grades.length}</p></div></div></article><article class="card-base p-6"><h3 class="text-base font-semibold text-slate-900">Показатели по предметам</h3><ul class="mt-4 space-y-3 text-sm">${topSubjects.length ? topSubjects.map((subject) => `<li class="rounded-xl bg-slate-50 p-3"><div class="flex items-center justify-between"><p class="font-medium text-slate-800">${subject.name}</p><span class="text-xs text-slate-500">${subject.count} оценок</span></div><div class="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-indigo-500" style="width:${Math.min(100, (subject.averageScore / 10) * 100)}%"></div></div><p class="mt-1 text-xs text-slate-600">Средний балл: <span class="font-semibold">${subject.averageScore.toFixed(2)}</span></p></li>`).join('') : '<li class="rounded-xl bg-slate-50 p-3 text-slate-500">Пока нет данных об успеваемости.</li>'}</ul></article></section>`;
+    const schoolInfo = `<section class="grid gap-5 xl:grid-cols-3"><article class="card-base p-6 xl:col-span-2"><h3 class="text-lg font-semibold text-slate-900">Средняя школа №12 "Солнечные детки"</h3><p class="mt-2 text-sm text-slate-600">Официальный сайт школы: успеваемость, ключевые показатели учебного процесса.</p><div class="mt-5 grid gap-3 sm:grid-cols-2"><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Классов в школе</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.classes.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Учебных предметов</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.subjects.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Обучающихся</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.students.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Оценок в журнале</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.grades.length}</p></div></div></article><article class="card-base p-6"><h3 class="text-base font-semibold text-slate-900">Показатели по предметам</h3><ul class="mt-4 space-y-3 text-sm">${topSubjects.length ? topSubjects.map((subject) => `<li class="rounded-xl bg-slate-50 p-3"><div class="flex items-center justify-between"><p class="font-medium text-slate-800">${subject.name}</p><span class="text-xs text-slate-500">${subject.count} оценок</span></div><div class="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-indigo-500" style="width:${Math.min(100, (subject.averageScore / 10) * 100)}%"></div></div><p class="mt-1 text-xs text-slate-600">Средний балл: <span class="font-semibold">${subject.averageScore.toFixed(2)}</span></p></li>`).join('') : '<li class="rounded-xl bg-slate-50 p-3 text-slate-500">Пока нет данных об успеваемости.</li>'}</ul></article></section>`;
     if (isTeacherRole()) {
         return `<section class="grid gap-5 lg:grid-cols-3 mb-6"><article class="card-base p-6 lg:col-span-2"><div class="flex items-center justify-between"><h3 class="text-base font-semibold text-slate-900">События учебного дня</h3><span class="text-xs text-slate-500">Последние ${recent.length} записей</span></div><ul class="mt-4 space-y-3">${recent.length ? recent.map((item) => `<li class="flex items-center gap-3 rounded-xl border border-slate-100 px-3 py-2.5"><span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">${initials(item.student)}</span><div class="min-w-0 flex-1"><p class="truncate text-sm font-medium text-slate-800">${fullName(item.student)}</p><p class="truncate text-xs text-slate-500">${item.subject?.name || 'Предмет'} · ${formatDate(item.date)}</p></div><span class="rounded-lg bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-700">${item.score}</span></li>`).join('') : '<li class="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">Пока нет новых записей в электронном журнале.</li>'}</ul></article><article class="card-base p-6"><h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Средний балл по моим предметам</h3><p class="mt-2 text-2xl font-semibold text-slate-900">${avg.toFixed(2)}</p><div class="mt-3 h-3 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-indigo-500" style="width:${Math.min(100, (avg / 10) * 100)}%"></div></div><p class="mt-3 text-xs text-slate-500">Охват классов: ${Math.min(100, Math.round((state.data.subjects.length / classesCount) * 100))}%.</p></article></section>${schoolInfo}`;
     }
@@ -519,17 +505,6 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
 
 
     document.getElementById('search-input')?.addEventListener('input', (e) => debouncedSearch(e.target.value));
-
-    document.querySelectorAll('[data-filter-key]').forEach((element) => {
-        element.addEventListener('change', (e) => {
-            const key = e.target.dataset.filterKey;
-            const value = e.target.value || null;
-            setState((s) => {
-                s.ui.filters[key] = value;
-                s.meta[s.route].page = 0;
-            });
-        });
-    });
 
     document.querySelectorAll('[data-sort]').forEach((element) => {
         element.addEventListener('click', (e) => {

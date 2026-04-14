@@ -37,6 +37,11 @@ button:disabled {
     border: 1px solid rgb(226 232 240);
     background: #fff;
     box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+    transition: box-shadow .2s ease, transform .2s ease;
+}
+
+.card-base:hover {
+    box-shadow: 0 10px 20px rgba(15, 23, 42, .08);
 }
 
 .input-base {
@@ -85,6 +90,7 @@ button:disabled {
 
 .btn-primary:hover {
     background: rgb(67 56 202);
+    transform: translateY(-1px);
 }
 
 .btn-primary:focus-visible,
@@ -103,6 +109,7 @@ button:disabled {
 
 .btn-secondary:hover {
     background: rgb(248 250 252);
+    border-color: rgb(148 163 184);
 }
 
 .btn-danger {
@@ -115,6 +122,10 @@ button:disabled {
 .btn-danger:hover {
     border-color: rgb(253 164 175);
     background: rgb(255 228 230);
+}
+
+table tr:last-child td {
+    border-bottom: none;
 }
 
 .entity-label-with-icon {

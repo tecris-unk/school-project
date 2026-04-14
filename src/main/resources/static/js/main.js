@@ -1,10 +1,10 @@
 import {api} from './api.js';
 import {resetUiState, setState, setToken, state, subscribe} from './state.js';
 import {debounce} from './utils/debounce.js';
-import {average, byId, classLabel, fullName} from './utils/helpers.js';
+import {average, byId, classLabel, formatDate, fullName, initials} from './utils/helpers.js';
 import {formDataToObject, renderDrawer, renderEntityForm, validateForm} from './ui/form.js';
 import {navItems, renderNav} from './ui/nav.js';
-import {confirmModal, notify} from './ui/notifications.js';
+import {confirmModal, infoModal, notify} from './ui/notifications.js';
 import {applyQuery, paginate, renderTable} from './ui/table.js';
 
 const app = document.getElementById('app');
@@ -138,6 +138,20 @@ function relationDrawerTemplate() {
       </form>`;
 }
 
+function renderEntityDetails(entity, row) {
+    if (!row) return '<p>Запись не найдена.</p>';
+    const fields = entityConfigs[entity].columns.map((column) => {
+        let value = row[column.key] ?? '—';
+        if (column.key === 'schoolClassId') value = classLabel(byId(state.refs.classes, row.schoolClassId));
+        if (column.key === 'teacherId') value = fullName(byId(state.refs.teachers, row.teacherId));
+        if (column.key === 'studentId') value = fullName(byId(state.data.students, row.studentId));
+        if (column.key === 'subjectId') value = byId(state.refs.subjects, row.subjectId)?.name || '—';
+        if (column.key === 'date') value = formatDate(value);
+        return `<div class="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2"><span class="text-slate-500">${column.label}</span><span class="font-medium text-slate-900 text-right">${value}</span></div>`;
+    }).join('');
+    return `<div class="space-y-2">${fields}</div>`;
+}
+
 async function loadRefs(force = false) {
     if (!force && state.refs.classes.length && state.refs.teachers.length && state.refs.subjects.length) return;
     if (!isTeacherRole()) {
@@ -176,6 +190,7 @@ async function loadEntity(entity, force = false) {
     const meta = state.meta[entity];
     if (!force && state.data[entity].length > 0 && !meta.pageable) return;
 
+    setState((s) => { s.loading = true; });
     try {
         const params = meta.pageable ? {page: meta.page, size: meta.size} : {};
         const teacherParams = isTeacherRole() && entity === 'students' ? {teacherEmail: state.auth.email} : {};
@@ -191,6 +206,8 @@ async function loadEntity(entity, force = false) {
         });
     } catch (error) {
         notify(error.message, 'error');
+    } finally {
+        setState((s) => { s.loading = false; });
     }
 }
 
@@ -203,15 +220,50 @@ function getVisibleRows(entity) {
     return { rows: paged, allFiltered: queried, meta: { ...meta, totalElements: queried.length, totalPages: Math.max(1, Math.ceil(queried.length / meta.size)) } };
 }
 
+function topSubjectsByAverage(limit = 5) {
+    const gradesBySubject = new Map();
+    state.data.grades.forEach((grade) => {
+        const list = gradesBySubject.get(grade.subjectId) || [];
+        list.push(grade.score);
+        gradesBySubject.set(grade.subjectId, list);
+    });
+
+    return [...gradesBySubject.entries()]
+        .map(([subjectId, scores]) => ({
+            subjectId,
+            name: byId(state.refs.subjects, subjectId)?.name || 'Предмет',
+            averageScore: average(scores),
+            count: scores.length,
+        }))
+        .sort((a, b) => b.averageScore - a.averageScore)
+        .slice(0, limit);
+}
+
+function recentActivity(limit = 6) {
+    const studentsById = new Map(state.data.students.map((student) => [student.id, student]));
+    const subjectsById = new Map(state.refs.subjects.map((subject) => [subject.id, subject]));
+    return [...state.data.grades]
+        .sort((left, right) => new Date(right.date) - new Date(left.date))
+        .slice(0, limit)
+        .map((grade) => ({
+            ...grade,
+            student: studentsById.get(grade.studentId),
+            subject: subjectsById.get(grade.subjectId),
+        }));
+}
+
 function dashboardTemplate() {
     const grades = state.data.grades.map((grade) => grade.score).filter((score) => Number.isFinite(score));
     const avg = average(grades);
-    const schoolInfo = `<section class="grid gap-5 lg:grid-cols-3"><article class="card-base p-6 lg:col-span-2"><h3 class="text-lg font-semibold text-slate-900">ГУО «Средняя школа №12 г. Витебска»</h3><p class="mt-2 text-sm text-slate-600">Современное учреждение образования с углублённым изучением отдельных предметов, электронным журналом и цифровыми сервисами для родителей и педагогов.</p><div class="mt-5 grid gap-3 sm:grid-cols-2"><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Адрес</p><p class="mt-1 text-sm font-medium text-slate-800">210015, г. Витебск, ул. Школьная, д. 12</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Приёмная</p><p class="mt-1 text-sm font-medium text-slate-800">+375 (212) 55-12-34</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">E-mail</p><p class="mt-1 text-sm font-medium text-slate-800">school12@edu.by</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Режим работы</p><p class="mt-1 text-sm font-medium text-slate-800">Пн–Пт: 08:00–18:00, Сб: 08:00–13:00</p></div></div></article><article class="card-base p-6"><h3 class="text-base font-semibold text-slate-900">Телефоны доверия</h3><ul class="mt-4 space-y-3 text-sm text-slate-700"><li class="rounded-xl bg-rose-50 p-3"><p class="font-medium text-rose-800">Экстренная психологическая помощь</p><p class="mt-1">8-801-100-16-11</p></li><li class="rounded-xl bg-amber-50 p-3"><p class="font-medium text-amber-800">Горячая линия по защите прав детей</p><p class="mt-1">+375 (17) 200-12-34</p></li><li class="rounded-xl bg-emerald-50 p-3"><p class="font-medium text-emerald-800">Социальный педагог школы</p><p class="mt-1">+375 (29) 700-45-67</p></li></ul></article></section>`;
+    const classesCount = state.data.classes.length || 1;
+    const topSubjects = topSubjectsByAverage();
+    const recent = recentActivity();
+    const schoolInfo = `<section class="grid gap-5 xl:grid-cols-3"><article class="card-base p-6 xl:col-span-2"><h3 class="text-lg font-semibold text-slate-900">School Management System</h3><p class="mt-2 text-sm text-slate-600">Цифровая панель для ежедневной работы администрации школы: посещаемость, журнал, классы и предметы в одном интерфейсе.</p><div class="mt-5 grid gap-3 sm:grid-cols-2"><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Классы</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.classes.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Предметы</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.subjects.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Ученики</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.students.length}</p></div><div class="rounded-xl bg-slate-50 p-4"><p class="text-xs uppercase tracking-wide text-slate-500">Записей оценок</p><p class="mt-1 text-sm font-semibold text-slate-800">${state.data.grades.length}</p></div></div></article><article class="card-base p-6"><h3 class="text-base font-semibold text-slate-900">Быстрая статистика</h3><ul class="mt-4 space-y-3 text-sm">${topSubjects.length ? topSubjects.map((subject) => `<li class="rounded-xl bg-slate-50 p-3"><div class="flex items-center justify-between"><p class="font-medium text-slate-800">${subject.name}</p><span class="text-xs text-slate-500">${subject.count} оценок</span></div><div class="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-indigo-500" style="width:${Math.min(100, (subject.averageScore / 10) * 100)}%"></div></div><p class="mt-1 text-xs text-slate-600">Средний балл: <span class="font-semibold">${subject.averageScore.toFixed(2)}</span></p></li>`).join('') : '<li class="rounded-xl bg-slate-50 p-3 text-slate-500">Нет данных по оценкам.</li>'}</ul></article></section>`;
     if (isTeacherRole()) {
-        return `<section class="grid md:grid-cols-3 gap-5 mb-6"><article class="card-base p-6"><p class="text-sm text-slate-500">Мои классы</p><h2 class="text-3xl font-semibold mt-2">${state.data.classes.length}</h2></article><article class="card-base p-6"><p class="text-sm text-slate-500">Мои предметы</p><h2 class="text-3xl font-semibold mt-2">${state.data.subjects.length}</h2></article><article class="card-base p-6 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article></section><div class="card-base p-6 mb-6 text-slate-600">Вам доступны только ваши классы и журнал оценок по вашим предметам.</div>${schoolInfo}`;
+        return `<section class="grid gap-5 md:grid-cols-3 mb-6"><article class="card-base hover:shadow-md p-6"><p class="text-sm text-slate-500">Мои классы</p><h2 class="text-3xl font-semibold mt-2">${state.data.classes.length}</h2></article><article class="card-base hover:shadow-md p-6"><p class="text-sm text-slate-500">Мои предметы</p><h2 class="text-3xl font-semibold mt-2">${state.data.subjects.length}</h2></article><article class="card-base p-6 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2><p class="mt-2 text-xs text-white/80">По всем выставленным оценкам</p></article></section><section class="grid gap-5 lg:grid-cols-3 mb-6"><article class="card-base p-6 lg:col-span-2"><h3 class="text-base font-semibold text-slate-900">Недавняя активность</h3><ul class="mt-4 space-y-3">${recent.length ? recent.map((item) => `<li class="flex items-center gap-3 rounded-xl border border-slate-100 px-3 py-2.5"><span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">${initials(item.student)}</span><div class="min-w-0 flex-1"><p class="truncate text-sm font-medium text-slate-800">${fullName(item.student)}</p><p class="truncate text-xs text-slate-500">${item.subject?.name || 'Предмет'} · ${formatDate(item.date)}</p></div><span class="rounded-lg bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-700">${item.score}</span></li>`).join('') : '<li class="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">Активность появится после выставления оценок.</li>'}</ul></article><article class="card-base p-6"><h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Охват классов</h3><p class="mt-2 text-2xl font-semibold text-slate-900">${Math.min(100, Math.round((state.data.subjects.length / classesCount) * 100))}%</p><div class="mt-3 h-3 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-indigo-500" style="width:${Math.min(100, Math.round((state.data.subjects.length / classesCount) * 100))}%"></div></div><p class="mt-3 text-xs text-slate-500">Соотношение моих предметов к числу доступных классов.</p></article></section>${schoolInfo}`;
     }
 
-    return `<section class="grid md:grid-cols-3 gap-5 mb-6"><article class="card-base p-6"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${state.data.students.length}</h2></article><article class="card-base p-6 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article><article class="card-base p-6"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article></section>${schoolInfo}`;
+    return `<section class="grid gap-5 md:grid-cols-3 mb-6"><article class="card-base hover:shadow-md p-6"><p class="text-sm text-slate-500">Ученики</p><h2 class="text-3xl font-semibold mt-2">${state.data.students.length}</h2></article><article class="card-base p-6 bg-indigo-600 text-white"><p class="text-sm text-white/80">Средний балл</p><h2 class="text-3xl font-semibold mt-2">${avg.toFixed(2)}</h2></article><article class="card-base hover:shadow-md p-6"><p class="text-sm text-slate-500">Учителя</p><h2 class="text-3xl font-semibold mt-2">${state.data.teachers.length}</h2></article></section><section class="grid gap-5 lg:grid-cols-3 mb-6"><article class="card-base p-6 lg:col-span-2"><div class="flex items-center justify-between"><h3 class="text-base font-semibold text-slate-900">Недавняя активность</h3><span class="text-xs text-slate-500">Последние ${recent.length} записей</span></div><ul class="mt-4 space-y-3">${recent.length ? recent.map((item) => `<li class="flex items-center gap-3 rounded-xl border border-slate-100 px-3 py-2.5"><span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">${initials(item.student)}</span><div class="min-w-0 flex-1"><p class="truncate text-sm font-medium text-slate-800">${fullName(item.student)}</p><p class="truncate text-xs text-slate-500">${item.subject?.name || 'Предмет'} · ${formatDate(item.date)}</p></div><span class="rounded-lg bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-700">${item.score}</span></li>`).join('') : '<li class="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">Активность появится после выставления оценок.</li>'}</ul></article><article class="card-base p-6"><h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Распределение оценок</h3><div class="mt-4 space-y-3">${[10,9,8,7,6].map((score) => { const count = state.data.grades.filter((grade) => grade.score === score).length; const percent = state.data.grades.length ? Math.round((count / state.data.grades.length) * 100) : 0; return `<div><div class="mb-1 flex items-center justify-between text-xs text-slate-600"><span>${score} баллов</span><span>${count}</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-indigo-500" style="width:${percent}%"></div></div></div>`; }).join('')}</div></article></section>${schoolInfo}`;
 }
 
 function loginTemplate() {
@@ -220,8 +272,8 @@ function loginTemplate() {
 
 function shellTemplate(content) {
     return `
-    <div class="min-h-screen bg-slate-100 flex flex-col">
-      <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <div class="h-screen overflow-hidden bg-slate-100 flex flex-col">
+      <header class="z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 md:px-6 lg:px-8">
           <div class="flex items-center gap-3">
             <img src="/favicon.ico" alt="Логотип школы" loading="eager" decoding="async" class="h-11 w-11 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm" />
@@ -239,11 +291,11 @@ function shellTemplate(content) {
           </div>
         </div>
       </header>
-      <main class="mx-auto grid w-full max-w-[1600px] flex-1 gap-0 px-0 md:grid-cols-[260px_minmax(0,1fr)] md:px-0">
-        <aside class="h-full border-r border-slate-200 bg-white p-4 md:p-5">
+       <main class="mx-auto grid min-h-0 w-full max-w-[1600px] flex-1 gap-0 md:grid-cols-[260px_minmax(0,1fr)]">
+        <aside class="h-full overflow-y-auto border-r border-slate-200 bg-white p-4 md:p-5">
           <div id="shell-nav"></div>
         </aside>
-         <section class="min-w-0 p-4 md:p-6 lg:p-8">
+         <section class="min-w-0 overflow-y-auto p-4 md:p-6 lg:p-8">
           <div id="shell-content">${content}</div>
         </section>
       </main>
@@ -313,7 +365,8 @@ function render() {
           ${canEdit ? `<button data-create-entity class="btn-primary">${state.route === 'grades' ? 'Создать запись' : 'Создать'}</button>` : ''}
         </div>
         </div>
-      ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: false })}
+      ${state.loading ? '<div class="mb-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">Загрузка данных...</div>' : ''}
+      ${renderTable({ entity: state.route, config, rows, refs: state.refs, data: state.data, ui: state.ui, meta, pageableFromApi: state.meta[state.route].pageable, canEdit, canDelete, loading: state.loading })}
     </section>
       ${classSubjectRelationsSection}
       ${renderDrawer({title: drawerTitle, subtitle: 'Заполните форму справа', body: drawerBody, open: state.ui.drawerOpen})}
@@ -455,6 +508,18 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
 
         document.querySelector('[data-cancel-edit]')?.addEventListener('click', closeDrawer);
     }
+
+    document.querySelectorAll('[data-view-id]').forEach((element) => {
+        element.addEventListener('click', (e) => {
+            const rowId = Number(e.currentTarget.dataset.viewId);
+            const row = byId(state.data[state.route], rowId);
+            infoModal({
+                title: `Просмотр: ${config.title}`,
+                body: renderEntityDetails(state.route, row),
+            });
+        });
+    });
+
 
     document.getElementById('search-input')?.addEventListener('input', (e) => debouncedSearch(e.target.value));
 

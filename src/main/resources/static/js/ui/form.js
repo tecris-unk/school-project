@@ -106,7 +106,7 @@ export function renderEntityForm(config, refs, data, row = null, entityKey = nul
         <h3 class="font-semibold tracking-tight text-slate-900 text-lg">${row ? 'Редактирование' : 'Создание'}: ${entityKey ? entityLabelWithIcon(entityKey, config.title) : config.title}</h3>
       </div>
       <div class="space-y-4">${fieldHtml}</div>
-      <div class="flex gap-2 pt-3">
+      <div class="flex gap-2 border-t border-slate-100 pt-4">
         <button class="btn-primary" type="submit">${row ? 'Сохранить' : 'Создать'}</button>
         <button class="btn-secondary" type="button" data-cancel-edit>Отмена</button>
       </div>

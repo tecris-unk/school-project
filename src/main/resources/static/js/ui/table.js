@@ -49,14 +49,14 @@ function renderSkeleton(cols) {
     return Array.from({length: 6}, (_, rowIndex) => `<tr class="border-b border-slate-100">${Array.from({length: cols}, () => `<td class="px-6 py-4"><div class="h-4 rounded bg-slate-200/80 animate-pulse ${rowIndex % 2 === 0 ? 'w-full' : 'w-4/5'}"></div></td>`).join('')}</tr>`).join('');
 }
 
-function emptyState(config, canCreate) {
+function emptyState(config, canCreate, hasQuery) {
     return `
     <div class="flex min-h-[360px] flex-col items-center justify-center px-6 py-10 text-center">
       <div class="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
         <span class="text-xl">📄</span>
       </div>
-      <h3 class="text-base font-semibold text-slate-900">Пока нет записей</h3>
-      <p class="mt-1 max-w-sm text-sm text-slate-500">Нет данных по текущим фильтрам. Измените условия поиска или создайте новую запись.</p>
+      <h3 class="text-base font-semibold text-slate-900">${hasQuery ? 'Ничего не найдено' : 'Пока нет записей'}</h3>
+      <p class="mt-1 max-w-sm text-sm text-slate-500">${hasQuery ? 'Попробуйте очистить поиск или фильтры.' : 'Добавьте первую запись, чтобы начать работу с разделом.'}</p>
       ${canCreate ? `<button data-create-entity class="btn-primary mt-5">${config.title === 'Оценки' ? 'Создать запись' : 'Создать'}</button>` : ''}
     </div>`;
 }
@@ -80,7 +80,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
             return `<tr class="border-b border-slate-100 hover:bg-indigo-50/40 transition-colors ${index % 2 ? 'bg-slate-50/20' : ''}">
                 ${canDelete ? `<td class="px-6 py-4"><input data-select-id="${row.id}" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" ${isSelected ? 'checked' : ''} /></td>` : ''}
             ${cells}
-            ${(canEdit || canDelete) ? `<td class="px-6 py-4"><div class="flex flex-wrap justify-end gap-2">${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="btn-secondary text-xs">Связать</button>` : ''}${canEdit ? `<button data-edit-id="${row.id}" class="btn-secondary text-xs">Редактировать</button>` : ''}${canDelete ? `<button data-delete-id="${row.id}" class="btn-danger text-xs">Удалить</button>` : ''}</div></td>` : ''}
+            ${(canEdit || canDelete) ? `<td class="px-6 py-4"><div class="flex flex-wrap justify-end gap-2"><button data-view-id="${row.id}" class="btn-secondary text-xs">Просмотр</button>${canEdit && config.linkAction ? `<button data-link-id="${row.id}" class="btn-secondary text-xs">Связать</button>` : ''}${canEdit ? `<button data-edit-id="${row.id}" class="btn-secondary text-xs">Редактировать</button>` : ''}${canDelete ? `<button data-delete-id="${row.id}" class="btn-danger text-xs">Удалить</button>` : ''}</div></td>` : ''}
         </tr>`;
         }).join('');
     }
@@ -103,7 +103,7 @@ export function renderTable({ entity, config, rows, refs, data, ui, meta, pageab
           </div>
         </div>
         </div>
-                ${!hasRows && !loading ? `<div class="px-5 py-6 sm:px-6">${emptyState(config, canEdit)}</div>` : `
+                ${!hasRows && !loading ? `<div class="px-5 py-6 sm:px-6">${emptyState(config, canEdit, Boolean(ui.search) || Object.values(ui.filters || {}).some(Boolean))}</div>` : `
       <div class="overflow-x-auto">
         <table class="min-w-full table-auto">
           <thead class="border-b border-slate-200 bg-slate-50">

@@ -34,8 +34,7 @@ const entityConfigs = {
             {key: 'email', label: 'Эл. почта', type: 'email', required: true},
             { key: 'schoolClassId', label: 'Класс', type: 'ref', ref: 'classes', allowEmpty: true }
         ],
-        payload: (v) => ({...v, schoolClassId: v.schoolClassId ? Number(v.schoolClassId) : null}),
-        linkAction: {label: 'Привязать класс'}
+        payload: (v) => ({...v, schoolClassId: v.schoolClassId ? Number(v.schoolClassId) : null})
     },
     classes: {
         title: 'Классы', endpoint: 'classes',

@@ -132,10 +132,12 @@ table tr:last-child td {
     display: inline-flex;
     align-items: center;
     gap: .5rem;
+    vertical-align: middle;
 }
 
 .entity-inline-icon {
     width: 1.5rem;
     height: 1.5rem;
     flex-shrink: 0;
+    vertical-align: middle;
 }

@@ -13,10 +13,5 @@ export function entityIcon(entityKey) {
 }
 
 export function entityLabelWithIcon(entityKey, label) {
-    return `
-      <span class="entity-label-with-icon">
-         ${entityIcon(entityKey)}
-        <span>${label}</span>
-      </span>
-    `;
+    return `<span class="entity-label-with-icon align-middle">${entityIcon(entityKey)}<span>${label}</span></span>`;
 }

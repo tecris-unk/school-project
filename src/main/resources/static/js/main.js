@@ -1,6 +1,5 @@
 import {api} from './api.js';
 import {resetUiState, setState, setToken, state, subscribe} from './state.js';
-import {debounce} from './utils/debounce.js';
 import {average, byId, classLabel, formatDate, fullName, initials} from './utils/helpers.js';
 import {formDataToObject, renderDrawer, renderEntityForm, validateForm} from './ui/form.js';
 import {navItems, renderNav} from './ui/nav.js';
@@ -406,13 +405,6 @@ function bindGlobalHandlers() {
     };
 }
 
-const debouncedSearch = debounce((value) => {
-    setState((s) => {
-        s.ui.search = value;
-        s.meta[s.route].page = 0;
-    });
-}, 300);
-
 async function submitRelationForm(values) {
     const ctx = state.ui.relationContext;
     if (!ctx) return;
@@ -518,7 +510,12 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
     });
 
 
-    document.getElementById('search-input')?.addEventListener('input', (e) => debouncedSearch(e.target.value));
+    document.getElementById('search-input')?.addEventListener('input', (e) => {
+        setState((s) => {
+            s.ui.search = e.target.value;
+            s.meta[s.route].page = 0;
+        });
+    });
 
     document.querySelectorAll('[data-sort]').forEach((element) => {
         element.addEventListener('click', (e) => {

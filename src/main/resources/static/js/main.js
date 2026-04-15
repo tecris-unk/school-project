@@ -11,6 +11,7 @@ const SAVE_SUCCESS_MESSAGE = 'Сохранение выполнено';
 const DELETE_SUCCESS_MESSAGE = 'Удаление выполнено';
 const CREATE_ACTION_LABEL = 'Создать запись';
 
+let skipSearchRefocus = false;
 const entityConfigs = {
     students: {
         title: 'Ученики',
@@ -364,7 +365,7 @@ function render() {
     bindEntityHandlers(config, allFiltered, rows, meta);
     bindGlobalHandlers();
 
-    if (shouldRestoreSearchFocus) {
+    if (shouldRestoreSearchFocus && !skipSearchRefocus) {
         const searchInput = document.getElementById('search-input');
         if (searchInput) {
             searchInput.focus();
@@ -511,10 +512,12 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
 
 
     document.getElementById('search-input')?.addEventListener('input', (e) => {
+        skipSearchRefocus = true;
         setState((s) => {
             s.ui.search = e.target.value;
             s.meta[s.route].page = 0;
         });
+        skipSearchRefocus = false;
     });
 
     document.querySelectorAll('[data-filter-key]').forEach((element) => {

@@ -435,6 +435,37 @@ async function submitRelationForm(values) {
     closeDrawer();
 }
 
+function applySearchFilterToRenderedTable(query) {
+    const tbody = document.querySelector('table tbody');
+    if (!tbody) return;
+
+    const rows = [...tbody.querySelectorAll('tr[data-table-row]')];
+    if (!rows.length) return;
+
+    const needle = (query || '').trim().toLowerCase();
+    let visibleCount = 0;
+
+    rows.forEach((row) => {
+        const match = !needle || row.textContent.toLowerCase().includes(needle);
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount += 1;
+    });
+
+    const existingEmptyRow = document.getElementById('client-search-empty-row');
+    if (visibleCount > 0) {
+        existingEmptyRow?.remove();
+        return;
+    }
+
+    if (existingEmptyRow) return;
+
+    const columnsCount = document.querySelectorAll('thead th').length || 1;
+    const emptyRow = document.createElement('tr');
+    emptyRow.id = 'client-search-empty-row';
+    emptyRow.innerHTML = `<td colspan="${columnsCount}" class="px-6 py-10 text-center text-sm text-slate-500">Ничего не найдено. Попробуйте другой запрос.</td>`;
+    tbody.append(emptyRow);
+}
+
 function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
     document.querySelectorAll('[data-drawer-close]').forEach((el) => el.addEventListener('click', closeDrawer));
     document.querySelectorAll('[data-create-entity]').forEach((el) => el.addEventListener('click', () => openEntityDrawer(null)));
@@ -510,11 +541,12 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
 
 
     document.getElementById('search-input')?.addEventListener('input', (e) => {
-        setState((s) => {
-            s.ui.search = e.target.value;
-            s.meta[s.route].page = 0;
-        });
+        state.ui.search = e.target.value;
+        state.meta[state.route].page = 0;
+        applySearchFilterToRenderedTable(e.target.value);
     });
+
+    applySearchFilterToRenderedTable(state.ui.search);
 
     document.querySelectorAll('[data-filter-key]').forEach((element) => {
         element.addEventListener('change', (e) => {

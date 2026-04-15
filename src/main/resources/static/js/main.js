@@ -307,6 +307,10 @@ function renderClassSubjectMatrix() {
 }
 
 function render() {
+    const activeElement = document.activeElement;
+    const shouldRestoreSearchFocus = activeElement?.id === 'search-input';
+    const searchSelectionStart = shouldRestoreSearchFocus ? activeElement.selectionStart : null;
+    const searchSelectionEnd = shouldRestoreSearchFocus ? activeElement.selectionEnd : null;
 
     if (state.route === 'login' || !state.auth.token) {
         app.innerHTML = loginTemplate();
@@ -360,6 +364,16 @@ function render() {
     if (navRoot) navRoot.innerHTML = renderNav(state.route, state.auth.role);
     bindEntityHandlers(config, allFiltered, rows, meta);
     bindGlobalHandlers();
+
+    if (shouldRestoreSearchFocus) {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.focus();
+            if (searchSelectionStart !== null && searchSelectionEnd !== null) {
+                searchInput.setSelectionRange(searchSelectionStart, searchSelectionEnd);
+            }
+        }
+    }
 }
 
 function bindLogin() {

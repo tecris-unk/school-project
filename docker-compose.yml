@@ -21,11 +21,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: school-app
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
     environment:
-      PORT: 8080
+      APP_PORT: ${APP_PORT:-8080}
+      PORT: ${PORT:-8080}
+      SPRING_APPLICATION_NAME: ${SPRING_APPLICATION_NAME:-school-project}
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${APP_DB_NAME:-school}
       SPRING_DATASOURCE_USERNAME: ${APP_DB_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${APP_DB_PASSWORD:-postgres}
@@ -35,6 +39,8 @@ services:
       POSTGRES_USER: ${APP_DB_USER:-postgres}
       POSTGRES_PASSWORD: ${APP_DB_PASSWORD:-postgres}
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+      SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL:-true}
+      SPRING_JPA_FORMAT_SQL: ${SPRING_JPA_FORMAT_SQL:-false}
     ports:
       - "${APP_PORT:-8080}:8080"
     healthcheck:

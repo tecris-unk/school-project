@@ -517,9 +517,22 @@ function bindEntityHandlers(config, allFiltered, displayedRows, meta) {
         });
     });
 
+    document.querySelectorAll('[data-filter-key]').forEach((element) => {
+        element.addEventListener('change', (e) => {
+            const key = e.currentTarget.dataset.filterKey;
+            if (!key) return;
+            setState((s) => {
+                s.ui.filters[key] = e.currentTarget.value;
+                s.meta[s.route].page = 0;
+                s.ui.selectedIds = new Set();
+            });
+        });
+    });
+
     document.querySelectorAll('[data-sort]').forEach((element) => {
         element.addEventListener('click', (e) => {
-            const key = e.target.dataset.sort;
+            const key = e.currentTarget.dataset.sort;
+            if (!key) return;
             setState((s) => {
                 const same = s.ui.sort.key === key;
                 s.ui.sort = {key, dir: same && s.ui.sort.dir === 'asc' ? 'desc' : 'asc'};

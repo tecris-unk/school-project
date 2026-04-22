@@ -117,7 +117,6 @@ Sonar: https://sonarcloud.io/project/overview?id=tecris-unk_school-project
 - API versioning и backward compatibility policy.
 - Redis-кеш + rate limiting.
 - Нотификации (email/telegram) по событиям успеваемости.
-- Полноценный CI/CD пайплайн: build → test → scan → deploy.
 
 ---
 
